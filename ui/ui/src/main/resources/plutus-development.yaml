@@ -1,0 +1,10 @@
+# Configuration information that is specific to running your
+# service in your development environment.
+
+framebuffer: "/tmp/framebuffer"
+framebufferSize: "1024,768"
+window: true
+softcard: ""
+softcardPassword: ""
+pubKeyEncryptionKey: ""
+teamName: "Developer"

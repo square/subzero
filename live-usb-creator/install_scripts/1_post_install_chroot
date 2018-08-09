@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# This script is run by anaconda after it has installed CentOS onto the ext4 disk image at /tmp/build/disk??????.img (and after our 0_post_install_nochroot script has run).
+# At runtime, that image is chrooted to /, so it’s the ideal time to run misc config tools before the image is squashfs-ified.
+
+# (Anaconda knows about this script because we reference it in a %post block in our custom rhel7-livemedia.ks kickstart.)
+
+###############################################################################
+# chown /opt/nfast, etc.
+###############################################################################
+useradd nfast
+chown -R nfast:nfast /opt/nfast
+
+# add "liveuser" user to "nfast" group, so we can easily run nfast commands from a non-privileged shell
+usermod -a -G nfast liveuser
+
+# append "/opt/nfast/bin" to path so we can easily run nfast commands from the shell without needing to prefix them
+echo 'export PATH=$PATH:/opt/nfast/bin' >> /home/liveuser/.bash_profile
+echo 'export PATH=$PATH:/opt/nfast/bin' >> /root/.bash_profile
+
+# block startup on nfast being configured
+echo '/usr/local/bin/nfast_block_shell' >> /home/liveuser/.bash_profile
+echo '/usr/local/bin/nfast_block_shell' >> /root/.bash_profile
+
+###############################################################################
+# Configure livemedia install to use on-media CentOS Everything yum repo
+###############################################################################
+yum-config-manager --disable \*
+yum-config-manager --enable c7-media --setopt='c7-media.baseurl=file:///run/initramfs/live/'
+rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+###############################################################################
+# Misc stuff
+###############################################################################
+
+# our "%addon com_redhat_kdump --disable" directive doesn’t seem to do the trick, as `systemctl status kdump.service`
+# still shows errors (“Failed to start Crash recovery kernel arming.”) without this disable instruction
+systemctl disable kdump.service
+
+###############################################################################
+# Plutus specific stuff
+###############################################################################
+
+echo 'exec /data/app/plutus/plutus-cli.sh' >> /root/.bash_profile

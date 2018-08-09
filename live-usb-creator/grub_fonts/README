@@ -1,0 +1,1 @@
+grub2-mkfont --verbose --size=20 --output=/vagrant/grub_fonts/SQMarket-Bold-20.pf2 /vagrant/otf_fonts/SQMarket-Bold.otf

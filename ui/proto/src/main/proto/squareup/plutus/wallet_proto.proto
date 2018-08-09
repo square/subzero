@@ -1,0 +1,33 @@
+syntax = "proto2";
+
+package squareup.plutus.wallet;
+
+option java_package = "com.squareup.protos.plutus.wallet";
+
+import "squareup/common/validation.proto";
+import "squareup/plutus/common.proto";
+
+/**
+ * The wallet file lives on the Plutus host machine's hard drive. It is also backed up to a USB
+ * drive.
+ *
+ * The protobuf is serialized using JSON. The field names therefore matter, their numbering does
+ * not.
+ */
+
+message Wallet {
+  enum Currency {
+    DEFAULT_CURRENCY_DO_NOT_USE = 0;
+    TEST_NET = 1;
+    MAIN_NET = 2;
+  }
+
+  optional Currency currency = 1 [(squareup.validation.required) = true];
+  optional string ocs_id = 2 [(squareup.validation.required) = true];
+  optional bytes ocs_cards_file = 3 [(squareup.validation.required) = true];
+  optional bytes ocs_card_one_file = 4 [(squareup.validation.required) = true];
+  optional string master_seed_encryption_key_id = 5 [(squareup.validation.required) = true];
+  optional bytes master_seed_encryption_key_file = 6 [(squareup.validation.required) = true];
+  optional service.EncryptedMasterSeed encrypted_master_seed = 7;
+  repeated service.EncryptedPubKey encrypted_pub_keys = 8;
+}

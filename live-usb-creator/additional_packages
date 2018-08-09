@@ -1,0 +1,12 @@
+# the lines in this file will land in the %packages section of the patched rhel7-livemedia.ks, thanks to add_additional_packages.py,
+# meaning the yum packages named here will be installed onto the livemedia installation
+
+# Java 8
+java-1.8.0-openjdk
+java-1.8.0-openjdk-devel
+
+# nCipher stuff
+gcc
+kernel-devel
+opensc
+pciutils

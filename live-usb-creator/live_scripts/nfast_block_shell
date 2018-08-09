@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Blocks until the existence of the path /.nfast-configured, which is intended to be touched after NFast Tools have been installed.
+# This can be added to ~/.bash_profile to prevent the shell from becoming interactive until after NFast Tools have been installed.
+
+if [[ ! -f /.nfast-configured ]]
+then
+  echo
+  printf 'Please wait while NFast Tools are installed... '
+  while [[ ! -f /.nfast-configured ]]
+  do
+    sleep 1
+  done
+  printf 'done.\n'
+fi

@@ -1,0 +1,91 @@
+<%page args="kernels, runtime_img, basearch, outroot, product, isolabel"/>
+<%
+configdir="tmp/config_files/x86"
+SYSLINUXDIR="usr/share/syslinux"
+PXEBOOTDIR="images/pxeboot"
+BOOTDIR="isolinux"
+KERNELDIR=PXEBOOTDIR
+LIVEDIR="LiveOS"
+LORAXDIR="usr/share/lorax/"
+%>
+
+mkdir ${LIVEDIR}
+install ${runtime_img} ${LIVEDIR}/squashfs.img
+treeinfo stage2 mainimage ${LIVEDIR}/squashfs.img
+
+## install bootloader and config files
+mkdir ${BOOTDIR}
+install ${SYSLINUXDIR}/isolinux.bin ${BOOTDIR}
+install ${SYSLINUXDIR}/vesamenu.c32 ${BOOTDIR}
+install ${configdir}/isolinux.cfg ${BOOTDIR}
+install ${configdir}/boot.msg ${BOOTDIR}
+install ${configdir}/grub.conf ${BOOTDIR}
+install usr/share/anaconda/boot/syslinux-splash.png ${BOOTDIR}/splash.png
+install boot/memtest* ${BOOTDIR}/memtest
+
+## configure bootloader
+replace @VERSION@ ${product.version} ${BOOTDIR}/grub.conf ${BOOTDIR}/isolinux.cfg ${BOOTDIR}/*.msg
+replace @PRODUCT@ '${product.name}'  ${BOOTDIR}/grub.conf ${BOOTDIR}/isolinux.cfg ${BOOTDIR}/*.msg
+replace @ROOT@ 'root=live:CDLABEL=${isolabel|udev}' ${BOOTDIR}/isolinux.cfg
+
+## install kernels
+mkdir ${KERNELDIR}
+%for kernel in kernels:
+    %if kernel.flavor:
+        installkernel images-xen ${kernel.path} ${KERNELDIR}/vmlinuz-${kernel.flavor}
+        installinitrd images-xen ${kernel.initrd.path} ${KERNELDIR}/initrd-${kernel.flavor}.img
+    %else:
+        installkernel images-${basearch} ${kernel.path} ${KERNELDIR}/vmlinuz
+        installinitrd images-${basearch} ${kernel.initrd.path} ${KERNELDIR}/initrd.img
+    %endif
+%endfor
+
+hardlink ${KERNELDIR}/vmlinuz ${BOOTDIR}
+hardlink ${KERNELDIR}/initrd.img ${BOOTDIR}
+%if basearch == 'x86_64':
+    treeinfo images-xen kernel ${KERNELDIR}/vmlinuz
+    treeinfo images-xen initrd ${KERNELDIR}/initrd.img
+%endif
+
+## WHeeeeeeee, EFI.
+<% efiargs=""; efigraft=""; efihybrid=""; efiarch32=None; efiarch64=None %>
+%if exists("boot/efi/EFI/*/gcdia32.efi"):
+    <% efiarch32 = 'IA32' %>
+%endif
+%if exists("boot/efi/EFI/*/gcdx64.efi"):
+    <% efiarch64 = 'X64' %>
+%endif
+%if efiarch32 or efiarch64:
+    <%
+    efigraft="EFI/BOOT={0}/EFI/BOOT".format(outroot)
+    images = ["images/efiboot.img"]
+    if domacboot:
+        images.append("images/macboot.img")
+    for img in images:
+        efiargs += " -eltorito-alt-boot -e {0} -no-emul-boot".format(img)
+        efigraft += " {0}={1}/{0}".format(img,outroot)
+    efihybrid = "--uefi --mac" if domacboot else "--uefi"
+    %>
+    <%include file="efi.tmpl" args="configdir=configdir, KERNELDIR=KERNELDIR, efiarch32=efiarch32, efiarch64=efiarch64, isolabel=isolabel"/>
+%endif
+
+# Create optional product.img and updates.img
+<% imggraft=""; images=["product", "updates"] %>
+%for img in images:
+    %if exists("%s/%s/" % (LORAXDIR, img)):
+        installimg ${LORAXDIR}/${img}/ images/${img}.img
+        <% imggraft += " images/{0}.img={1}/images/{0}.img".format(img, outroot) %>
+    %endif
+%endfor
+
+## make boot.iso
+runcmd mkisofs -o ${outroot}/images/boot.iso \
+       -b ${BOOTDIR}/isolinux.bin -c ${BOOTDIR}/boot.cat \
+       -boot-load-size 4 -boot-info-table -no-emul-boot \
+       ${efiargs} -R -J -V '${isolabel}' -T -graft-points \
+       ${BOOTDIR}=${outroot}/${BOOTDIR} \
+       ${KERNELDIR}=${outroot}/${KERNELDIR} \
+       ${LIVEDIR}=${outroot}/${LIVEDIR} \
+       ${efigraft} ${imggraft}
+runcmd isohybrid ${efihybrid} ${outroot}/images/boot.iso
+treeinfo images-${basearch} boot.iso images/boot.iso

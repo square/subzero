@@ -1,0 +1,13 @@
+# Force all fields to be statically allocated
+* type:FT_STATIC
+
+TxInput.prev_hash fixed_length:true max_size:32
+
+# IsValidSignatureEncoding in bitcoin core fails if sig.size() > 73
+# https://github.com/bitcoin/bitcoin/blob/v0.16.0/src/script/interpreter.cpp#L122
+Signature.der max_size:73
+Signature.hash fixed_length:true max_size:32
+
+EncryptedPubKey.encrypted_pub_key max_size:156
+
+EncryptedMasterSeed.encrypted_master_seed max_size:1024

@@ -1,0 +1,6 @@
+package: .
+import:
+- package: github.com/jung-kurt/gofpdf
+  version: v1.0.0
+- package: gopkg.in/alecthomas/kingpin.v2
+  version: v2.2.6

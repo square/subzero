@@ -1,0 +1,70 @@
+#general settings
+message-font: "DejaVu Sans Regular 12"
+message-color: "#000"
+message-bg-color: "#fff"
+#terminal-box: "terminal_box_*.png"
+#terminal-font: "Unknown Regular 12"
+desktop-color: "#000"
+
+#help bar at the bottom
++ label {
+  top = 100%-25
+  left = 0
+  width = 100%
+  height = 20
+  text = "@KEYMAP_MIDDLE@"
+  align = "center"
+  font = "DejaVu Sans Regular 10"
+  color = "#FFF"
+}
+
++ image {
+  left = 100%-256
+  width = 256
+  top = 128
+  height = 128
+  file = "square_logo_offset.png"
+}
+
++ image {
+  left = 0%
+  width = 100%
+  top = 128
+  height = 128
+  file = "square_logo_background.png"
+}
+
+#boot menu
++ boot_menu {
+  left = 0%
+  width = 100%+8
+  top = 384
+  height = 100%-384
+  item_font = "SQ Market Bold 20"
+  item_color = "#000"
+  item_pixmap_style = "inactive_item_*.png"
+  selected_item_font = "SQ Market Bold 20"
+  selected_item_color= "#fff"
+  selected_item_pixmap_style = "selected_item_*.png"
+  item_height = 32
+  item_padding = 0
+  item_spacing = 32
+  icon_width = 6
+  icon_height = 0
+  scrollbar = false
+}
+
+#progress bar
++ progress_bar {
+  id = "__timeout__"
+  left = 15%
+  top = 80%
+  height = 20
+  width = 70%
+  font = "DejaVu Sans Regular 12"
+  text_color = "#000"
+  fg_color = "#fff"
+  bg_color = "#6ac"
+  border_color = "#fff"
+  text = "@TIMEOUT_NOTIFICATION_LONG@"
+}

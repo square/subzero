@@ -1,0 +1,73 @@
+<%page args="configdir, KERNELDIR, efiarch32, efiarch64, isolabel"/>
+<%
+from string import lower
+EFIBOOTDIR="EFI/BOOT"
+APPLE_EFI_ICON=inroot+"/usr/share/pixmaps/bootloader/fedora.icns"
+APPLE_EFI_DISKNAME=inroot+"/usr/share/pixmaps/bootloader/fedora-media.vol"
+%>
+
+mkdir ${EFIBOOTDIR}
+mkdir ${EFIBOOTDIR}/fonts/
+%if exists("usr/share/shim/lockdown.efi"):
+    install usr/share/shim/lockdown.efi ${EFIBOOTDIR}/
+%endif
+%if efiarch64:
+install boot/efi/EFI/*/shim${efiarch64|lower}.efi ${EFIBOOTDIR}/BOOT${efiarch64}.EFI
+install boot/efi/EFI/*/mm${efiarch64|lower}.efi ${EFIBOOTDIR}/
+install boot/efi/EFI/*/gcd${efiarch64|lower}.efi ${EFIBOOTDIR}/grub${efiarch64|lower}.efi
+%endif
+%if efiarch32:
+install boot/efi/EFI/*/shim${efiarch32|lower}.efi ${EFIBOOTDIR}/BOOT${efiarch32}.EFI
+install boot/efi/EFI/*/mm${efiarch32|lower}.efi ${EFIBOOTDIR}/
+install boot/efi/EFI/*/gcd${efiarch32|lower}.efi ${EFIBOOTDIR}/grub${efiarch32|lower}.efi
+%endif
+install boot/efi/EFI/*/fonts/unicode.pf2 ${EFIBOOTDIR}/fonts/
+
+### square theme additions
+runcmd sh -c "cp /vagrant/grub_fonts/*.pf2 ${outroot}/${EFIBOOTDIR}/fonts/"
+mkdir ${EFIBOOTDIR}/themes/square/
+runcmd sh -c "cp /vagrant/grub_themes/square/* ${outroot}/${EFIBOOTDIR}/themes/square/"
+mkdir ${EFIBOOTDIR}/x86_64-efi/
+runcmd sh -c "cp /usr/lib/grub/x86_64-efi/* ${outroot}/${EFIBOOTDIR}/x86_64-efi/"
+
+## actually make the EFI images
+${make_efiboot("images/efiboot.img")}
+%if domacboot:
+    ${make_efiboot("images/macboot.img", imgtype="apple")}
+%endif
+
+## This is kinda gross, but then... so's EFI.
+<%def name="make_efiboot(img, include_kernel=False, disk=False, imgtype='default')">
+    <%
+    kdir = EFIBOOTDIR if include_kernel else KERNELDIR
+    eficonf = "%s/grub.cfg" % (EFIBOOTDIR, )
+    args = "--label=ANACONDA"
+    if disk: args += " --disk"
+    if imgtype == "apple": args += ' --apple --icon=%s --diskname=%s --product="%s %s"' % (APPLE_EFI_ICON, APPLE_EFI_DISKNAME, product.name, product.version)
+    %>
+    %if include_kernel:
+        copy ${KERNELDIR}/vmlinuz ${EFIBOOTDIR}
+        copy ${KERNELDIR}/initrd.img ${EFIBOOTDIR}
+    %endif
+    %if exists("usr/share/shim/lockdown.efi"):
+        install ${configdir}/grub2-efi-lockdown.cfg ${eficonf}
+    %else:
+        install ${configdir}/grub2-efi.cfg ${eficonf}
+    %endif
+    replace @PRODUCT@ '${product.name}' ${eficonf}
+    replace @VERSION@ ${product.version} ${eficonf}
+    replace @KERNELNAME@ vmlinuz ${eficonf}
+    replace @KERNELPATH@ /${kdir}/vmlinuz ${eficonf}
+    replace @INITRDPATH@ /${kdir}/initrd.img ${eficonf}
+    replace @ISOLABEL@ '${isolabel}' ${eficonf}
+    %if disk:
+        replace @ROOT@ root=live:LABEL=ANACONDA ${eficonf}
+    %else:
+        replace @ROOT@ 'root=live:CDLABEL=${isolabel|udev}' ${eficonf}
+    %endif
+    runcmd mkefiboot ${args} ${outroot}/${EFIBOOTDIR} ${outroot}/${img}
+    %if include_kernel:
+        remove ${EFIBOOTDIR}/vmlinuz
+        remove ${EFIBOOTDIR}/initrd.img
+    %endif
+</%def>

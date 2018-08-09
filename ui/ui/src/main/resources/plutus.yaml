@@ -1,0 +1,5 @@
+# mapping of security worlds to environments
+# This mapping enables having a single DVD which works with different envs.
+
+environments:
+

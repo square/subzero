@@ -1,0 +1,51 @@
+syntax = "proto2";
+
+package squareup.plutus.service;
+
+option java_package = "com.squareup.protos.plutus.service";
+
+/**
+ * Shared protobuf between internal.proto and service.proto.
+ */
+
+enum Destination {
+  DEFAULT_DESTINATION_DO_NOT_USE = 0;
+  CHANGE = 1;
+  GATEWAY = 2;
+}
+
+message Path {
+  optional uint32 account = 1;
+  optional bool is_change = 2;
+  optional uint32 index = 3;
+}
+
+message TxInput {
+  optional bytes prev_hash = 1;
+  optional uint32 prev_index = 2;
+  optional uint64 amount = 3; // in Satoshi
+  optional Path path = 4;
+}
+
+message TxOutput {
+  optional uint64 amount = 1; // in Satoshi
+  optional Destination destination = 2;
+  optional Path path = 3;
+}
+
+// Signature is the DER encoded bytes as found in bitcoin transactions
+message Signature {
+  optional bytes der = 1;
+  // This is the BIP 0143 transaction hash, which the signature is over.
+  // It is not strictly needed, but is useful for debugging.
+  // We may choose to remove it for QR code size reasons.
+  optional bytes hash = 2;
+}
+
+message EncryptedMasterSeed {
+  required bytes encrypted_master_seed = 1;
+}
+
+message EncryptedPubKey {
+  optional bytes encrypted_pub_key = 1;
+}

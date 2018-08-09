@@ -1,0 +1,6 @@
+[submodule "trezor-crypto"]
+	path = trezor-crypto
+	url = https://github.com/trezor/trezor-crypto.git
+[submodule "nanopb"]
+	path = nanopb
+	url = https://github.com/nanopb/nanopb.git

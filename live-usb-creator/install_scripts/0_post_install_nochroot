@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# This script is run by anaconda after it has installed CentOS onto the ext4 disk image at /tmp/build/disk??????.img (and before our 1_post_install_chroot script has run).
+# At runtime, that image is mounted at /mnt/sysimage/, so it’s the ideal time to copy misc files onto the new filesystem before it’s squashfs-ified.
+
+# (Anaconda knows about this script because we reference it in a %post block in our custom rhel7-livemedia.ks kickstart.)
+
+###############################################################################
+# Copy nCipher CodeSafe to image
+###############################################################################
+mkdir /tmp/nfast_install
+pushd /tmp/nfast_install
+
+# Hardware Support (mandatory)
+tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/hwsp/agg.tar
+
+# Core Tools (recommended)
+tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/ctls/agg.tar
+
+# Java Support (including KeySafe)
+tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/javasp/agg.tar
+
+# nCipherKM JCA/JCE provider classes
+tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/jcecsp/user.tar
+
+# nCipher PKCS #11 library
+tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/pkcs11/user.tar
+
+# CHIL (Cryptographic Hardware Interface Library),
+# apparently required for "generatekey" utility
+tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/hwcrhk/user.tar
+
+# Remote Administration Service
+tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/dsserv/user.tar
+
+# Remote Administration Client Tools
+tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/ratls/agg.tar
+
+# nCore CodeSafe API Documentation (not in SecWorld; CodeSafe only)
+tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/csdref/agg.tar
+
+# nCore API Documentation (not in SecWorld; CodeSafe only)
+tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/devref/agg.tar
+
+# CodeSafe Developer (not in SecWorld; CodeSafe only)
+tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/csd/agg.tar
+
+# Prebuilt powerpcm-gcc for Codesafe/C (not in SecWorld; CodeSafe only)
+tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/gccsrc/ppcdev.tar
+
+pushd opt
+mv nfast /mnt/sysimage/opt/
+popd
+popd
+rm -rf /tmp/nfast_install
+
+###############################################################################
+# Customize SYSLINUX bootloader background image
+###############################################################################
+cp /vagrant/syslinux-splash.png /mnt/sysimage/usr/share/anaconda/boot/syslinux-splash.png
+
+###############################################################################
+# Plutus DVD stuff
+###############################################################################
+
+mkdir -p /mnt/sysimage/data/app/plutus
+cp -r /vagrant/data_app_plutus/* /mnt/sysimage/data/app/plutus
+

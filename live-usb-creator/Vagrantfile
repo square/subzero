@@ -1,0 +1,76 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANT_ROOT = File.dirname(__FILE__)
+# TODO: consider using a buildlog ISO: https://buildlogs.centos.org/rolling/7/isos/x86_64/?C=M;O=D
+# could that give us an aligned VM image release and Everything ISO release?
+CENTOS_EVERYTHING_ISO_NAME = "CentOS-7-x86_64-Everything-1804.iso"
+
+# this kernel release value is specific to the config.vm.box_version set below.
+# when changing config.vm.box_version, run `uname -r` to find the kernel release
+# (and, of course, then download the RPM with kernel headers for that release;
+# we need to localinstall this RPM (a) because the CentOS 1804 everything ISO has kernel
+# headers that do not exactly match the VM’s 1804.02 release and (b) because for the
+# VBoxGuestAdditions to install successfully, kernel headers version has to match exactly)
+KERNEL_RELEASE = "3.10.0-862.2.3.el7.x86_64"
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos/7"
+  config.vm.box_version = "1804.02"
+  config.vm.box_check_update = false
+
+  config.vm.provision "shell", path: "bootstrap.sh"
+
+  config.vm.provider "virtualbox" do |vb|
+    # Do not display the VirtualBox GUI when booting the machine
+    vb.gui = false
+    vb.cpus = 4
+
+    vb.customize ["storageattach", :id,
+      "--storagectl", "IDE",
+      "--port", "1",
+      "--device", "0",
+      "--type", "dvddrive",
+      "--medium", File.absolute_path(File.join(VAGRANT_ROOT, CENTOS_EVERYTHING_ISO_NAME))]
+    # otherwise, VBox will try to boot from the CD
+    vb.customize ["modifyvm", :id,
+      "--boot1", "disk"]
+
+    # CentOS doesn't include VirtualBox Guest Extensions themselves, so we have to add them ourselves;
+    # the "vagrant-vbguest" plugin does that for us
+    # See https://github.com/CentOS/sig-cloud-instance-build/issues/27
+    #     https://github.com/CentOS/sig-cloud-instance-build/issues/107
+    unless Vagrant.has_plugin?("vagrant-vbguest")
+      raise 'vagrant-vbguest is not installed! Install with "vagrant plugin install vagrant-vbguest"'
+    end
+
+    # tell yum to use the local media before installing VBoxGuestAdditions dependencies
+    class LocalCentOsMediaInstaller < VagrantVbguest::Installers::Linux
+      def install(opts=nil, &block)
+        # copy the kernel headers RPM to the guest
+        # (we need to do this because those on the Everything ISO won't match)
+        kernel_devel_rpm_name = "kernel-devel-#{KERNEL_RELEASE}.rpm"
+        kernel_devel_host_source_path = File.join(VAGRANT_ROOT, kernel_devel_rpm_name)
+        kernel_devel_guest_tmp_path = File.join("/tmp", kernel_devel_rpm_name)
+        communicate.upload(kernel_devel_host_source_path, kernel_devel_guest_tmp_path)
+
+        # the VM release (1804.02) is actually slightly newer than the Everything ISO release (1804), so we have to install
+        # the kernel-devel package from an RPM specifically associated with our kernel release
+        communicate.sudo('mkdir /media/CentOS && ' \
+                         'mount -r /dev/sr0 /media/CentOS && ' \
+                         'yum-config-manager --disable \* && ' \
+                         "yum-config-manager --enable c7-media --setopt='c7-media.baseurl=file:///media/CentOS/' && " \
+                         "rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 &&" \
+                         "yum swap -y -- install perl gcc binutils make perl bzip2 lorax anaconda patch grub2-efi-x64-modules" \
+                                    " -- localinstall #{kernel_devel_guest_tmp_path}", opts, &block)
+        super
+      end
+    end
+
+    config.vbguest.no_remote = true
+    config.vbguest.installer = LocalCentOsMediaInstaller
+
+    # for some reason, Vagrant seems to prefer "rsync" by default, even though we just set up Guest Extensions
+    config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  end
+end

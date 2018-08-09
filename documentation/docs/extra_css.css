@@ -1,0 +1,12 @@
+@font-face {
+  font-family: "SqMarket";
+  src: url("/SQMarket-Regular.otf") format("opentype");
+}
+
+body {
+  font-family: "SqMarket" !important;
+}
+
+h1, h2, h3, h4, h5, h6, legend {
+  font-family: "SqMarket";
+}

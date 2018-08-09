@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# /etc/rc.d/init.d/livesys calls out to this script (/usr/local/bin/startup), meaning it’s run on startup.
+# Note that it does NOT block a TTY/login/bash/etc., hence the nfast_block_shell utility script.
+
+/usr/local/bin/install_nfast_tools
+
+# now that NFast Tools have been installed, we touch /.nfast-configured, thus unblocking the nfast_block_shell utility script
+touch /.nfast-configured

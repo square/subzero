@@ -1,0 +1,25 @@
+# Nanopb options
+
+# Force all fields to be statically allocated
+* type:FT_STATIC
+
+# TODO: figure out the right size for tickets. 256 is a made up number.
+InternalCommandRequest.version max_size:8
+InternalCommandRequest.master_seed_encryption_key_ticket max_size:256
+InternalCommandRequest.pub_key_encryption_key_ticket max_size:256
+
+InternalCommandRequest.SignTxRequest.inputs max_count:128
+InternalCommandRequest.SignTxRequest.outputs max_count:128
+InternalCommandRequest.SignTxRequest.encrypted_pub_keys max_count:4
+
+InternalCommandRequest.InitWalletRequest.random_bytes max_size:64
+
+# We are doing 2-of-4 multisig
+InternalCommandRequest.FinalizeWalletRequest.encrypted_pub_keys max_count:4
+
+InternalCommandResponse.FinalizeWalletResponse.pub_key max_size:128
+InternalCommandResponse.FinalizeWalletResponse.pub_keys_hash max_size:32
+
+InternalCommandResponse.SignTxResponse.signatures max_count:128
+
+InternalCommandResponse.ErrorResponse.message max_size:1024

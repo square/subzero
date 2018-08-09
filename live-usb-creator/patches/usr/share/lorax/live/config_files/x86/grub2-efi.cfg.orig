@@ -1,0 +1,40 @@
+set default="1"
+
+function load_video {
+  insmod efi_gop
+  insmod efi_uga
+  insmod video_bochs
+  insmod video_cirrus
+  insmod all_video
+}
+
+load_video
+set gfxpayload=keep
+insmod gzio
+insmod part_gpt
+insmod ext2
+
+set timeout=60
+### END /etc/grub.d/00_header ###
+
+search --no-floppy --set=root -l '@ISOLABEL@'
+
+### BEGIN /etc/grub.d/10_linux ###
+menuentry 'Start @PRODUCT@ @VERSION@' --class fedora --class gnu-linux --class gnu --class os {
+	linuxefi @KERNELPATH@ @ROOT@ rd.live.image quiet
+	initrdefi @INITRDPATH@
+}
+menuentry 'Test this media & start @PRODUCT@ @VERSION@' --class fedora --class gnu-linux --class gnu --class os {
+	linuxefi @KERNELPATH@ @ROOT@ rd.live.image rd.live.check quiet
+	initrdefi @INITRDPATH@
+}
+submenu 'Troubleshooting -->' {
+	menuentry 'Start @PRODUCT@ @VERSION@ in basic graphics mode' --class fedora --class gnu-linux --class gnu --class os {
+		linuxefi @KERNELPATH@ @ROOT@ rd.live.image xdriver=vesa nomodeset quiet
+		initrdefi @INITRDPATH@
+	}
+	menuentry 'Rescue a @PRODUCT@ system' --class fedora --class gnu-linux --class gnu --class os {
+		linuxefi @KERNELPATH@ @ROOT@ rd.live.image rescue quiet
+		initrdefi @INITRDPATH@
+	}
+}

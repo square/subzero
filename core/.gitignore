@@ -1,0 +1,7 @@
+*~
+*.swp
+*.swo
+*.o
+cmake-build-*
+build/**
+venv/**

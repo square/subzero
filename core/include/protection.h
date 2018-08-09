@@ -1,0 +1,35 @@
+#pragma once
+
+#include <sha2.h>
+#include <squareup/plutus/internal.pb.h>
+
+#include "config.h"
+
+/**
+ * Encrypt xpub with the pubkey encryption key.
+ *
+ * Always zeros xpub.
+ */
+Result protect_pubkey(char xpub[static XPUB_SIZE],
+                      EncryptedPubKey *encrypted_pub_key);
+
+/**
+ * Decrypt encrypted_pub_key with pubkey encryption key.
+ */
+Result expose_pubkey(EncryptedPubKey *encrypted_pub_key,
+                     char xpub[static XPUB_SIZE]);
+
+/**
+ * Encrypt master_seed with master_seed_encryption_key.
+ *
+ * Zeros master_seed.
+ */
+Result protect_wallet(uint8_t master_seed[static MASTER_SEED_SIZE],
+                      EncryptedMasterSeed *encrypted_master_seed);
+
+/**
+ * Decrypt master_seed with master_seed_encryption_key. In dev, we XOR with a
+ * magic byte.
+ */
+Result expose_wallet(EncryptedMasterSeed *encrypted_master_seed,
+                     uint8_t master_seed[static MASTER_SEED_SIZE]);
