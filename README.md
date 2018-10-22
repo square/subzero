@@ -1,7 +1,5 @@
 # HSM Cold Storage
 
-<img src="logo.png" width="120" height="120">
-
 For security purpose, Square stores a reserve of Bitcoins in an offline setting. By having these funds offline, we
 reduce attack surface and hence risk of theft.
 
