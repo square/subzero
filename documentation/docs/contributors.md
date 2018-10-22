@@ -8,6 +8,7 @@ coordinator service, test the solution and iterate on bug fixes.
 
 In addition to the list below (in alphabetical order), a (large) number of people asked to remain anonymous.
 
+* Mat Byczkowski
 * Jonathan Carter
 * Matthew McPherrin
 * Alok Menghrajani
