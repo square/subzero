@@ -6,7 +6,8 @@ contributed time and energy to review the initial design. They then helped write
 A cross-function group of people were involved to build the physical locations, implement the design, write the
 coordinator service, test the solution and iterate on bug fixes.
 
-In addition to the list below, a number of people asked to remain anonymous.
+In addition to the list below (in alphabetical order), a (large) number of people asked to remain anonymous.
 
+* Jonathan Carter
 * Matthew McPherrin
 * Alok Menghrajani
