@@ -11,3 +11,4 @@ In addition to the list below (in alphabetical order), a (large) number of peopl
 * Jonathan Carter
 * Matthew McPherrin
 * Alok Menghrajani
+* Emily Pirnack
