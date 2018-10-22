@@ -37,10 +37,10 @@ to compare bytes with Electrum.
   - [How to sign a transaction with multiple inputs?](https://bitcoin.stackexchange.com/questions/41209/how-to-sign-a-transaction-with-multiple-inputs/41226#41226)
 
 # Getting started (docker)
-This will build and start plutus in docker.
+This will build and start subzero in docker.
 
-    git clone --recursive ssh://git@git.corp.squareup.com/infosec/plutus.git
-    ./plutus-docker.sh run
+    git clone --recursive ssh://git@git.corp.squareup.com/infosec/subzero.git
+    ./subzero-docker.sh run
 
 # Developing in CLion
 Create a new project from this repo in CLion.
@@ -51,35 +51,35 @@ for it to load the proto headers.
 # Developing in Docker
 See options with
 
-    ./plutus-docker.sh help
+    ./subzero-docker.sh help
 
 If you want to iteratively develop in the docker container, you might want to:
 
-    ./plutus-docker.sh dev
+    ./subzero-docker.sh dev
 
 You now have a shell inside the container.
 To rebuild:
 
     cd /build
-    ./plutus --checks-only
+    ./subzero --checks-only
 
 You can continue to edit files outside the container, since it's a shared
 filesystem with the host.
 
 # Getting started (locally)
 
-    git clone --recursive ssh://git@git.corp.squareup.com/infosec/plutus.git
-    cd plutus
+    git clone --recursive ssh://git@git.corp.squareup.com/infosec/subzero.git
+    cd subzero
     mkdir build
     cd build
     CURRENCY=btc-testnet cmake ../
     make
-    ./plutus
+    ./subzero
 
 # nCipher (without signed code)
 
-    git clone --recursive ssh://git@git.corp.squareup.com/infosec/plutus.git
-    cd plutus
+    git clone --recursive ssh://git@git.corp.squareup.com/infosec/subzero.git
+    cd subzero
     mkdir build
     cd build
     TARGET=nCipher CURRENCY=btc-testnet cmake ../

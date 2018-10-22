@@ -2,7 +2,7 @@
 
 #include <pb_decode.h>
 #include <pb_encode.h>
-#include <squareup/plutus/internal.pb.h>
+#include <squareup/subzero/internal.pb.h>
 
 #include "checks.h"
 #include "config.h"

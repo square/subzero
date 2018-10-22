@@ -8,7 +8,7 @@
 #include "config.h"
 #include "checks.h"
 #include "log.h"
-#include "squareup/plutus/internal.pb.h"
+#include "squareup/subzero/internal.pb.h"
 
 /**
  * Perform BIP32 derivation using a hardcoded mnemonic and verify that we get

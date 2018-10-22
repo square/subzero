@@ -2,8 +2,8 @@
 #include <nfastapp.h>
 #include <protection.h>
 #include <seelib.h>
-#include <squareup/plutus/common.pb.h>
-#include <squareup/plutus/internal.pb.h>
+#include <squareup/subzero/common.pb.h>
+#include <squareup/subzero/internal.pb.h>
 
 #include "aes_gcm.h"
 #include "config.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <squareup/plutus/internal.pb.h>
+#include <squareup/subzero/internal.pb.h>
 
 Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
                        uint8_t *ciphertext, size_t ciphertext_len,

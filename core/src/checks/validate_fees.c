@@ -3,7 +3,7 @@
 #include "checks.h"
 #include "rpc.h"
 #include "sign.h"
-#include "squareup/plutus/internal.pb.h"
+#include "squareup/subzero/internal.pb.h"
 #include "log.h"
 
 int verify_validate_fees(void) {

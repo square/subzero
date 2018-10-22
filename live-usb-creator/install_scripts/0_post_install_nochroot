@@ -63,6 +63,6 @@ cp /vagrant/syslinux-splash.png /mnt/sysimage/usr/share/anaconda/boot/syslinux-s
 # Plutus DVD stuff
 ###############################################################################
 
-mkdir -p /mnt/sysimage/data/app/plutus
-cp -r /vagrant/data_app_plutus/* /mnt/sysimage/data/app/plutus
+mkdir -p /mnt/sysimage/data/app/subzero
+cp -r /vagrant/data_app_subzero/* /mnt/sysimage/data/app/subzero
 

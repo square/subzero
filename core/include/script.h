@@ -1,6 +1,6 @@
 #pragma once
 
-#include <squareup/plutus/internal.pb.h>
+#include <squareup/subzero/internal.pb.h>
 #include <stdint.h>
 #include <stdio.h>
 

@@ -1,0 +1,81 @@
+syntax = "proto2";
+
+package squareup.subzero.service;
+
+option java_package = "com.squareup.protos.subzero.service";
+option java_generic_services = true;
+
+import "squareup/subzero/common.proto";
+import "squareup/common/validation.proto";
+
+/**
+ * Proto used to communicate between the Coordinator Service and the Java CLI.
+ *
+ * Also used by PlutusService for integration testing purpose.
+ */
+
+service PlutusService {
+  rpc Command (CommandRequest) returns (CommandResponse);
+}
+
+/* CommandRequest is sent to the subzero CLI from persephone */
+message CommandRequest {
+  /* Initialize a new wallet in cold storage */
+  message InitWalletRequest {
+  }
+
+  /* Finalize a wallet to get its public key */
+  message FinalizeWalletRequest {
+    /* An encrypted response from the HSM from an InitWalletResponse */
+    repeated EncryptedPubKey encrypted_pub_keys = 1;
+  }
+
+  /* Sign a transaction */
+  message SignTxRequest {
+    repeated TxInput inputs = 1;
+    repeated TxOutput outputs = 2;
+    optional uint32 lock_time = 3;
+    optional string local_currency = 4; // USD (or your local currency)
+    optional double local_rate = 5;     // USD per Satoshi (or your local currency per Satoshi)
+  }
+
+  /* This version should bump anytime there's a breaking change that requires updates from
+     the online and offline components of cold storage */
+  optional uint32 version = 1 [(squareup.validation.required) = true];
+  /* The wallet ID is an arbitrary number used to designate which offline wallet should be used */
+  optional uint32 wallet_id = 2 [(squareup.validation.required) = true];
+  /* The token is echoed back from the request to allow pairing requests and responses */
+  optional string token = 6;
+  oneof command {
+    InitWalletRequest InitWallet = 3;
+    FinalizeWalletRequest FinalizeWallet = 4;
+    SignTxRequest SignTx = 5;
+  }
+}
+
+/* CommandResponse is returned from the subzero CLI, back to persephone */
+message CommandResponse {
+  message InitWalletResponse {
+    /* An encrypted response from the HSM, to be used in a FinalizeWalletRequest */
+    optional EncryptedPubKey encrypted_pub_key = 1 [(squareup.validation.required) = true];
+  }
+
+  message FinalizeWalletResponse {
+    /* The extended public key to use when constructing cold wallet addresses */
+    optional bytes pub_key = 1 [(squareup.validation.required) = true];
+  }
+
+  message SignTxResponse {
+    /* The signatures for this transaction, one per input spent */
+    repeated Signature signatures = 1;
+  }
+
+  /* The token is echoed back from the request to allow pairing requests and responses */
+  optional string token = 4;
+  /* The response oneof will map to the request */
+  oneof response {
+    InitWalletResponse InitWallet = 1;
+    FinalizeWalletResponse FinalizeWallet = 2;
+    SignTxResponse SignTx = 3;
+  }
+}

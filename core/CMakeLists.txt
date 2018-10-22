@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8)
-project (plutus)
+project (subzero)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -Wextra -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wcast-qual -std=gnu11 -DPB_FIELD_16BIT")
 
@@ -96,5 +96,5 @@ else ()
   list(APPEND main_SRC "src/main.c")
 endif ()
 
-add_executable(plutus ${main_SRC})
-target_link_libraries(plutus TrezorCrypto PlutusProtos)
+add_executable(subzero ${main_SRC})
+target_link_libraries(subzero TrezorCrypto PlutusProtos)

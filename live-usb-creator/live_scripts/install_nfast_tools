@@ -25,13 +25,13 @@ popd
 mkdir -p /hd
 mount /dev/sda1 /hd
 
-# Setup symlinks for /opt/nfast/kmdata/local and /data/app/plutus/wallets
+# Setup symlinks for /opt/nfast/kmdata/local and /data/app/subzero/wallets
 mkdir -p /opt/nfast/kmdata/
 rm -rf /opt/nfast/kmdata/local/
 ln -s /hd/local /opt/nfast/kmdata/local
-ln -s /hd/wallets /data/app/plutus/wallets
+ln -s /hd/wallets /data/app/subzero/wallets
 
-nohup /opt/nfast/bin/see-stdioesock-serv --machine /data/app/plutus/plutus-signed.sar --userdata-sar /data/app/plutus/plutus-userdata-signed.sar > /hd/plutus-signed.stdout 2> /hd/plutus-signed.stderr &
+nohup /opt/nfast/bin/see-stdioesock-serv --machine /data/app/subzero/subzero-signed.sar --userdata-sar /data/app/subzero/subzero-userdata-signed.sar > /hd/subzero-signed.stdout 2> /hd/subzero-signed.stderr &
 
 # warm up the cache
-cat /data/app/plutus/plutus-cli.jar > /dev/null
+cat /data/app/subzero/subzero-cli.jar > /dev/null
