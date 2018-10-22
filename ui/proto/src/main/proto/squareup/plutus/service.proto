@@ -1,11 +1,11 @@
 syntax = "proto2";
 
-package squareup.plutus.service;
+package squareup.subzero.service;
 
-option java_package = "com.squareup.protos.plutus.service";
+option java_package = "com.squareup.protos.subzero.service";
 option java_generic_services = true;
 
-import "squareup/plutus/common.proto";
+import "squareup/subzero/common.proto";
 import "squareup/common/validation.proto";
 
 /**
@@ -18,7 +18,7 @@ service PlutusService {
   rpc Command (CommandRequest) returns (CommandResponse);
 }
 
-/* CommandRequest is sent to the plutus CLI from persephone */
+/* CommandRequest is sent to the subzero CLI from persephone */
 message CommandRequest {
   /* Initialize a new wallet in cold storage */
   message InitWalletRequest {
@@ -53,7 +53,7 @@ message CommandRequest {
   }
 }
 
-/* CommandResponse is returned from the plutus CLI, back to persephone */
+/* CommandResponse is returned from the subzero CLI, back to persephone */
 message CommandResponse {
   message InitWalletResponse {
     /* An encrypted response from the HSM, to be used in a FinalizeWalletRequest */

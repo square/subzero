@@ -1,15 +1,15 @@
 syntax = "proto2";
 
-option java_package = "com.squareup.protos.plutus.service";
+option java_package = "com.squareup.protos.subzero.service";
 option java_multiple_files = true;
 
-import "squareup/plutus/common.proto";
+import "squareup/subzero/common.proto";
 
 /**
  * Proto used to communicate between the Java CLI and the CodeSafe code.
  *
  * This file must be kept in sync with the C proto definition at:
- * https://stash.corp.squareup.com/projects/INFOSEC/repos/plutus/browse/proto
+ * https://stash.corp.squareup.com/projects/INFOSEC/repos/subzero/browse/proto
  */
 
 message InternalCommandRequest {

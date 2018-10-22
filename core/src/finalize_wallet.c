@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <bip32.h>
 #include <curves.h>
-#include <squareup/plutus/internal.pb.h>
+#include <squareup/subzero/internal.pb.h>
 
 #include "config.h"
 #include "log.h"

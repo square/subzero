@@ -1,8 +1,8 @@
-package com.squareup.plutus.wallet;
+package com.squareup.subzero.wallet;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.JsonFormat;
-import com.squareup.protos.plutus.wallet.WalletProto.Wallet;
+import com.squareup.protos.subzero.wallet.WalletProto.Wallet;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,8 +20,8 @@ import static java.lang.String.format;
  * file.
  */
 public class WalletLoader {
-  private final static String HD_PATH = "/data/app/plutus/wallets/";
-  protected final static String MARKER_FILE = ".plutus_702e63a9";
+  private final static String HD_PATH = "/data/app/subzero/wallets/";
+  protected final static String MARKER_FILE = ".subzero_702e63a9";
 
   private Path directory;
 
@@ -85,7 +85,7 @@ public class WalletLoader {
       throw new IllegalStateException(format("marker file not found: %s", marker));
     }
 
-    Path wallet = directory.resolve(format("plutus-%d.wallet", walletId));
+    Path wallet = directory.resolve(format("subzero-%d.wallet", walletId));
     return wallet;
   }
 }

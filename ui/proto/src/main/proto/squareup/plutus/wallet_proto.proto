@@ -1,11 +1,11 @@
 syntax = "proto2";
 
-package squareup.plutus.wallet;
+package squareup.subzero.wallet;
 
-option java_package = "com.squareup.protos.plutus.wallet";
+option java_package = "com.squareup.protos.subzero.wallet";
 
 import "squareup/common/validation.proto";
-import "squareup/plutus/common.proto";
+import "squareup/subzero/common.proto";
 
 /**
  * The wallet file lives on the Plutus host machine's hard drive. It is also backed up to a USB

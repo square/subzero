@@ -1,7 +1,7 @@
 #include <nfastapp.h>
 #include <stdbool.h>
 
-#include <squareup/plutus/internal.pb.h>
+#include <squareup/subzero/internal.pb.h>
 
 #include "module_certificate.h"
 #include "init.h"

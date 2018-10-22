@@ -1,6 +1,6 @@
-# plutus-shared
+# subzero-shared
 
-This library encapsulates the logic needed for interacting with plutus.  It is designed for use in
+This library encapsulates the logic needed for interacting with subzero.  It is designed for use in
 our coordinator service, and in our integration tests.
 
 ## API

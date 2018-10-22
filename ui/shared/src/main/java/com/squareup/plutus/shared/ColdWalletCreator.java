@@ -1,8 +1,8 @@
-package com.squareup.plutus.shared;
+package com.squareup.subzero.shared;
 
-import com.squareup.protos.plutus.service.Common.EncryptedPubKey;
-import com.squareup.protos.plutus.service.Service.CommandRequest;
-import com.squareup.protos.plutus.service.Service.CommandResponse;
+import com.squareup.protos.subzero.service.Common.EncryptedPubKey;
+import com.squareup.protos.subzero.service.Service.CommandRequest;
+import com.squareup.protos.subzero.service.Service.CommandResponse;
 import java.util.Map;
 import java.util.Optional;
 
@@ -17,7 +17,7 @@ public class ColdWalletCreator {
    *
    * @param token A token for tracking this request.
    * @param walletId An arbitrary wallet ID number,  used to identify the wallet in all requests to
-   * plutus.  A Plutus instance will reject this request if a wallet with that ID already exists.
+   * subzero.  A Plutus instance will reject this request if a wallet with that ID already exists.
    * @return The request to send to Plutus
    */
   public static CommandRequest init(String token, int walletId) {

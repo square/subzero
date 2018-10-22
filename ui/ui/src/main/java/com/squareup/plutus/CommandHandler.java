@@ -1,12 +1,12 @@
-package com.squareup.plutus;
+package com.squareup.subzero;
 
-import com.squareup.plutus.actions.FinalizeWallet;
-import com.squareup.plutus.actions.InitWallet;
-import com.squareup.plutus.actions.SignTx;
-import com.squareup.plutus.shared.Constants;
-import com.squareup.protos.plutus.service.Internal.InternalCommandRequest;
-import com.squareup.protos.plutus.service.Service.CommandRequest;
-import com.squareup.protos.plutus.service.Service.CommandResponse;
+import com.squareup.subzero.actions.FinalizeWallet;
+import com.squareup.subzero.actions.InitWallet;
+import com.squareup.subzero.actions.SignTx;
+import com.squareup.subzero.shared.Constants;
+import com.squareup.protos.subzero.service.Internal.InternalCommandRequest;
+import com.squareup.protos.subzero.service.Service.CommandRequest;
+import com.squareup.protos.subzero.service.Service.CommandResponse;
 
 /**
  * CommandHandler dispatches CommandRequests to an appropriate handler, which will make an
@@ -16,7 +16,7 @@ import com.squareup.protos.plutus.service.Service.CommandResponse;
  */
 
 public class CommandHandler {
-  public static CommandResponse dispatch(PlutusCli plutus, InternalCommandConnector conn,
+  public static CommandResponse dispatch(PlutusCli subzero, InternalCommandConnector conn,
       CommandRequest serviceRequest) throws Exception {
 
     InternalCommandRequest.Builder internalRequest = InternalCommandRequest.newBuilder()
@@ -27,14 +27,14 @@ public class CommandHandler {
     switch (serviceRequest.getCommandCase()) {
       case INITWALLET:
         builder.setInitWallet(
-            InitWallet.initWallet(plutus, conn, serviceRequest, internalRequest));
+            InitWallet.initWallet(subzero, conn, serviceRequest, internalRequest));
         break;
       case FINALIZEWALLET:
         builder.setFinalizeWallet(
-            FinalizeWallet.finalizeWallet(plutus, conn, serviceRequest, internalRequest));
+            FinalizeWallet.finalizeWallet(subzero, conn, serviceRequest, internalRequest));
         break;
       case SIGNTX:
-        builder.setSignTx(SignTx.signTx(plutus, conn, serviceRequest, internalRequest));
+        builder.setSignTx(SignTx.signTx(subzero, conn, serviceRequest, internalRequest));
         break;
       default:
         throw new RuntimeException("Invalid request");

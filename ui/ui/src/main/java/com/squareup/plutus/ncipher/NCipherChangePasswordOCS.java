@@ -1,4 +1,4 @@
-package com.squareup.plutus.ncipher;
+package com.squareup.subzero.ncipher;
 
 import com.ncipher.km.nfkm.CmdCallBack;
 import com.ncipher.km.nfkm.Slot;
@@ -12,7 +12,7 @@ public class NCipherChangePasswordOCS implements CmdCallBack {
   private String changeFrom;
   private String changeTo;
 
-  public final static String PLACEHOLDER_PASSWORD = "plutus";
+  public final static String PLACEHOLDER_PASSWORD = "subzero";
 
   public NCipherChangePasswordOCS(String changeFrom, String changeTo) {
     this.changeFrom = changeFrom;

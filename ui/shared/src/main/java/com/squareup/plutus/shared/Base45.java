@@ -1,4 +1,4 @@
-package com.squareup.plutus.shared;
+package com.squareup.subzero.shared;
 
 import com.google.common.collect.ImmutableMap;
 import java.io.ByteArrayOutputStream;

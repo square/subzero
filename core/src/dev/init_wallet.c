@@ -1,8 +1,8 @@
 #include <assert.h>
 #include <pb_decode.h>
 #include <pb_encode.h>
-#include <squareup/plutus/common.pb.h>
-#include <squareup/plutus/internal.pb.h>
+#include <squareup/subzero/common.pb.h>
+#include <squareup/subzero/internal.pb.h>
 #include <stdio.h>
 
 #include "bip32.h"

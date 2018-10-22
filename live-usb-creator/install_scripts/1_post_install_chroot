@@ -41,4 +41,4 @@ systemctl disable kdump.service
 # Plutus specific stuff
 ###############################################################################
 
-echo 'exec /data/app/plutus/plutus-cli.sh' >> /root/.bash_profile
+echo 'exec /data/app/subzero/subzero-cli.sh' >> /root/.bash_profile

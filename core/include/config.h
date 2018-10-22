@@ -78,7 +78,7 @@
 
 #define PORT 32366
 
-#define VERSION_FILE "/tmp/.plutus-ver"
+#define VERSION_FILE "/tmp/.subzero-ver"
 // VERSION_MAGIC is a constant picked randomly. Prevents swaping nvram/file
 // between applications.
 #define VERSION_MAGIC 0x20de

@@ -1,31 +1,31 @@
-package com.squareup.plutus.actions;
+package com.squareup.subzero.actions;
 
 import com.google.common.base.Strings;
 import com.google.protobuf.ByteString;
-import com.squareup.plutus.InternalCommandConnector;
-import com.squareup.plutus.ncipher.NCipher;
-import com.squareup.plutus.PlutusCli;
-import com.squareup.plutus.wallet.WalletLoader;
-import com.squareup.protos.plutus.service.Internal.InternalCommandRequest;
-import com.squareup.protos.plutus.service.Internal.InternalCommandResponse;
-import com.squareup.protos.plutus.service.Service.CommandRequest;
-import com.squareup.protos.plutus.service.Service.CommandResponse;
-import com.squareup.protos.plutus.wallet.WalletProto.Wallet;
+import com.squareup.subzero.InternalCommandConnector;
+import com.squareup.subzero.ncipher.NCipher;
+import com.squareup.subzero.PlutusCli;
+import com.squareup.subzero.wallet.WalletLoader;
+import com.squareup.protos.subzero.service.Internal.InternalCommandRequest;
+import com.squareup.protos.subzero.service.Internal.InternalCommandResponse;
+import com.squareup.protos.subzero.service.Service.CommandRequest;
+import com.squareup.protos.subzero.service.Service.CommandResponse;
+import com.squareup.protos.subzero.wallet.WalletProto.Wallet;
 import java.security.SecureRandom;
 import org.spongycastle.util.encoders.Hex;
 
 import static java.lang.String.format;
 
 public class InitWallet {
-  public static CommandResponse.InitWalletResponse initWallet(PlutusCli plutus,
+  public static CommandResponse.InitWalletResponse initWallet(PlutusCli subzero,
       InternalCommandConnector conn,
       CommandRequest request,
       InternalCommandRequest.Builder internalRequest) throws Exception {
 
-    if (Strings.isNullOrEmpty(plutus.debug)) {
+    if (Strings.isNullOrEmpty(subzero.debug)) {
       // Tell user what is going on in interactive mode
       String message = format("You are about to initialize wallet: %d", request.getWalletId());
-      if(!plutus.getScreens().approveAction(message)) {
+      if(!subzero.getScreens().approveAction(message)) {
         throw new RuntimeException("User did not approve init wallet");
       }
     }
@@ -45,13 +45,13 @@ public class InitWallet {
     initWalletBuilder.setRandomBytes(ByteString.copyFrom(randomBytes));
 
     NCipher nCipher = null;
-    if (plutus.nCipher) {
+    if (subzero.nCipher) {
       // Load security world, OCS and the master_seed encryption key.
       // Then get a ticket for the key, which we send to the CodeSafe module.
       // TODO(alok): this hangs if the nCipher is not properly configured. In dev, this happens
       // when I fail to open my ssh tunnels. Perhaps we need a loading screen here?
       nCipher = new NCipher();
-      nCipher.loadOcs(plutus.ocsPassword, plutus.getScreens());
+      nCipher.loadOcs(subzero.ocsPassword, subzero.getScreens());
 
       wallet.setOcsId(nCipher.getOcsId());
       wallet.setOcsCardsFile(ByteString.copyFrom(nCipher.getOcsCardsFile()));
@@ -62,7 +62,7 @@ public class InitWallet {
 
       internalRequest.setMasterSeedEncryptionKeyTicket(ByteString.copyFrom(nCipher.getMasterSeedEncryptionKeyTicket()));
 
-      nCipher.loadSoftcard(plutus.config.softcard, plutus.config.getSoftcardPassword(), plutus.config.pubKeyEncryptionKey);
+      nCipher.loadSoftcard(subzero.config.softcard, subzero.config.getSoftcardPassword(), subzero.config.pubKeyEncryptionKey);
 
       // Uncomment if you need to create the pub key encryption key
       // nCipher.createPubKeyEncryptionKeyTicket();
@@ -73,10 +73,10 @@ public class InitWallet {
     internalRequest.setInitWallet(initWalletBuilder);
     InternalCommandResponse response = conn.run(internalRequest.build());
 
-    if (plutus.nCipher) {
+    if (subzero.nCipher) {
       nCipher.unloadOcs();
-      if (Strings.isNullOrEmpty(plutus.debug)) {
-        plutus.getScreens().removeOperatorCard("Please remove Operator Card and return it to the safe. Then hit <enter>.");
+      if (Strings.isNullOrEmpty(subzero.debug)) {
+        subzero.getScreens().removeOperatorCard("Please remove Operator Card and return it to the safe. Then hit <enter>.");
       }
     }
 

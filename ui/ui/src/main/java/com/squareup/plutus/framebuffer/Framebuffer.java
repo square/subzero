@@ -1,8 +1,8 @@
-package com.squareup.plutus.framebuffer;
+package com.squareup.subzero.framebuffer;
 
 import com.google.common.base.Strings;
-import com.squareup.plutus.PlutusCli;
-import com.squareup.plutus.PlutusConfig;
+import com.squareup.subzero.PlutusCli;
+import com.squareup.subzero.PlutusConfig;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;

@@ -1,4 +1,4 @@
-package com.squareup.plutus.framebuffer;
+package com.squareup.subzero.framebuffer;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;

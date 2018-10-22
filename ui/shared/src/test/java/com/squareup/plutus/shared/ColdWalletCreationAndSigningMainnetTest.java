@@ -1,15 +1,15 @@
-package com.squareup.plutus.shared;
+package com.squareup.subzero.shared;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.ByteString;
-import com.squareup.protos.plutus.service.Common.Destination;
-import com.squareup.protos.plutus.service.Common.EncryptedPubKey;
-import com.squareup.protos.plutus.service.Common.Path;
-import com.squareup.protos.plutus.service.Common.Signature;
-import com.squareup.protos.plutus.service.Common.TxInput;
-import com.squareup.protos.plutus.service.Common.TxOutput;
-import com.squareup.protos.plutus.service.Service.CommandRequest;
-import com.squareup.protos.plutus.service.Service.CommandResponse;
+import com.squareup.protos.subzero.service.Common.Destination;
+import com.squareup.protos.subzero.service.Common.EncryptedPubKey;
+import com.squareup.protos.subzero.service.Common.Path;
+import com.squareup.protos.subzero.service.Common.Signature;
+import com.squareup.protos.subzero.service.Common.TxInput;
+import com.squareup.protos.subzero.service.Common.TxOutput;
+import com.squareup.protos.subzero.service.Service.CommandRequest;
+import com.squareup.protos.subzero.service.Service.CommandResponse;
 import java.util.LinkedList;
 import java.util.List;
 import org.bitcoinj.params.MainNetParams;

@@ -1,10 +1,10 @@
-package com.squareup.plutus.shared;
+package com.squareup.subzero.shared;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.squareup.protos.plutus.service.Common.EncryptedPubKey;
-import com.squareup.protos.plutus.service.Service.CommandRequest;
-import com.squareup.protos.plutus.service.Service.CommandResponse;
+import com.squareup.protos.subzero.service.Common.EncryptedPubKey;
+import com.squareup.protos.subzero.service.Service.CommandRequest;
+import com.squareup.protos.subzero.service.Service.CommandResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

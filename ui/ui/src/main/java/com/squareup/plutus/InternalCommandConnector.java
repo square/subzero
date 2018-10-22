@@ -1,17 +1,17 @@
-package com.squareup.plutus;
+package com.squareup.subzero;
 
-import com.squareup.plutus.exceptions.HsmConnectionException;
-import com.squareup.plutus.exceptions.MismatchedVersionException;
-import com.squareup.plutus.exceptions.SelfCheckException;
-import com.squareup.plutus.exceptions.UnknownException;
-import com.squareup.protos.plutus.service.Internal.InternalCommandRequest;
-import com.squareup.protos.plutus.service.Internal.InternalCommandResponse;
+import com.squareup.subzero.exceptions.HsmConnectionException;
+import com.squareup.subzero.exceptions.MismatchedVersionException;
+import com.squareup.subzero.exceptions.SelfCheckException;
+import com.squareup.subzero.exceptions.UnknownException;
+import com.squareup.protos.subzero.service.Internal.InternalCommandRequest;
+import com.squareup.protos.subzero.service.Internal.InternalCommandResponse;
 import java.io.IOException;
 import java.net.Socket;
 
 /**
  * InternalCommandConnection is a connection, usually over localhost, to the C server portion
- * of plutus.  This class is used by both the plutus-cli and plutus-integration
+ * of subzero.  This class is used by both the subzero-cli and subzero-integration
  */
 public class InternalCommandConnector {
   private String host;

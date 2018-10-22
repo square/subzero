@@ -33,14 +33,14 @@ RUN curl -ksSL https://hoistrepo-api.sso.global.square/download/user-submitted-a
     curl -ksSL https://hoistrepo-api.sso.global.square/download/user-submitted-artifacts/ncipher-codesafe/csd-agg_12.20.51.tar.gz | \
     tar -xz
 
-ADD . /plutus
+ADD . /subzero
 
-WORKDIR /plutus
+WORKDIR /subzero
 
-RUN mkdir /build && cd /build && CURRENCY=btc-testnet cmake /plutus && make
+RUN mkdir /build && cd /build && CURRENCY=btc-testnet cmake /subzero && make
 
-RUN mkdir /crossbuild && cd /crossbuild && TARGET=nCipher CURRENCY=btc-testnet cmake /plutus && make
+RUN mkdir /crossbuild && cd /crossbuild && TARGET=nCipher CURRENCY=btc-testnet cmake /subzero && make
 
 EXPOSE 32366
 
-CMD ["/build/plutus"]
+CMD ["/build/subzero"]

@@ -1,11 +1,11 @@
-package com.squareup.plutus.shared;
+package com.squareup.subzero.shared;
 
 import com.squareup.core.Pair;
-import com.squareup.protos.plutus.service.Common.Path;
-import com.squareup.protos.plutus.service.Common.Signature;
-import com.squareup.protos.plutus.service.Common.TxInput;
-import com.squareup.protos.plutus.service.Common.TxOutput;
-import com.squareup.protos.plutus.service.Service.CommandRequest;
+import com.squareup.protos.subzero.service.Common.Path;
+import com.squareup.protos.subzero.service.Common.Signature;
+import com.squareup.protos.subzero.service.Common.TxInput;
+import com.squareup.protos.subzero.service.Common.TxOutput;
+import com.squareup.protos.subzero.service.Service.CommandRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -26,7 +26,7 @@ import org.bitcoinj.script.ScriptBuilder;
 import org.bitcoinj.script.ScriptChunk;
 import org.bitcoinj.script.ScriptOpCodes;
 
-import static com.squareup.plutus.shared.PlutusUtils.derivePublicKey;
+import static com.squareup.subzero.shared.PlutusUtils.derivePublicKey;
 import static java.lang.String.format;
 import static org.bitcoinj.crypto.DeterministicKey.deserializeB58;
 

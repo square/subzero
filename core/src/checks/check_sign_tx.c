@@ -6,8 +6,8 @@
 #include <config.h>
 #include <protection.h>
 #include <rpc.h>
-#include <squareup/plutus/common.pb.h>
-#include <squareup/plutus/internal.pb.h>
+#include <squareup/subzero/common.pb.h>
+#include <squareup/subzero/internal.pb.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -20,7 +20,7 @@
 #include "print.h"
 #include "script.h"
 #include "sign.h"
-#include "squareup/plutus/internal.pb.h"
+#include "squareup/subzero/internal.pb.h"
 
 // Return a constructed request for test
 // See test-transaction.txt for info on the data used here

@@ -1,4 +1,4 @@
-package com.squareup.plutus.exceptions;
+package com.squareup.subzero.exceptions;
 
 public class UnknownException extends RuntimeException {
   public UnknownException(String message) {

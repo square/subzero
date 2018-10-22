@@ -1,4 +1,4 @@
-package com.squareup.plutus.ncipher;
+package com.squareup.subzero.ncipher;
 
 import com.ncipher.km.nfkm.CmdCallBack;
 import com.ncipher.km.nfkm.Slot;

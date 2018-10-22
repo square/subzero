@@ -1,4 +1,4 @@
-package com.squareup.plutus.shared;
+package com.squareup.subzero.shared;
 
 import java.util.Random;
 import org.junit.Test;

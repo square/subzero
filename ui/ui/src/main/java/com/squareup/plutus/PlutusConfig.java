@@ -1,6 +1,6 @@
-package com.squareup.plutus;
+package com.squareup.subzero;
 
-import com.squareup.plutus.ncipher.NCipher;
+import com.squareup.subzero.ncipher.NCipher;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -26,7 +26,7 @@ public class PlutusConfig {
    * PlutusCli does not use ServiceContainer, so we implement our own config loading.
    */
   public static PlutusConfig load() throws IOException {
-    // load plutus.yaml
+    // load subzero.yaml
     EnvironmentsMap environmentsMap = loadEnvMap();
 
     // Get HSM's security world. Default to dev.
@@ -40,13 +40,13 @@ public class PlutusConfig {
 
     // Load the right config file
     ClassLoader classLoader = PlutusCli.class.getClassLoader();
-    URL resource = classLoader.getResource(format("plutus-%s.yaml", env.name()));
+    URL resource = classLoader.getResource(format("subzero-%s.yaml", env.name()));
     return new Yaml().loadAs(resource.openStream(), PlutusConfig.class);
   }
 
   protected static EnvironmentsMap loadEnvMap() throws IOException {
     ClassLoader classLoader = PlutusCli.class.getClassLoader();
-    URL resource = classLoader.getResource("plutus.yaml");
+    URL resource = classLoader.getResource("subzero.yaml");
     return new Yaml().loadAs(resource.openStream(), EnvironmentsMap.class);
   }
 

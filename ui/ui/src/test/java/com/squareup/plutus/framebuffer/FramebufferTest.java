@@ -1,6 +1,6 @@
-package com.squareup.plutus.framebuffer;
+package com.squareup.subzero.framebuffer;
 
-import com.squareup.plutus.PlutusConfig;
+import com.squareup.subzero.PlutusConfig;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.io.File;

@@ -1,31 +1,31 @@
-package com.squareup.plutus.actions;
+package com.squareup.subzero.actions;
 
 import com.google.common.base.Strings;
 import com.google.protobuf.ByteString;
 import com.ncipher.nfast.NFException;
-import com.squareup.plutus.InternalCommandConnector;
-import com.squareup.plutus.ncipher.NCipher;
-import com.squareup.plutus.PlutusCli;
-import com.squareup.plutus.wallet.WalletLoader;
-import com.squareup.protos.plutus.service.Common.Destination;
-import com.squareup.protos.plutus.service.Common.TxInput;
-import com.squareup.protos.plutus.service.Common.TxOutput;
-import com.squareup.protos.plutus.service.Internal.InternalCommandRequest;
-import com.squareup.protos.plutus.service.Internal.InternalCommandResponse;
-import com.squareup.protos.plutus.service.Service.CommandRequest;
-import com.squareup.protos.plutus.service.Service.CommandResponse;
-import com.squareup.protos.plutus.wallet.WalletProto.Wallet;
+import com.squareup.subzero.InternalCommandConnector;
+import com.squareup.subzero.ncipher.NCipher;
+import com.squareup.subzero.PlutusCli;
+import com.squareup.subzero.wallet.WalletLoader;
+import com.squareup.protos.subzero.service.Common.Destination;
+import com.squareup.protos.subzero.service.Common.TxInput;
+import com.squareup.protos.subzero.service.Common.TxOutput;
+import com.squareup.protos.subzero.service.Internal.InternalCommandRequest;
+import com.squareup.protos.subzero.service.Internal.InternalCommandResponse;
+import com.squareup.protos.subzero.service.Service.CommandRequest;
+import com.squareup.protos.subzero.service.Service.CommandResponse;
+import com.squareup.protos.subzero.wallet.WalletProto.Wallet;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
 import static java.lang.String.format;
 
 public class SignTx {
-  public static CommandResponse.SignTxResponse signTx(PlutusCli plutus,
+  public static CommandResponse.SignTxResponse signTx(PlutusCli subzero,
       InternalCommandConnector conn, CommandRequest request,
       InternalCommandRequest.Builder internalRequest) throws IOException, NFException {
 
-    if (Strings.isNullOrEmpty(plutus.debug)) {
+    if (Strings.isNullOrEmpty(subzero.debug)) {
       // Compute amount being sent
       long amount = 0L;
       long fee = 0L;
@@ -60,7 +60,7 @@ public class SignTx {
           formatter2.format((double)100000 * signTxRequest.getLocalRate()),
           signTxRequest.getLocalCurrency()));
 
-      if(!plutus.getScreens().approveAction(s.toString())) {
+      if(!subzero.getScreens().approveAction(s.toString())) {
         throw new RuntimeException("User did not approve signing operation");
       }
     }
@@ -86,9 +86,9 @@ public class SignTx {
     signTx.setLockTime(request.getSignTxOrThrow().getLockTime());
 
     NCipher nCipher = null;
-    if (plutus.nCipher) {
+    if (subzero.nCipher) {
       nCipher = new NCipher();
-      nCipher.loadOcs(plutus.ocsPassword, plutus.getScreens());
+      nCipher.loadOcs(subzero.ocsPassword, subzero.getScreens());
 
       // TODO: the wallet contains a backup of the OCS files. We could drop them if they are
       // missing. It might make wallet recovery easier?
@@ -97,7 +97,7 @@ public class SignTx {
       byte[] ticket = nCipher.getMasterSeedEncryptionKeyTicket();
       internalRequest.setMasterSeedEncryptionKeyTicket(ByteString.copyFrom(ticket));
 
-      nCipher.loadSoftcard(plutus.config.softcard, plutus.config.getSoftcardPassword(), plutus.config.pubKeyEncryptionKey);
+      nCipher.loadSoftcard(subzero.config.softcard, subzero.config.getSoftcardPassword(), subzero.config.pubKeyEncryptionKey);
       ticket = nCipher.getPubKeyEncryptionKeyTicket();
       internalRequest.setPubKeyEncryptionKeyTicket(ByteString.copyFrom(ticket));
     }
@@ -106,10 +106,10 @@ public class SignTx {
     internalRequest.setSignTx(signTx);
     InternalCommandResponse.SignTxResponse iresp = conn.run(internalRequest.build()).getSignTxOrThrow();
 
-    if (plutus.nCipher) {
+    if (subzero.nCipher) {
       nCipher.unloadOcs();
-      if (Strings.isNullOrEmpty(plutus.debug)) {
-        plutus.getScreens().removeOperatorCard("Please remove Operator Card and return it to the safe. Then hit <enter>.");
+      if (Strings.isNullOrEmpty(subzero.debug)) {
+        subzero.getScreens().removeOperatorCard("Please remove Operator Card and return it to the safe. Then hit <enter>.");
       }
     }
 

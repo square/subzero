@@ -1,4 +1,4 @@
-package com.squareup.plutus.shared;
+package com.squareup.subzero.shared;
 
 public class Constants {
   public static final int VERSION = 205;
@@ -9,8 +9,8 @@ public class Constants {
 
   // These constants need to be kept in sync with the following two files. The Java constants can be
   // more restrictive than the C ones.
-  // https://git.sqcorp.co/projects/INFOSEC/repos/plutus/browse/proto/squareup/plutus/common.options
-  // https://git.sqcorp.co/projects/INFOSEC/repos/plutus/browse/proto/squareup/plutus/internal.options
+  // https://git.sqcorp.co/projects/INFOSEC/repos/subzero/browse/proto/squareup/subzero/common.options
+  // https://git.sqcorp.co/projects/INFOSEC/repos/subzero/browse/proto/squareup/subzero/internal.options
   public static final int ENCRYPTED_MASTER_SEED_MAX_SIZE = 92;
   public static final int MASTER_SEED_ENCRYPTION_KEY_TICKET_MAX_SIZE = 256;
   public static final int PUB_KEY_ENCRYPTION_KEY_TICKET_MAX_SIZE = 256;

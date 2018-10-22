@@ -1,4 +1,4 @@
-package com.squareup.plutus;
+package com.squareup.subzero;
 
 import com.squareup.testing.SlowTests;
 import java.net.URL;
@@ -14,7 +14,7 @@ public class PlutusCliTest {
   @Test public void checkPerEnvironmentResources() {
     for (PlutusConfig.EnvironmentsMap.Environments env : PlutusConfig.EnvironmentsMap.Environments.values()) {
       ClassLoader classLoader = PlutusCli.class.getClassLoader();
-      URL resource = classLoader.getResource(format("plutus-%s.yaml", env.name()));
+      URL resource = classLoader.getResource(format("subzero-%s.yaml", env.name()));
       assertThat(resource).as("resource for %s", env).isNotNull();
     }
   }

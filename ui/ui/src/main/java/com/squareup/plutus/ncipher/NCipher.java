@@ -1,4 +1,4 @@
-package com.squareup.plutus.ncipher;
+package com.squareup.subzero.ncipher;
 
 import com.google.common.base.Strings;
 import com.ncipher.km.marshall.NFKM_ModuleState;
@@ -28,7 +28,7 @@ import com.ncipher.nfast.marshall.MarshallContext;
 import com.ncipher.nfast.marshall.MarshallTypeError;
 import com.ncipher.provider.km.nCipherKM;
 import com.ncipher.provider.nCRuntimeException;
-import com.squareup.plutus.framebuffer.Screens;
+import com.squareup.subzero.framebuffer.Screens;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,7 +48,7 @@ import static java.lang.String.format;
  * of doing things.
  */
 public class NCipher {
-  private static final String DATA_SIGNING_KEY_NAME = "plutusdatasigner";
+  private static final String DATA_SIGNING_KEY_NAME = "subzerodatasigner";
 
   private SecurityWorld securityWorld;
   private Module module;
@@ -111,7 +111,7 @@ public class NCipher {
 
     System.out.println("OCS found");
     ocsCardSet = cardSets[0];
-    // TODO: we could give the OCS a name, e.g. plutus-{dev, staging, prod}-ocs and then check
+    // TODO: we could give the OCS a name, e.g. subzero-{dev, staging, prod}-ocs and then check
     // the name here.
     NCipherLoadOCS loadOCS = new NCipherLoadOCS(defaultPassword, screens, NCipherChangePasswordOCS.PLACEHOLDER_PASSWORD);
 

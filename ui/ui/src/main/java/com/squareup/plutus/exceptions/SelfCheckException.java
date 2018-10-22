@@ -1,4 +1,4 @@
-package com.squareup.plutus.exceptions;
+package com.squareup.subzero.exceptions;
 
 public class SelfCheckException extends RuntimeException {
   public SelfCheckException(String message) {

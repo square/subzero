@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sha2.h>
-#include <squareup/plutus/internal.pb.h>
+#include <squareup/subzero/internal.pb.h>
 
 #include "config.h"
 

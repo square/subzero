@@ -1,14 +1,14 @@
-package com.squareup.plutus;
+package com.squareup.subzero;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.google.protobuf.TextFormat;
-import com.squareup.plutus.framebuffer.Framebuffer;
-import com.squareup.plutus.framebuffer.Screens;
-import com.squareup.plutus.ncipher.NCipher;
-import com.squareup.plutus.shared.PlutusUtils;
-import com.squareup.protos.plutus.service.Service.CommandRequest;
-import com.squareup.protos.plutus.service.Service.CommandResponse;
+import com.squareup.subzero.framebuffer.Framebuffer;
+import com.squareup.subzero.framebuffer.Screens;
+import com.squareup.subzero.ncipher.NCipher;
+import com.squareup.subzero.shared.PlutusUtils;
+import com.squareup.protos.subzero.service.Service.CommandRequest;
+import com.squareup.protos.subzero.service.Service.CommandResponse;
 import java.util.Base64;
 
 public class PlutusCli {
@@ -25,10 +25,10 @@ public class PlutusCli {
   // If missing or incorrect, will prompt for a password on stdin.
   @Parameter(names = "--ocs-password") public String ocsPassword;
 
-  // By default, plutus listens on this port, which is allocated in Registry
+  // By default, subzero listens on this port, which is allocated in Registry
   @Parameter(names = "--port") public int port = 32366;
 
-  // Almost always you want to talk to plutus on localhost
+  // Almost always you want to talk to subzero on localhost
   @Parameter(names = "--hostname") public String hostname = "localhost";
 
   public PlutusConfig config;
@@ -45,15 +45,15 @@ public class PlutusCli {
   }
 
   public static void main(String[] args) throws Exception {
-    PlutusCli plutus = new PlutusCli();
-    plutus.config = PlutusConfig.load();
+    PlutusCli subzero = new PlutusCli();
+    subzero.config = PlutusConfig.load();
 
     JCommander jCommander = JCommander.newBuilder()
-        .addObject(plutus)
+        .addObject(subzero)
         .build();
     jCommander.setProgramName("Plutus");
     jCommander.parse(args);
-    if (plutus.help) {
+    if (subzero.help) {
       jCommander.usage();
       return;
     }
@@ -61,12 +61,12 @@ public class PlutusCli {
     System.out.println("This program draws to a framebuffer. If you are only seeing this output,");
     System.out.println("then something has gone wrong. Please report this error.");
 
-    if (plutus.uiTest) {
-      plutus.uiTest();
-    } else if (plutus.debug != null) {
-      plutus.debugMode();
+    if (subzero.uiTest) {
+      subzero.uiTest();
+    } else if (subzero.debug != null) {
+      subzero.debugMode();
     } else {
-      plutus.interactive();
+      subzero.interactive();
     }
   }
 

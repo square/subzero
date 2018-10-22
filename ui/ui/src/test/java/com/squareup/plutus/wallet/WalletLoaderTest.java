@@ -1,10 +1,10 @@
-package com.squareup.plutus.wallet;
+package com.squareup.subzero.wallet;
 
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
-import com.squareup.protos.plutus.service.Common.EncryptedMasterSeed;
-import com.squareup.protos.plutus.service.Common.EncryptedPubKey;
-import com.squareup.protos.plutus.wallet.WalletProto.Wallet;
+import com.squareup.protos.subzero.service.Common.EncryptedMasterSeed;
+import com.squareup.protos.subzero.service.Common.EncryptedPubKey;
+import com.squareup.protos.subzero.wallet.WalletProto.Wallet;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -77,7 +77,7 @@ public class WalletLoaderTest {
     // Save and check file's content
     walletLoader.save(1234, wallet);
 
-    byte[] bytes = Files.toByteArray(tempDir.toPath().resolve("plutus-1234.wallet").toFile());
+    byte[] bytes = Files.toByteArray(tempDir.toPath().resolve("subzero-1234.wallet").toFile());
     byte[] expected = Resources.toByteArray(Resources.getResource("fixture.wallet"));
 
     System.out.println(new String(bytes));

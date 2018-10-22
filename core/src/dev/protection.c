@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <protection.h>
-#include <squareup/plutus/common.pb.h>
-#include <squareup/plutus/internal.pb.h>
+#include <squareup/subzero/common.pb.h>
+#include <squareup/subzero/internal.pb.h>
 
 #include "log.h"
 #include "memzero.h"

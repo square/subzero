@@ -1,9 +1,9 @@
-package com.squareup.plutus.ncipher;
+package com.squareup.subzero.ncipher;
 
 import com.google.common.base.Strings;
 import com.ncipher.km.nfkm.CmdCallBack;
 import com.ncipher.km.nfkm.Slot;
-import com.squareup.plutus.framebuffer.Screens;
+import com.squareup.subzero.framebuffer.Screens;
 import java.io.IOException;
 
 /**
