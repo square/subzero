@@ -10,7 +10,7 @@ import "squareup/subzero/common.proto";
  * Proto used to communicate between the Java CLI and the CodeSafe code.
  *
  * This file must be kept in sync with the C proto definition at:
- * https://git.sqcorp.co/projects/INFOSEC/repos/subzero/browse/proto
+ * https://github.com/square/subzero/blob/master/core/proto/squareup/subzero/internal.proto
  */
 
 message InternalCommandRequest {

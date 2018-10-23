@@ -9,8 +9,8 @@ public class Constants {
 
   // These constants need to be kept in sync with the following two files. The Java constants can be
   // more restrictive than the C ones.
-  // https://git.sqcorp.co/projects/INFOSEC/repos/subzero/browse/proto/squareup/subzero/common.options
-  // https://git.sqcorp.co/projects/INFOSEC/repos/subzero/browse/proto/squareup/subzero/internal.options
+  // https://github.com/square/subzero/blob/master/core/proto/squareup/subzero/common.options
+  // https://github.com/square/subzero/blob/master/core/proto/squareup/subzero/internal.options
   public static final int ENCRYPTED_MASTER_SEED_MAX_SIZE = 92;
   public static final int MASTER_SEED_ENCRYPTION_KEY_TICKET_MAX_SIZE = 256;
   public static final int PUB_KEY_ENCRYPTION_KEY_TICKET_MAX_SIZE = 256;
