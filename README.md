@@ -19,15 +19,11 @@ the caveat that the code is currently only useful if you have the exact same har
 code more modular over time, as long as the broader community shows interest to implement support for additional
 hardware vendors.
 
+See also [Open Sourcing Subzero (blog post)](https://medium.com/square-corner-blog/open-sourcing-subzero-ee9e3e071827)
+
 # Documentation
 
-GitHub doesn't support pages for private repos. The current way to read documentation is therefore:
-
-    git clone git@github.com:square/hsm-cold-storage.git
-    mkdocs serve
-    open http://127.0.0.1:8000
-
-*mkdocs is a static documentation generator written in Python and available at https://github.com/mkdocs/mkdocs/*
+[https://square.github.io/subzero/](https://square.github.io/subzero/)
 
 # License
 
