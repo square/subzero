@@ -68,7 +68,7 @@ filesystem with the host.
 
 # Getting started (locally)
 
-    git clone --recursive ssh://git@git.corp.squareup.com/infosec/subzero.git
+    git clone --recursive ssh://git@github.com:square/subzero.git
     cd subzero
     mkdir build
     cd build
@@ -78,7 +78,7 @@ filesystem with the host.
 
 # nCipher (without signed code)
 
-    git clone --recursive ssh://git@git.corp.squareup.com/infosec/subzero.git
+    git clone --recursive ssh://git@github.com:square/subzero.git
     cd subzero
     mkdir build
     cd build
