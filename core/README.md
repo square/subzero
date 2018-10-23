@@ -39,8 +39,8 @@ to compare bytes with Electrum.
 # Getting started (docker)
 This will build and start subzero in docker.
 
-    git clone --recursive ssh://git@git.corp.squareup.com/infosec/subzero.git
-    ./subzero-docker.sh run
+    git clone --recursive https://github.com/square/subzero.git
+    ./subzero/core/subzero-docker.sh run
 
 # Developing in CLion
 Create a new project from this repo in CLion.
@@ -68,8 +68,8 @@ filesystem with the host.
 
 # Getting started (locally)
 
-    git clone --recursive ssh://git@git.corp.squareup.com/infosec/subzero.git
-    cd subzero
+    git clone --recursive https://github.com/square/subzero.git
+    cd subzero/core
     mkdir build
     cd build
     CURRENCY=btc-testnet cmake ../
@@ -78,11 +78,10 @@ filesystem with the host.
 
 # nCipher (without signed code)
 
-    git clone --recursive ssh://git@git.corp.squareup.com/infosec/subzero.git
-    cd subzero
+    git clone --recursive https://github.com/square/subzero.git
+    cd subzero/core
     mkdir build
     cd build
     TARGET=nCipher CURRENCY=btc-testnet cmake ../
     make
     make run
-
