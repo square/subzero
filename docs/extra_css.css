@@ -1,6 +1,6 @@
 @font-face {
   font-family: "SqMarket";
-  src: url("/SQMarket-Regular.otf") format("opentype");
+  src: url("SQMarket-Regular.otf") format("opentype");
 }
 
 body {

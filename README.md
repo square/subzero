@@ -23,7 +23,7 @@ See also [Open Sourcing Subzero (blog post)](https://medium.com/square-corner-bl
 
 # Documentation
 
-[https://square.github.io/subzero/](https://square.github.io/subzero/)
+[https://subzero.readthedocs.io](https://subzero.readthedocs.io)
 
 # License
 
