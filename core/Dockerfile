@@ -28,9 +28,9 @@ RUN mkdir protobuf && \
 
 # Add nCipher tools, which unpack to /opt/nfast
 WORKDIR /
-RUN curl -ksSL https://<insert your local url to ncipher-tools>/gccsrc-ppcdev_12.20.51.tar.gz | \
+RUN curl -sSL https://<insert your local url to ncipher-tools>/gccsrc-ppcdev_12.20.51.tar.gz | \
     tar -xz && \
-    curl -ksSL https://<insert your local url to ncipher-tools>/csd-agg_12.20.51.tar.gz | \
+    curl -sSL https://<insert your local url to ncipher-tools>/csd-agg_12.20.51.tar.gz | \
     tar -xz
 
 ADD . /subzero
