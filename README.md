@@ -1,17 +1,17 @@
 # HSM Cold Storage
 
-For security purpose, Square stores a reserve of Bitcoins in an offline setting. By having these funds offline, we
-reduce attack surface and hence risk of theft.
+For security, Square stores a reserve of Bitcoins in an offline setting. By having these funds offline, we
+reduce attack surface and risk of theft.
 
 Square's solution is unique, specifically, we leverage FIPS certified Hardware Security Modules (HSMs) to protect the
-private key material. We decided to use such HSMs because we already own, operate and trust these devices for other payments-related needs.
+private key material. We decided to use such HSMs because we already own, operate, and trust these devices for other payment-related needs.
 
 Funds can be sent from online systems to the cold storage at any time. Moving funds out of cold storage requires a
 multi-party signing ceremony. In addition, the offline HSMs are able to enforce business logic rules, for instance we
 only allow sending funds to Square-owned addresses. Such a scheme is usually called defense in depth or an onion model.
 We maintain the online/offline isolation by importing transaction metadata and exporting signatures using QR codes.
 
-HSMs have the ability to share key material. This enables us the ability to store our backups in encrypted form and
+HSMs have the ability to share key material. This enables the ability to store our backups in encrypted form and
 restore a wallet at any location.
 
 This repo contains our design documents as well as specific technical information. We are sharing our source code, with
