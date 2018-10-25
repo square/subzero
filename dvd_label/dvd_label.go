@@ -38,10 +38,11 @@ func main() {
 	draw(pdf, now, 105, 196)
 
 	err := pdf.OutputFileAndClose("dvd_label.pdf")
-	fmt.Printf("Writing dvd_label.pdf")
 	if err != nil {
-		fmt.Println("error: %s", err)
+		fmt.Printf("error: %s\n", err)
+		return
 	}
+	fmt.Printf("Done writing dvd_label.pdf\n")
 }
 
 func draw(pdf *gofpdf.Fpdf, now time.Time, x float64, y float64) {
@@ -66,5 +67,5 @@ func draw(pdf *gofpdf.Fpdf, now time.Time, x float64, y float64) {
 
 	// logo
 	var opt gofpdf.ImageOptions
-	pdf.ImageOptions("../logo.png", x+3+37-10, y+3-10, 25, 25, false, opt, 0, "")
+	pdf.ImageOptions("logo.png", x+3+37-10, y+7-10, 25, 25, false, opt, 0, "")
 }
