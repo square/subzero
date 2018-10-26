@@ -69,7 +69,7 @@ static Result derive_public_key(const char *xpub, Path *path,
     ERROR("path is missing is_change.");
     return Result_DERIVE_PUBKEY_NO_IS_CHANGE_FAILURE;
   }
-  if (!path->has_account) {
+  if (!path->has_index) {
     ERROR("path is missing index.");
     return Result_DERIVE_PUBKEY_NO_INDEX_FAILURE;
   }
