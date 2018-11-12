@@ -19,7 +19,9 @@ to compare bytes with Electrum.
     cd ../../
 
     # you can then edit the code in lib/ and see the changes
-    ./electrum --testnet -v
+    ./run_electrum --testnet -v
+
+    # see also https://github.com/spesmilo/electrum/tree/master/contrib/build-osx
 
 # Bitcoin resources
 - [Mastering Bitcoin: Programming the Open Blockchain](https://www.amazon.com/Mastering-Bitcoin-Programming-Open-Blockchain/dp/1491954388/) is worth every penny. The book's latex source is free and you can build it yourself if you want a pdf version.
