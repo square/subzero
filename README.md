@@ -1,3 +1,5 @@
+<img src="logo.png" width="100">
+
 # HSM Cold Storage
 
 For security, Square stores a reserve of Bitcoins in an offline setting. By having these funds offline, we
