@@ -4,7 +4,7 @@
 
 A Coordinator service is required to manage UTXO, initiate a signing ceremony and merge signatures.
 
-The coodrinator service and the Core need to agree on the gateway wallet.
+The coordinator service and the Core need to agree on the gateway wallet.
 
 ## Core
 
