@@ -27,7 +27,7 @@ func main() {
 	pdf.AddFont("SQMarket", "", "./SQMarket-Regular.json")
 	pdf.AddPage()
 	pdf.SetMargins(0, 0, 0)
-	pdf.SetTextColor(130, 166, 185)
+	pdf.SetTextColor(0, 0, 0)
 
 	now := time.Now()
 
@@ -67,5 +67,5 @@ func draw(pdf *gofpdf.Fpdf, now time.Time, x float64, y float64) {
 
 	// logo
 	var opt gofpdf.ImageOptions
-	pdf.ImageOptions("logo.png", x+3+37-10, y+7-10, 25, 25, false, opt, 0, "")
+	pdf.ImageOptions("../logo.png", x+3+37-10, y+5-10, 25, 25, false, opt, 0, "")
 }
