@@ -5,7 +5,7 @@ import com.google.protobuf.ByteString;
 import com.ncipher.nfast.NFException;
 import com.squareup.subzero.InternalCommandConnector;
 import com.squareup.subzero.ncipher.NCipher;
-import com.squareup.subzero.PlutusCli;
+import com.squareup.subzero.SubzeroGui;
 import com.squareup.subzero.wallet.WalletLoader;
 import com.squareup.protos.subzero.service.Common.Destination;
 import com.squareup.protos.subzero.service.Common.TxInput;
@@ -21,7 +21,7 @@ import java.text.DecimalFormat;
 import static java.lang.String.format;
 
 public class SignTx {
-  public static CommandResponse.SignTxResponse signTx(PlutusCli subzero,
+  public static CommandResponse.SignTxResponse signTx(SubzeroGui subzero,
       InternalCommandConnector conn, CommandRequest request,
       InternalCommandRequest.Builder internalRequest) throws IOException, NFException {
 

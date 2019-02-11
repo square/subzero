@@ -16,7 +16,7 @@ import com.squareup.protos.subzero.service.Service.CommandResponse;
  */
 
 public class CommandHandler {
-  public static CommandResponse dispatch(PlutusCli subzero, InternalCommandConnector conn,
+  public static CommandResponse dispatch(SubzeroGui subzero, InternalCommandConnector conn,
       CommandRequest serviceRequest) throws Exception {
 
     InternalCommandRequest.Builder internalRequest = InternalCommandRequest.newBuilder()

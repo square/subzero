@@ -23,7 +23,7 @@ public class PlutusConfig {
   public String teamName;            // either "<name>" or "!!<path>"
 
   /**
-   * PlutusCli does not use ServiceContainer, so we implement our own config loading.
+   * SubzeroGui does not use ServiceContainer, so we implement our own config loading.
    */
   public static PlutusConfig load() throws IOException {
     // load subzero.yaml
@@ -39,13 +39,13 @@ public class PlutusConfig {
     System.out.printf("Env: %s\n", env.name());
 
     // Load the right config file
-    ClassLoader classLoader = PlutusCli.class.getClassLoader();
+    ClassLoader classLoader = SubzeroGui.class.getClassLoader();
     URL resource = classLoader.getResource(format("subzero-%s.yaml", env.name()));
     return new Yaml().loadAs(resource.openStream(), PlutusConfig.class);
   }
 
   protected static EnvironmentsMap loadEnvMap() throws IOException {
-    ClassLoader classLoader = PlutusCli.class.getClassLoader();
+    ClassLoader classLoader = SubzeroGui.class.getClassLoader();
     URL resource = classLoader.getResource("subzero.yaml");
     return new Yaml().loadAs(resource.openStream(), EnvironmentsMap.class);
   }
