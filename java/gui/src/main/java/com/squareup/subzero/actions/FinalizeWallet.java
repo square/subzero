@@ -5,7 +5,7 @@ import com.google.protobuf.ByteString;
 import com.ncipher.nfast.NFException;
 import com.squareup.subzero.InternalCommandConnector;
 import com.squareup.subzero.ncipher.NCipher;
-import com.squareup.subzero.PlutusCli;
+import com.squareup.subzero.SubzeroGui;
 import com.squareup.subzero.wallet.WalletLoader;
 import com.squareup.protos.subzero.service.Internal.InternalCommandRequest;
 import com.squareup.protos.subzero.service.Internal.InternalCommandResponse;
@@ -18,7 +18,7 @@ import static java.lang.String.format;
 
 public class FinalizeWallet {
   public static CommandResponse.FinalizeWalletResponse finalizeWallet(
-      PlutusCli subzero,
+      SubzeroGui subzero,
       InternalCommandConnector conn,
       CommandRequest request,
       InternalCommandRequest.Builder internalRequest) throws IOException, NFException {

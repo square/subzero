@@ -11,7 +11,7 @@ import com.squareup.protos.subzero.service.Service.CommandRequest;
 import com.squareup.protos.subzero.service.Service.CommandResponse;
 import java.util.Base64;
 
-public class PlutusCli {
+public class SubzeroGui {
   @Parameter(names = "--help", help = true)
   private boolean help = false;
 
@@ -45,7 +45,7 @@ public class PlutusCli {
   }
 
   public static void main(String[] args) throws Exception {
-    PlutusCli subzero = new PlutusCli();
+    SubzeroGui subzero = new SubzeroGui();
     subzero.config = PlutusConfig.load();
 
     JCommander jCommander = JCommander.newBuilder()

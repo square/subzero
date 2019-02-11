@@ -1,7 +1,7 @@
 package com.squareup.subzero.framebuffer;
 
 import com.google.common.base.Strings;
-import com.squareup.subzero.PlutusCli;
+import com.squareup.subzero.SubzeroGui;
 import com.squareup.subzero.PlutusConfig;
 import java.awt.Canvas;
 import java.awt.Color;
@@ -242,7 +242,7 @@ public class Framebuffer {
     } else {
       // Load SqMarket font
       try {
-        ClassLoader classLoader = PlutusCli.class.getClassLoader();
+        ClassLoader classLoader = SubzeroGui.class.getClassLoader();
         URL resource = classLoader.getResource("SQMarket-Regular.otf");
         if (resource != null) {
           font = Font.createFont(Font.TRUETYPE_FONT, resource.openStream())

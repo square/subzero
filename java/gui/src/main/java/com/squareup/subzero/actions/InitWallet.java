@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import com.google.protobuf.ByteString;
 import com.squareup.subzero.InternalCommandConnector;
 import com.squareup.subzero.ncipher.NCipher;
-import com.squareup.subzero.PlutusCli;
+import com.squareup.subzero.SubzeroGui;
 import com.squareup.subzero.wallet.WalletLoader;
 import com.squareup.protos.subzero.service.Internal.InternalCommandRequest;
 import com.squareup.protos.subzero.service.Internal.InternalCommandResponse;
@@ -17,7 +17,7 @@ import org.spongycastle.util.encoders.Hex;
 import static java.lang.String.format;
 
 public class InitWallet {
-  public static CommandResponse.InitWalletResponse initWallet(PlutusCli subzero,
+  public static CommandResponse.InitWalletResponse initWallet(SubzeroGui subzero,
       InternalCommandConnector conn,
       CommandRequest request,
       InternalCommandRequest.Builder internalRequest) throws Exception {
