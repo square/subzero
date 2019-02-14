@@ -27,20 +27,18 @@ import static org.spongycastle.util.encoders.Hex.toHexString;
  * https://live.blockcypher.com/btc/tx/607cf3511f0fa527b67d1790fa35d54c0d045c6cb65da1343fe103679e85dd9b/
  */
 public class ColdWalletCreationAndSigningMainnetTest {
-  private final int version = 204;
   private final int walletId = 1;
 
   @Test public void createInitWalletQrCode() {
     // The first QR code is the request to initialize a wallet
     CommandRequest commandRequest = CommandRequest.newBuilder()
-        .setVersion(version)
         .setWalletId(walletId)
         .setInitWallet(CommandRequest.InitWalletRequest.newBuilder())
         .build();
     PlutusUtils.validateCommandRequest(commandRequest);
 
     String initWalletRequest = Base64.toBase64String(commandRequest.toByteArray());
-    assertThat(initWalletRequest).isEqualTo("CMwBEAEaAA==");
+    assertThat(initWalletRequest).isEqualTo("EAEaAA==");
 
     // This QR code is scanned on each offline machine, and results in 4 responses:
     // initWalletResponse1, initWalletResponse2, initWalletResponse3, and initWalletResponse4
@@ -67,7 +65,6 @@ public class ColdWalletCreationAndSigningMainnetTest {
         .getEncryptedPubKeyOrThrow();
 
     CommandRequest commandRequest = CommandRequest.newBuilder()
-        .setVersion(version)
         .setWalletId(walletId)
         .setFinalizeWallet(CommandRequest.FinalizeWalletRequest.newBuilder()
             .addEncryptedPubKeys(encPubKey1)
@@ -78,7 +75,7 @@ public class ColdWalletCreationAndSigningMainnetTest {
     PlutusUtils.validateCommandRequest(commandRequest);
 
     String finalizeWalletRequest = Base64.toBase64String(commandRequest.toByteArray());
-    assertThat(finalizeWalletRequest).isEqualTo("CMwBEAEixAQKjgEKiwHvyz0I2ogp02jcQKD7dcCJ/afV0RC6Ktkm80lRzYxnNlgFLogVhBajNc1BMk0ltrWX+eK4s867QvOdS3CW1pGFv9S26ZQMBkLeq/+PEq92JRkbuhszGH2Joo3cJYnzSk5vORJFP1n7NY0dSgZgUr12ly62sc8u7rG3sREZppouTWIRwF0SE9kyFeT8Co4BCosB4VzWQwKqdIc05locckbRCA+4qbp5vHCfhhi/Wpgz3X3g5jcdL5nakwJiC8jFPc1q4XT4Z4Z2JVEtcaXTAOpjHtTxeNx3llt41tAJezo4R7gNof26qFMdJxQsArpCXOJTGFNlH1lxeagzBY9Mk6c4jzGQfQSczFILPW6QjFdNz3tS7TAxDI5aynVeaQqOAQqLAZiMXfOLhmmIhbE8j54JAde3KU6oDjZPZphkwgI8BUM6e+rppj+iTGNETNEiWtg7ge3IRXpGE19VPWgz9LulMesMiiCFczIPqdc8CTy6R6spu86aonJCyzu6ZSKhNU/J7nbJFn0RcDm0hRlZ04fgY4aP2VGwk90z9BkSPy/KWNnjkaxtTabQJYgwl9gKjgEKiwHVCxt9Mr6G04bgA5AybsdbaW/UgYyGwKpJGk/1M/eN8aT9cPvPQ+UsHJ3KlqKzuzxNkefTH/jCffC7+vyzSNPqofOSh+1xAFUU0db9Qjc1DObIQxWhpJ6XRzJoQs9hDlpTtzOJGUXMr0xW8SyVT/ZKMvqTxVmvLBvikOscVqhg28Vt0Z6e2br4MVza");
+    assertThat(finalizeWalletRequest).isEqualTo("EAEixAQKjgEKiwHvyz0I2ogp02jcQKD7dcCJ/afV0RC6Ktkm80lRzYxnNlgFLogVhBajNc1BMk0ltrWX+eK4s867QvOdS3CW1pGFv9S26ZQMBkLeq/+PEq92JRkbuhszGH2Joo3cJYnzSk5vORJFP1n7NY0dSgZgUr12ly62sc8u7rG3sREZppouTWIRwF0SE9kyFeT8Co4BCosB4VzWQwKqdIc05locckbRCA+4qbp5vHCfhhi/Wpgz3X3g5jcdL5nakwJiC8jFPc1q4XT4Z4Z2JVEtcaXTAOpjHtTxeNx3llt41tAJezo4R7gNof26qFMdJxQsArpCXOJTGFNlH1lxeagzBY9Mk6c4jzGQfQSczFILPW6QjFdNz3tS7TAxDI5aynVeaQqOAQqLAZiMXfOLhmmIhbE8j54JAde3KU6oDjZPZphkwgI8BUM6e+rppj+iTGNETNEiWtg7ge3IRXpGE19VPWgz9LulMesMiiCFczIPqdc8CTy6R6spu86aonJCyzu6ZSKhNU/J7nbJFn0RcDm0hRlZ04fgY4aP2VGwk90z9BkSPy/KWNnjkaxtTabQJYgwl9gKjgEKiwHVCxt9Mr6G04bgA5AybsdbaW/UgYyGwKpJGk/1M/eN8aT9cPvPQ+UsHJ3KlqKzuzxNkefTH/jCffC7+vyzSNPqofOSh+1xAFUU0db9Qjc1DObIQxWhpJ6XRzJoQs9hDlpTtzOJGUXMr0xW8SyVT/ZKMvqTxVmvLBvikOscVqhg28Vt0Z6e2br4MVza");
 
     // This QR code is scanned on each offline machine, and results in 4 responses:
     // finalizeWalletResponse1, finalizeWalletResponse2, finalizeWalletResponse3, and finalizeWalletResponse4
@@ -160,7 +157,7 @@ public class ColdWalletCreationAndSigningMainnetTest {
     String gateway = "xpub69kTAN2XXad5k39pCzEwBRwu76pX3kNUyPAgxe3vbgoZ4M4FzqxyeMe8FgsCSkTbT797YuP2u4Hhc4kgV8tAeiH7hFnk9obqxyJ7bzeuroC";
 
     ColdWallet coldWallet = new ColdWallet(MainNetParams.get(), walletId, addresses, gateway);
-    CommandRequest commandRequest = coldWallet.startTransaction(version,
+    CommandRequest commandRequest = coldWallet.startTransaction(
         ImmutableList.of(TxInput.newBuilder()
             .setPrevHash(ByteString.copyFrom(
                 Hex.decode("f9e21886a6b8216ec0717728ecc4433a0b765b0f81ea1d4cd5b982fcbf293f8d")))
@@ -177,7 +174,7 @@ public class ColdWalletCreationAndSigningMainnetTest {
     PlutusUtils.validateCommandRequest(commandRequest);
 
     String signTxRequest = Base64.toBase64String(commandRequest.toByteArray());
-    assertThat(signTxRequest).isEqualTo("CMwBEAEqRgoyCiD54hiGprghbsBxdyjsxEM6C3ZbD4HqHUzVuYL8vyk/jRABGKCNBiIICMMwEAAY5BgSDgiQ2AUQAhoGCAAQABgAGAA=");
+    assertThat(signTxRequest).isEqualTo("EAEqRgoyCiD54hiGprghbsBxdyjsxEM6C3ZbD4HqHUzVuYL8vyk/jRABGKCNBiIICMMwEAAY5BgSDgiQ2AUQAhoGCAAQABgAGAA=");
 
     // This QR code is scanned on two offline machine, and results in 2 responses:
     // signTxResponse1, and signTxResponse2
@@ -188,7 +185,7 @@ public class ColdWalletCreationAndSigningMainnetTest {
     // The gateway address we use here must match what's hardcoded in Plutus' CodeSafe module or
     // the signature will fail to verify.
     CommandRequest signTxRequest = CommandRequest.parseFrom(Base64.decode(
-        "CMwBEAEqRgoyCiD54hiGprghbsBxdyjsxEM6C3ZbD4HqHUzVuYL8vyk/jRABGKCNBiIICMMwEAAY5BgSDgiQ2AUQAhoGCAAQABgAGAA="));
+        "EAEqRgoyCiD54hiGprghbsBxdyjsxEM6C3ZbD4HqHUzVuYL8vyk/jRABGKCNBiIICMMwEAAY5BgSDgiQ2AUQAhoGCAAQABgAGAA="));
 
     String signTxResponse1 =
         "Gm0KawpHMEUCIQCJJWmmh+4E+crFreeG5wfO4T8YDxpkVQa6UraQGGZt6AIgNfWa50vuoEwtLd1nc5O6yNpMOmU+WVrGMFkOU5SWStwSIK6oB2Egliv9dn0Zu7s5ZBwaTLkEkYZ8/Y5C7uCY0vnKIgA=";

@@ -39,9 +39,8 @@ message CommandRequest {
     optional double local_rate = 5;     // USD per Satoshi (or your local currency per Satoshi)
   }
 
-  /* This version should bump anytime there's a breaking change that requires updates from
-     the online and offline components of cold storage */
-  optional uint32 version = 1 [(squareup.validation.required) = true];
+  /** @Deprecated */
+  optional uint32 unused = 1;
   /* The wallet ID is an arbitrary number used to designate which offline wallet should be used */
   optional uint32 wallet_id = 2 [(squareup.validation.required) = true];
   /* The token is echoed back from the request to allow pairing requests and responses */

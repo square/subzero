@@ -22,7 +22,6 @@ public class ColdWalletCreator {
    */
   public static CommandRequest init(String token, int walletId) {
     return CommandRequest.newBuilder()
-        .setVersion(Constants.VERSION)
         .setToken(token)
         .setWalletId(walletId)
         .setInitWallet(CommandRequest.InitWalletRequest.newBuilder())
@@ -46,7 +45,6 @@ public class ColdWalletCreator {
       return Optional.empty();
     }
     return Optional.of(CommandRequest.newBuilder()
-        .setVersion(Constants.VERSION)
         .setToken(elementToken)
         .setWalletId(walletId)
         .setFinalizeWallet(CommandRequest.FinalizeWalletRequest.newBuilder()
