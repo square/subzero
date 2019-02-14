@@ -1,5 +1,4 @@
-# Plutus
-_Greek god of wealth_
+# Subzero
 
 Codesafe code to perform Bitcoin wallet operations.
 

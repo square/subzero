@@ -11,7 +11,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import static java.lang.String.format;
 
-public class PlutusConfig {
+public class SubzeroConfig {
   private final static String FILE_PREFIX = "!!";
 
   public String framebuffer;         // path
@@ -25,7 +25,7 @@ public class PlutusConfig {
   /**
    * SubzeroGui does not use ServiceContainer, so we implement our own config loading.
    */
-  public static PlutusConfig load() throws IOException {
+  public static SubzeroConfig load() throws IOException {
     // load subzero.yaml
     EnvironmentsMap environmentsMap = loadEnvMap();
 
@@ -41,7 +41,7 @@ public class PlutusConfig {
     // Load the right config file
     ClassLoader classLoader = SubzeroGui.class.getClassLoader();
     URL resource = classLoader.getResource(format("subzero-%s.yaml", env.name()));
-    return new Yaml().loadAs(resource.openStream(), PlutusConfig.class);
+    return new Yaml().loadAs(resource.openStream(), SubzeroConfig.class);
   }
 
   protected static EnvironmentsMap loadEnvMap() throws IOException {

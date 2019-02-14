@@ -27,7 +27,7 @@ import org.bitcoinj.script.ScriptBuilder;
 import org.bitcoinj.script.ScriptChunk;
 import org.bitcoinj.script.ScriptOpCodes;
 
-import static com.squareup.subzero.shared.PlutusUtils.derivePublicKey;
+import static com.squareup.subzero.shared.SubzeroUtils.derivePublicKey;
 import static java.lang.String.format;
 import static org.bitcoinj.crypto.DeterministicKey.deserializeB58;
 
@@ -41,7 +41,7 @@ public class ColdWallet {
    * Constructor for ColdWallet object, used to interact with a cold wallet.
    *
    * @param params org.bitcoinj.params.TestNet3Params or org.bitcoinj.params.MainNetParams
-   * @param walletId A walletId used by Plutus to identify which wallet to use
+   * @param walletId A walletId used by Subzero to identify which wallet to use
    * @param publicRootKeys The public keys from wallet initialization
    */
   public ColdWallet(NetworkParameters params, int walletId, List<String> publicRootKeys,
@@ -69,7 +69,7 @@ public class ColdWallet {
    * @return Address that you can send bitcoin to cold storage with
    */
   public Address address(Path path) {
-    return PlutusUtils.deriveP2SHP2WSH(params, Constants.MULTISIG_THRESHOLD, publicRootKeys, path);
+    return SubzeroUtils.deriveP2SHP2WSH(params, Constants.MULTISIG_THRESHOLD, publicRootKeys, path);
   }
 
   /**
@@ -107,7 +107,7 @@ public class ColdWallet {
    *
    * @param inputs This needs to match the inputs passed to startTransaction
    * @param outputs This needs to match the inputs passed to startTransaction
-   * @param signatures The signatures from the Plutus responses to the startTransaction CommandRequests
+   * @param signatures The signatures from the Subzero responses to the startTransaction CommandRequests
    */
   public byte[] createTransaction(List<TxInput> inputs, List<TxOutput> outputs,
       List<List<Signature>> signatures) {
@@ -181,7 +181,7 @@ public class ColdWallet {
         out.write(prevHash);
         Utils.uint32ToByteStreamLE(prevIndex, out);
         hashPrevouts.update(prevHash);
-        PlutusUtils.hashUint32LE(prevIndex, hashPrevouts);
+        SubzeroUtils.hashUint32LE(prevIndex, hashPrevouts);
 
         // serialize the script
         // Derive the public keys from the roots
@@ -208,7 +208,7 @@ public class ColdWallet {
         out.write(redeemScript.getProgram());
 
         Utils.uint32ToByteStreamLE(sequence, out);
-        PlutusUtils.hashUint32LE(sequence, hashSequence);
+        SubzeroUtils.hashUint32LE(sequence, hashSequence);
       }
 
       // 5. txouts
@@ -218,7 +218,7 @@ public class ColdWallet {
         // Each output starts with the amount:
         Long amount = output.getAmountOrThrow();
         Utils.uint64ToByteStreamLE(BigInteger.valueOf(amount), out);
-        PlutusUtils.hashUint64LE(amount, hashOutputs);
+        SubzeroUtils.hashUint64LE(amount, hashOutputs);
 
         Address address;
         switch (output.getDestination()) {
@@ -227,7 +227,7 @@ public class ColdWallet {
             address = new Address(params, to.getPubKeyHash());
             break;
           case CHANGE:
-            address = PlutusUtils.deriveP2SHP2WSH(params, Constants.MULTISIG_THRESHOLD,
+            address = SubzeroUtils.deriveP2SHP2WSH(params, Constants.MULTISIG_THRESHOLD,
                 publicRootKeys, output.getPathOrThrow());
             break;
           default:
@@ -252,7 +252,7 @@ public class ColdWallet {
         byte[] witnessProgram = witness.right.getProgram();
         TxInput input = inputs.get(i);
 
-        byte[] hash = PlutusUtils.bip0143hash(prevoutsDoubleSha, sequenceDoubleSha, outputsDoubleSha, input,
+        byte[] hash = SubzeroUtils.bip0143hash(prevoutsDoubleSha, sequenceDoubleSha, outputsDoubleSha, input,
             witnessProgram, sequence, lock_time);
 
         // Each witness field starts with a compactSize integer to indicate the number of stack items
@@ -268,7 +268,7 @@ public class ColdWallet {
 
         // We need the signatures sorted in the same order as the public keys.
         // This function validates the signatures and sorts them.
-        List<byte[]> sortedSigs = PlutusUtils.validateAndSort(witness.left, hash, signatures.get(0).get(i),
+        List<byte[]> sortedSigs = SubzeroUtils.validateAndSort(witness.left, hash, signatures.get(0).get(i),
             signatures.get(1).get(i));
 
         // Write two signatures out.  It's length + 1 because of the extra byte for the signature type

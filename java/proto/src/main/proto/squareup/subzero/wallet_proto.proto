@@ -7,7 +7,7 @@ option java_package = "com.squareup.protos.subzero.wallet";
 import "common.proto";
 
 /**
- * The wallet file lives on the Plutus host machine's hard drive. It is also backed up to a USB
+ * The wallet file lives on the Subzero host machine's hard drive. It is also backed up to a USB
  * drive.
  *
  * The protobuf is serialized using JSON. The field names therefore matter, their numbering does

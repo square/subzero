@@ -45,7 +45,7 @@ import static java.lang.String.format;
  * Note: if we have a bug in the way we derive addresses and send money there, we risk losing funds.
  *       i.e. the correctness of this code is critical!
  */
-public class PlutusUtils {
+public class SubzeroUtils {
   static final String ERROR_ENCRYPTED_MASTER_SEED_SIZE = "EncryptedMasterSeed size exceeds limit";
   static final String ERROR_ENCRYPTED_PUB_KEYS_COUNT = "encrypted_pub_keys count exceeds limit";
   static final String ERROR_ENCRYPTED_PUB_KEY_SIZE = "EncryptedPubKey size exceeds limit";

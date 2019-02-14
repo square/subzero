@@ -22,25 +22,25 @@ import org.junit.Before;
 import org.junit.Test;
 import org.spongycastle.util.encoders.Hex;
 
-import static com.squareup.subzero.shared.PlutusUtils.ERROR_ENCRYPTED_MASTER_SEED_SIZE;
-import static com.squareup.subzero.shared.PlutusUtils.ERROR_ENCRYPTED_PUB_KEYS_COUNT;
-import static com.squareup.subzero.shared.PlutusUtils.ERROR_ENCRYPTED_PUB_KEY_SIZE;
-import static com.squareup.subzero.shared.PlutusUtils.ERROR_INCONSISTENT_IS_CHANGE;
-import static com.squareup.subzero.shared.PlutusUtils.ERROR_INPUTS_COUNT;
-import static com.squareup.subzero.shared.PlutusUtils.ERROR_INVALID_DESTINATION;
-import static com.squareup.subzero.shared.PlutusUtils.ERROR_MASTER_SEED_ENCRYPTION_KEY_TICKET_SIZE;
-import static com.squareup.subzero.shared.PlutusUtils.ERROR_OUTPUTS_COUNT;
-import static com.squareup.subzero.shared.PlutusUtils.ERROR_PUB_KEY_ENCRYPTION_KEY_TICKET_SIZE;
-import static com.squareup.subzero.shared.PlutusUtils.ERROR_RANDOM_BYTES_SIZE;
-import static com.squareup.subzero.shared.PlutusUtils.ERROR_TXINPUT_PREV_HASH_SIZE;
-import static com.squareup.subzero.shared.PlutusUtils.validateCommandRequest;
-import static com.squareup.subzero.shared.PlutusUtils.validateFees;
-import static com.squareup.subzero.shared.PlutusUtils.validateInternalCommandRequest;
+import static com.squareup.subzero.shared.SubzeroUtils.ERROR_ENCRYPTED_MASTER_SEED_SIZE;
+import static com.squareup.subzero.shared.SubzeroUtils.ERROR_ENCRYPTED_PUB_KEYS_COUNT;
+import static com.squareup.subzero.shared.SubzeroUtils.ERROR_ENCRYPTED_PUB_KEY_SIZE;
+import static com.squareup.subzero.shared.SubzeroUtils.ERROR_INCONSISTENT_IS_CHANGE;
+import static com.squareup.subzero.shared.SubzeroUtils.ERROR_INPUTS_COUNT;
+import static com.squareup.subzero.shared.SubzeroUtils.ERROR_INVALID_DESTINATION;
+import static com.squareup.subzero.shared.SubzeroUtils.ERROR_MASTER_SEED_ENCRYPTION_KEY_TICKET_SIZE;
+import static com.squareup.subzero.shared.SubzeroUtils.ERROR_OUTPUTS_COUNT;
+import static com.squareup.subzero.shared.SubzeroUtils.ERROR_PUB_KEY_ENCRYPTION_KEY_TICKET_SIZE;
+import static com.squareup.subzero.shared.SubzeroUtils.ERROR_RANDOM_BYTES_SIZE;
+import static com.squareup.subzero.shared.SubzeroUtils.ERROR_TXINPUT_PREV_HASH_SIZE;
+import static com.squareup.subzero.shared.SubzeroUtils.validateCommandRequest;
+import static com.squareup.subzero.shared.SubzeroUtils.validateFees;
+import static com.squareup.subzero.shared.SubzeroUtils.validateInternalCommandRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
-public class PlutusUtilsTest {
+public class SubzeroUtilsTest {
   private static ByteString shortByteString;
   private static ByteString longByteString;
   private static List<EncryptedPubKey> pubKeys;
@@ -88,7 +88,7 @@ public class PlutusUtilsTest {
     //
     // which hashes to:
     // 336c78bfe541c4b4dd1cb5b3d3ebd5a346db6223 (i.e. 2Mww8Pp2ZZc7gUr1z2ddUHx7Sa9J9avA7hJ)
-    Path path = PlutusUtils.newPath(6211, false, 3172);
+    Path path = SubzeroUtils.newPath(6211, false, 3172);
     List<DeterministicKey> addresses = ImmutableList.of(
         "tpubD9xeStpGFRUVhE7c3dDsdqNmbPC6RjQhvSc7UetKRMYjjLusaJx6Nfb3bAGQXDmnY5iuBApU75yuLDDYDXvq3FnXX1zEQMficGXkrYn6i1L",
         "tpubD9JLQCZyqpsY7L5dY86vJnJ1g1Acgb5MzpF7MgE29qQzUcM1LpxTuKeCRWwnCncVRhxYugumQqndARHqQ95c629h7bEciRH39LHXjpJEbsY",
@@ -96,7 +96,7 @@ public class PlutusUtilsTest {
         "tpubD8YrhVDcGsTdyj4pZh2ZGJvcqpASFZLai9tRHPj4ikjyn4MZcoHjqeuzNBGntpkSxNg61FKo9yCWpCvUGVnMpJJUwGJcWUpxTdPQKVdgoSo")
         .stream().map(pub -> DeterministicKey.deserializeB58(pub, TestNet3Params.get())).collect(Collectors.toList());
 
-    Address address = PlutusUtils.deriveP2SHP2WSH(TestNet3Params.get(), 2, addresses, path);
+    Address address = SubzeroUtils.deriveP2SHP2WSH(TestNet3Params.get(), 2, addresses, path);
     assertThat(address.toBase58()).isEqualTo("2Mww8Pp2ZZc7gUr1z2ddUHx7Sa9J9avA7hJ");
   }
 
@@ -120,11 +120,11 @@ public class PlutusUtilsTest {
         "tpubD9MkddWNiSU4tvVjoGryqunfjMkjMXhB4D17McCNrE7ZKd3R4kRPR1kB8gq1u2q8UKx9KqPRGyQW6Fhq7vZwDNZYZGbKd8AMSPtBhoumfVG",
         TestNet3Params.get());
 
-    DeterministicKey childKey = PlutusUtils.derivePublicKey(extendedPublicKey, PlutusUtils.newPath(0, false, 42));
+    DeterministicKey childKey = SubzeroUtils.derivePublicKey(extendedPublicKey, SubzeroUtils.newPath(0, false, 42));
     byte[] expected = Hex.decode("03754317f9ec1b17305ed7f1d8f6247876f5d7bd7b3586681f1faa98d5740c8051");
     assertThat(childKey.getPubKey()).isEqualTo(expected);
 
-    childKey = PlutusUtils.derivePublicKey(extendedPublicKey, PlutusUtils.newPath(2725, true, 62));
+    childKey = SubzeroUtils.derivePublicKey(extendedPublicKey, SubzeroUtils.newPath(2725, true, 62));
     expected = Hex.decode("02f8ec392b6eae0ef6e8b9d5ca7342194394c9d252be7e4e42ff83a9ddf76ff201");
     assertThat(childKey.getPubKey()).isEqualTo(expected);
   }

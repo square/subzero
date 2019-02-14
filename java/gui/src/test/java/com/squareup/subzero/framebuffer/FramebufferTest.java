@@ -1,6 +1,6 @@
 package com.squareup.subzero.framebuffer;
 
-import com.squareup.subzero.PlutusConfig;
+import com.squareup.subzero.SubzeroConfig;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.io.File;
@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FramebufferTest {
-  private PlutusConfig config = new PlutusConfig();
+  private SubzeroConfig config = new SubzeroConfig();
 
   private void assertColor(File file, Color color, int pixels) throws IOException {
     byte[] data = Files.readAllBytes(file.toPath());

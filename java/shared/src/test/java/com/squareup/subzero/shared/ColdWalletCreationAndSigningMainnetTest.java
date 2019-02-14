@@ -35,7 +35,7 @@ public class ColdWalletCreationAndSigningMainnetTest {
         .setWalletId(walletId)
         .setInitWallet(CommandRequest.InitWalletRequest.newBuilder())
         .build();
-    PlutusUtils.validateCommandRequest(commandRequest);
+    SubzeroUtils.validateCommandRequest(commandRequest);
 
     String initWalletRequest = Base64.toBase64String(commandRequest.toByteArray());
     assertThat(initWalletRequest).isEqualTo("EAEaAA==");
@@ -72,7 +72,7 @@ public class ColdWalletCreationAndSigningMainnetTest {
             .addEncryptedPubKeys(encPubKey3)
             .addEncryptedPubKeys(encPubKey4))
         .build();
-    PlutusUtils.validateCommandRequest(commandRequest);
+    SubzeroUtils.validateCommandRequest(commandRequest);
 
     String finalizeWalletRequest = Base64.toBase64String(commandRequest.toByteArray());
     assertThat(finalizeWalletRequest).isEqualTo("EAEixAQKjgEKiwHvyz0I2ogp02jcQKD7dcCJ/afV0RC6Ktkm80lRzYxnNlgFLogVhBajNc1BMk0ltrWX+eK4s867QvOdS3CW1pGFv9S26ZQMBkLeq/+PEq92JRkbuhszGH2Joo3cJYnzSk5vORJFP1n7NY0dSgZgUr12ly62sc8u7rG3sREZppouTWIRwF0SE9kyFeT8Co4BCosB4VzWQwKqdIc05locckbRCA+4qbp5vHCfhhi/Wpgz3X3g5jcdL5nakwJiC8jFPc1q4XT4Z4Z2JVEtcaXTAOpjHtTxeNx3llt41tAJezo4R7gNof26qFMdJxQsArpCXOJTGFNlH1lxeagzBY9Mk6c4jzGQfQSczFILPW6QjFdNz3tS7TAxDI5aynVeaQqOAQqLAZiMXfOLhmmIhbE8j54JAde3KU6oDjZPZphkwgI8BUM6e+rppj+iTGNETNEiWtg7ge3IRXpGE19VPWgz9LulMesMiiCFczIPqdc8CTy6R6spu86aonJCyzu6ZSKhNU/J7nbJFn0RcDm0hRlZ04fgY4aP2VGwk90z9BkSPy/KWNnjkaxtTabQJYgwl9gKjgEKiwHVCxt9Mr6G04bgA5AybsdbaW/UgYyGwKpJGk/1M/eN8aT9cPvPQ+UsHJ3KlqKzuzxNkefTH/jCffC7+vyzSNPqofOSh+1xAFUU0db9Qjc1DObIQxWhpJ6XRzJoQs9hDlpTtzOJGUXMr0xW8SyVT/ZKMvqTxVmvLBvikOscVqhg28Vt0Z6e2br4MVza");
@@ -171,7 +171,7 @@ public class ColdWalletCreationAndSigningMainnetTest {
             .setPath(outputPath)
             .build()),
         null, null);
-    PlutusUtils.validateCommandRequest(commandRequest);
+    SubzeroUtils.validateCommandRequest(commandRequest);
 
     String signTxRequest = Base64.toBase64String(commandRequest.toByteArray());
     assertThat(signTxRequest).isEqualTo("EAEqRgoyCiD54hiGprghbsBxdyjsxEM6C3ZbD4HqHUzVuYL8vyk/jRABGKCNBiIICMMwEAAY5BgSDgiQ2AUQAhoGCAAQABgAGAA=");
@@ -182,7 +182,7 @@ public class ColdWalletCreationAndSigningMainnetTest {
 
   @Test public void createTransaction() throws Exception {
     // We use signTxResponse1 and signTxResponse2 to create the transaction.
-    // The gateway address we use here must match what's hardcoded in Plutus' CodeSafe module or
+    // The gateway address we use here must match what's hardcoded in Subzero's CodeSafe module or
     // the signature will fail to verify.
     CommandRequest signTxRequest = CommandRequest.parseFrom(Base64.decode(
         "EAEqRgoyCiD54hiGprghbsBxdyjsxEM6C3ZbD4HqHUzVuYL8vyk/jRABGKCNBiIICMMwEAAY5BgSDgiQ2AUQAhoGCAAQABgAGAA="));
