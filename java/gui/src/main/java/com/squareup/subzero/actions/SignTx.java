@@ -45,20 +45,21 @@ public class SignTx {
       DecimalFormat formatter2 = new DecimalFormat("#,##0.00");
 
       StringBuilder s = new StringBuilder();
-      s.append(format("SignTx. Wallet %s sending:\n", request.getWalletIdOrThrow()));
-      s.append(format("%s Satoshi with fee %s Satoshi\n",
+      s.append(format("SignTx. Wallet %s sending:\n\n", request.getWalletIdOrThrow()));
+      s.append(format("%s Satoshi with fee %s Satoshi\n\n",
           formatter1.format(amount), formatter1.format(fee)));
-      s.append(format("%s Bitcoin with fee %s Bitcoin\n\n",
-          formatter2.format((double)amount / 100000),
-          formatter2.format((double)fee / 100000)));
-      s.append(format("%s %s with fee %s %s\n",
-          formatter2.format((double)amount * signTxRequest.getLocalRate()),
-          signTxRequest.getLocalCurrency(),
-          formatter2.format((double)fee * signTxRequest.getLocalRate()),
-          signTxRequest.getLocalCurrency()));
-      s.append(format("(assuming 1 BTC = %s %s)",
-          formatter2.format((double)100000 * signTxRequest.getLocalRate()),
-          signTxRequest.getLocalCurrency()));
+      s.append(format("%f Bitcoin with fee %f Bitcoin\n\n",
+          (double)amount / 100_000_000, (double)fee / 100_000_000));
+      if (signTxRequest.getLocalRate() > 0) {
+        s.append(format("%s %s with fee %s %s\n",
+            formatter2.format((double) amount * signTxRequest.getLocalRate()),
+            signTxRequest.getLocalCurrency(),
+            formatter2.format((double) fee * signTxRequest.getLocalRate()),
+            signTxRequest.getLocalCurrency()));
+        s.append(format("(assuming 1 BTC = %s %s)",
+            formatter2.format((double) 100_000_000 * signTxRequest.getLocalRate()),
+            signTxRequest.getLocalCurrency()));
+      }
 
       if(!subzero.getScreens().approveAction(s.toString())) {
         throw new RuntimeException("User did not approve signing operation");
