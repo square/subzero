@@ -35,9 +35,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.security.Security;
-import org.spongycastle.util.encoders.Base64;
 import org.spongycastle.util.encoders.Hex;
 
+import static com.google.common.io.BaseEncoding.base64;
 import static java.lang.String.format;
 
 /**
@@ -122,7 +122,7 @@ public class NCipher {
       while (true) {
         byte[] b = new byte[6];
         new SecureRandom().nextBytes(b);
-        newPassword = Base64.toBase64String(b);
+        newPassword = base64().encode(b);
         screens.warnPasswordChange(newPassword);
         String again = screens.promptPasswordChange();
         if (again.equals(newPassword)) {

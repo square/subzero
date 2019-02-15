@@ -9,7 +9,8 @@ import com.squareup.subzero.ncipher.NCipher;
 import com.squareup.subzero.shared.PlutusUtils;
 import com.squareup.protos.subzero.service.Service.CommandRequest;
 import com.squareup.protos.subzero.service.Service.CommandResponse;
-import java.util.Base64;
+
+import static com.google.common.io.BaseEncoding.base64;
 
 public class SubzeroGui {
   @Parameter(names = "--help", help = true)
@@ -71,13 +72,13 @@ public class SubzeroGui {
   }
 
   private void debugMode() throws Exception {
-    byte[] rawCmd = Base64.getDecoder().decode(debug);
+    byte[] rawCmd = base64().decode(debug);
     CommandRequest commandRequest = CommandRequest.parseFrom(rawCmd);
 
     InternalCommandConnector conn = new
         InternalCommandConnector(hostname, port);
     CommandResponse commandResponse = CommandHandler.dispatch(this, conn, commandRequest);
-    String response = Base64.getEncoder().encodeToString(commandResponse.toByteArray());
+    String response = base64().encode(commandResponse.toByteArray());
 
     // Pretty print the response
     String debugString = TextFormat.shortDebugString(commandResponse);
@@ -99,8 +100,7 @@ public class SubzeroGui {
       while (true) {
         String input = screens.readQRCode();
 
-        Base64.Decoder decoder = Base64.getDecoder();
-        byte[] proto = decoder.decode(input);
+        byte[] proto = base64().decode(input);
 
         CommandRequest commandRequest = CommandRequest.parseFrom(proto);
 
@@ -108,7 +108,7 @@ public class SubzeroGui {
             CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port), commandRequest);
         System.out.println(response.toString());
 
-        String encoded = Base64.getEncoder().encodeToString(response.toByteArray());
+        String encoded = base64().encode(response.toByteArray());
 
         Screens.ExitOrRestart command = screens.displayQRCode(encoded);
         if (command == Screens.ExitOrRestart.Exit) {
