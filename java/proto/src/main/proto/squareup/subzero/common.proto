@@ -15,7 +15,8 @@ enum Destination {
 }
 
 message Path {
-  optional uint32 account = 1;
+  /** @deprecated */
+  optional uint32 unused = 1;
   optional bool is_change = 2;
   optional uint32 index = 3;
 }

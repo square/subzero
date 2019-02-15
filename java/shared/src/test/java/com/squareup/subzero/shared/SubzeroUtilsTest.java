@@ -77,7 +77,7 @@ public class SubzeroUtilsTest {
     //   m/1'
     //   tpubD8YrhVDcGsTdyj4pZh2ZGJvcqpASFZLai9tRHPj4ikjyn4MZcoHjqeuzNBGntpkSxNg61FKo9yCWpCvUGVnMpJJUwGJcWUpxTdPQKVdgoSo
     //
-    // I then randomly picked the following address: m/1'/6211/0/3172
+    // I then randomly picked the following address: m/1'/0/3172
     //
     // The redeem script is:
     // 0 [sha256 of
@@ -88,7 +88,7 @@ public class SubzeroUtilsTest {
     //
     // which hashes to:
     // 336c78bfe541c4b4dd1cb5b3d3ebd5a346db6223 (i.e. 2Mww8Pp2ZZc7gUr1z2ddUHx7Sa9J9avA7hJ)
-    Path path = SubzeroUtils.newPath(6211, false, 3172);
+    Path path = SubzeroUtils.newPath(false, 3172);
     List<DeterministicKey> addresses = ImmutableList.of(
         "tpubD9xeStpGFRUVhE7c3dDsdqNmbPC6RjQhvSc7UetKRMYjjLusaJx6Nfb3bAGQXDmnY5iuBApU75yuLDDYDXvq3FnXX1zEQMficGXkrYn6i1L",
         "tpubD9JLQCZyqpsY7L5dY86vJnJ1g1Acgb5MzpF7MgE29qQzUcM1LpxTuKeCRWwnCncVRhxYugumQqndARHqQ95c629h7bEciRH39LHXjpJEbsY",
@@ -97,13 +97,13 @@ public class SubzeroUtilsTest {
         .stream().map(pub -> DeterministicKey.deserializeB58(pub, TestNet3Params.get())).collect(Collectors.toList());
 
     Address address = SubzeroUtils.deriveP2SHP2WSH(TestNet3Params.get(), 2, addresses, path);
-    assertThat(address.toBase58()).isEqualTo("2Mww8Pp2ZZc7gUr1z2ddUHx7Sa9J9avA7hJ");
+    assertThat(address.toBase58()).isEqualTo("2MuAdStu2xZtRSyA5B6wRtj7SmaLjDyfm1H");
   }
 
   @Test public void derivePublicKey() {
     // Using https://iancoleman.io/bip39/, I created a random key. The derivation we use for cold
-    // wallet is m/coin_type'/account/change/address_index. The coin_type' is taken care of for us,
-    // so we only care about account/change/address_index.
+    // wallet is m/coin_type'/change/address_index. The coin_type' is taken care of for us,
+    // so we only care about change/address_index.
     //
     // To help future debugging efforts, the random mnemonic was:
     // net kit animal ball brass honey give drill robot camera timber shrimp
@@ -111,21 +111,22 @@ public class SubzeroUtilsTest {
     // At BIP32 path m/1', we get the extended public key:
     // tpubD9MkddWNiSU4tvVjoGryqunfjMkjMXhB4D17McCNrE7ZKd3R4kRPR1kB8gq1u2q8UKx9KqPRGyQW6Fhq7vZwDNZYZGbKd8AMSPtBhoumfVG
     //
-    // I then looked up the keys for m/1'/0/0/42 and m/1'/2725/1/62
-    // (msWMunawMux73M2ivLrxdwA7vEYJPMBpGC / 03b60a0afc82bd97bf1d34887f607c636b72b26b9877109b2fe5bd40bc7d748448)
+    // I then looked up the keys for
+    // m/1'/0/42: myobdmpEtNgLgFXCK4EBK3u11sfG6yJVCb / 0289ab6408ce23716bb5484ef31aae98d45013cea12920bd0d92c75ee318f84d28
+    // and m/1'/1/62: n4HYVM4T5kCjYnL72DCvkKEkgZMSvUfQuY / 03739f4d23146ab04e007809339b39eb0d5ea34ec79e518b4639b2b1bf2fd744dd
     //
-    // Where 42, 62 and 2725 are random values.
+    // (where 42 and 62 are randomly chosen values).
 
     DeterministicKey extendedPublicKey = DeterministicKey.deserializeB58(
         "tpubD9MkddWNiSU4tvVjoGryqunfjMkjMXhB4D17McCNrE7ZKd3R4kRPR1kB8gq1u2q8UKx9KqPRGyQW6Fhq7vZwDNZYZGbKd8AMSPtBhoumfVG",
         TestNet3Params.get());
 
-    DeterministicKey childKey = SubzeroUtils.derivePublicKey(extendedPublicKey, SubzeroUtils.newPath(0, false, 42));
-    byte[] expected = Hex.decode("03754317f9ec1b17305ed7f1d8f6247876f5d7bd7b3586681f1faa98d5740c8051");
+    DeterministicKey childKey = SubzeroUtils.derivePublicKey(extendedPublicKey, SubzeroUtils.newPath(false, 42));
+    byte[] expected = Hex.decode("0289ab6408ce23716bb5484ef31aae98d45013cea12920bd0d92c75ee318f84d28");
     assertThat(childKey.getPubKey()).isEqualTo(expected);
 
-    childKey = SubzeroUtils.derivePublicKey(extendedPublicKey, SubzeroUtils.newPath(2725, true, 62));
-    expected = Hex.decode("02f8ec392b6eae0ef6e8b9d5ca7342194394c9d252be7e4e42ff83a9ddf76ff201");
+    childKey = SubzeroUtils.derivePublicKey(extendedPublicKey, SubzeroUtils.newPath(true, 62));
+    expected = Hex.decode("03739f4d23146ab04e007809339b39eb0d5ea34ec79e518b4639b2b1bf2fd744dd");
     assertThat(childKey.getPubKey()).isEqualTo(expected);
   }
 
@@ -380,7 +381,6 @@ public class SubzeroUtilsTest {
                 .setAmount(1000)
                 .setDestination(Destination.DEFAULT_DESTINATION_DO_NOT_USE)
                 .setPath(Path.newBuilder()
-                    .setAccount(1)
                     .setIsChange(false)
                     .setIndex(2))
             ))
@@ -397,7 +397,6 @@ public class SubzeroUtilsTest {
                 .setAmount(1000)
                 .setDestination(Destination.GATEWAY)
                 .setPath(Path.newBuilder()
-                    .setAccount(1)
                     .setIsChange(true)
                     .setIndex(2))
             ))
@@ -411,7 +410,6 @@ public class SubzeroUtilsTest {
                 .setAmount(1000)
                 .setDestination(Destination.CHANGE)
                 .setPath(Path.newBuilder()
-                    .setAccount(1)
                     .setIsChange(false)
                     .setIndex(2))
             ))
@@ -524,7 +522,6 @@ public class SubzeroUtilsTest {
         .setAmount(amount)
         .setDestination(destination)
         .setPath(Path.newBuilder()
-            .setAccount(1)
             .setIsChange(destination == Destination.CHANGE)
             .setIndex(2))
         .build();

@@ -21,15 +21,12 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.spongycastle.util.encoders.Hex.toHexString;
 
 /**
- * This tests show cases how to initialize, finalize and sign a transaction.
- *
- * The data corresponds to the following real transaction on mainnet:
- * https://live.blockcypher.com/btc/tx/607cf3511f0fa527b67d1790fa35d54c0d045c6cb65da1343fe103679e85dd9b/
+ * These tests showcase how to initialize, finalize and sign a transaction.
  */
 public class ColdWalletCreationAndSigningMainnetTest {
-  private final int walletId = 1;
+  private final int walletId = 20190131;
 
-  @Test public void createInitWalletQrCode() {
+  @Test public void createInitWalletRequest() {
     // The first QR code is the request to initialize a wallet
     CommandRequest commandRequest = CommandRequest.newBuilder()
         .setWalletId(walletId)
@@ -38,18 +35,18 @@ public class ColdWalletCreationAndSigningMainnetTest {
     SubzeroUtils.validateCommandRequest(commandRequest);
 
     String initWalletRequest = Base64.toBase64String(commandRequest.toByteArray());
-    assertThat(initWalletRequest).isEqualTo("EAEaAA==");
+    assertThat(initWalletRequest).isEqualTo("ELOn0AkaAA==");
 
     // This QR code is scanned on each offline machine, and results in 4 responses:
     // initWalletResponse1, initWalletResponse2, initWalletResponse3, and initWalletResponse4
   }
 
-  @Test public void createFinalizeWalletQrCode() throws Exception {
+  @Test public void createFinalizeWalletRequest() throws Exception {
     // We use the 4 initWalletResponses to create a finalize wallet QR code.
-    String initWalletResponse1 = "CpEBCo4BCosB78s9CNqIKdNo3ECg+3XAif2n1dEQuirZJvNJUc2MZzZYBS6IFYQWozXNQTJNJba1l/niuLPOu0LznUtwltaRhb/UtumUDAZC3qv/jxKvdiUZG7obMxh9iaKN3CWJ80pObzkSRT9Z+zWNHUoGYFK9dpcutrHPLu6xt7ERGaaaLk1iEcBdEhPZMhXk/CIA";
-    String initWalletResponse2 = "CpEBCo4BCosB4VzWQwKqdIc05locckbRCA+4qbp5vHCfhhi/Wpgz3X3g5jcdL5nakwJiC8jFPc1q4XT4Z4Z2JVEtcaXTAOpjHtTxeNx3llt41tAJezo4R7gNof26qFMdJxQsArpCXOJTGFNlH1lxeagzBY9Mk6c4jzGQfQSczFILPW6QjFdNz3tS7TAxDI5aynVeaSIA";
-    String initWalletResponse3 = "CpEBCo4BCosBmIxd84uGaYiFsTyPngkB17cpTqgONk9mmGTCAjwFQzp76ummP6JMY0RM0SJa2DuB7chFekYTX1U9aDP0u6Ux6wyKIIVzMg+p1zwJPLpHqym7zpqickLLO7plIqE1T8nudskWfRFwObSFGVnTh+Bjho/ZUbCT3TP0GRI/L8pY2eORrG1NptAliDCX2CIA";
-    String initWalletResponse4 = "CpEBCo4BCosB1QsbfTK+htOG4AOQMm7HW2lv1IGMhsCqSRpP9TP3jfGk/XD7z0PlLBydypais7s8TZHn0x/4wn3wu/r8s0jT6qHzkoftcQBVFNHW/UI3NQzmyEMVoaSel0cyaELPYQ5aU7cziRlFzK9MVvEslU/2SjL6k8VZrywb4pDrHFaoYNvFbdGentm6+DFc2iIA";
+    String initWalletResponse1 = "CnMKcQpv0trfyJyS+f3Y/szeyPCf/enBmPr+6MfH4pL8/M+TyO+Yx5PB7dPCy/vFnNmZ6M7eyeDkk8Lu6+vgntvBwduS8PvfwfjBxO/fx/DQzJnI+cLJycXnk86T5+vQzOiY4vuT78LYmJ3n3sT9zMPT+dvpIgA=";
+    String initWalletResponse2 = "CnMKcQpv0trfyJyS0tydwvDFxJ/7w5vM4ZPE0OTv7pzr85nb3sDs/vDDnpjE3OjcwJOfm/PPmfmT/Ono3p/iy//S/dvh/8Cczvjw/sTDxcLJ/8Sbzd/r+8fA7J3e5uTs8Mzh8uDJwfzN8/j82fzo4MP438iYIgA=";
+    String initWalletResponse3 = "CnMKcQpv0trfyJyTm8/L7eD+/efn5sHMmeDd85vA2+zLnpLsktDe4fDr8M/h6N2b2NDO/MDC592Y/M/8zOLc++bZ6OHf/sSb0v2S4evswcX96czbzvvw0/uYndzQ6MPnzOzHwM7ey9jLzPKfxOvN78P5wMfzIgA=";
+    String initWalletResponse4 = "CnMKcQpv0trfyJySmMWb29vs7sPDzsOY0pzAnfrS8/7tn8/Z3dPSksDO29mfw8797cfg8+3h+NCZ0PiZyez+5N7Z0vz5+tnF4t7Onszrn//IyPrrne3HxJ6em8+Y4ezIw+b+2t2bxOz54pPFydjc4Obk693PIgA=";
 
     EncryptedPubKey encPubKey1 = CommandResponse.parseFrom(Base64.decode(initWalletResponse1))
             .getInitWalletOrThrow()
@@ -75,7 +72,7 @@ public class ColdWalletCreationAndSigningMainnetTest {
     SubzeroUtils.validateCommandRequest(commandRequest);
 
     String finalizeWalletRequest = Base64.toBase64String(commandRequest.toByteArray());
-    assertThat(finalizeWalletRequest).isEqualTo("EAEixAQKjgEKiwHvyz0I2ogp02jcQKD7dcCJ/afV0RC6Ktkm80lRzYxnNlgFLogVhBajNc1BMk0ltrWX+eK4s867QvOdS3CW1pGFv9S26ZQMBkLeq/+PEq92JRkbuhszGH2Joo3cJYnzSk5vORJFP1n7NY0dSgZgUr12ly62sc8u7rG3sREZppouTWIRwF0SE9kyFeT8Co4BCosB4VzWQwKqdIc05locckbRCA+4qbp5vHCfhhi/Wpgz3X3g5jcdL5nakwJiC8jFPc1q4XT4Z4Z2JVEtcaXTAOpjHtTxeNx3llt41tAJezo4R7gNof26qFMdJxQsArpCXOJTGFNlH1lxeagzBY9Mk6c4jzGQfQSczFILPW6QjFdNz3tS7TAxDI5aynVeaQqOAQqLAZiMXfOLhmmIhbE8j54JAde3KU6oDjZPZphkwgI8BUM6e+rppj+iTGNETNEiWtg7ge3IRXpGE19VPWgz9LulMesMiiCFczIPqdc8CTy6R6spu86aonJCyzu6ZSKhNU/J7nbJFn0RcDm0hRlZ04fgY4aP2VGwk90z9BkSPy/KWNnjkaxtTabQJYgwl9gKjgEKiwHVCxt9Mr6G04bgA5AybsdbaW/UgYyGwKpJGk/1M/eN8aT9cPvPQ+UsHJ3KlqKzuzxNkefTH/jCffC7+vyzSNPqofOSh+1xAFUU0db9Qjc1DObIQxWhpJ6XRzJoQs9hDlpTtzOJGUXMr0xW8SyVT/ZKMvqTxVmvLBvikOscVqhg28Vt0Z6e2br4MVza");
+    assertThat(finalizeWalletRequest).isEqualTo("ELOn0AkizAMKcQpv0trfyJyS+f3Y/szeyPCf/enBmPr+6MfH4pL8/M+TyO+Yx5PB7dPCy/vFnNmZ6M7eyeDkk8Lu6+vgntvBwduS8PvfwfjBxO/fx/DQzJnI+cLJycXnk86T5+vQzOiY4vuT78LYmJ3n3sT9zMPT+dvpCnEKb9La38icktLcncLwxcSf+8ObzOGTxNDk7+6c6/OZ297A7P7ww56YxNzo3MCTn5vzz5n5k/zp6N6f4sv/0v3b4f/AnM748P7Ew8XCyf/Em83f6/vHwOyd3ubk7PDM4fLgycH8zfP4/Nn86ODD+N/ImApxCm/S2t/InJObz8vt4P795+fmwcyZ4N3zm8Db7MuekuyS0N7h8Ovwz+Ho3ZvY0M78wMLn3Zj8z/zM4tz75tno4d/+xJvS/ZLh6+zBxf3pzNvO+/DT+5id3NDow+fM7MfAzt7L2MvM8p/E683vw/nAx/MKcQpv0trfyJySmMWb29vs7sPDzsOY0pzAnfrS8/7tn8/Z3dPSksDO29mfw8797cfg8+3h+NCZ0PiZyez+5N7Z0vz5+tnF4t7Onszrn//IyPrrne3HxJ6em8+Y4ezIw+b+2t2bxOz54pPFydjc4Obk693P");
 
     // This QR code is scanned on each offline machine, and results in 4 responses:
     // finalizeWalletResponse1, finalizeWalletResponse2, finalizeWalletResponse3, and finalizeWalletResponse4
@@ -83,10 +80,10 @@ public class ColdWalletCreationAndSigningMainnetTest {
 
   @Test public void deriveColdWalletAddress() throws Exception {
     // We use the 4 finalizeWalletResponses to derive a cold wallet address
-    String finalizeWalletResponse1 = "EnEKb3hwdWI2OVljTjRiWTNLNHIzTlFNbWFWWkdOcnBzOTZjQ1ZSYUZES2RWUTVjS0xtOGNhUWVXZDhCYnVwUUd3WjVWODJ4R1NDN1VXbWkyQkFHZkdRVTh2cGFnMVhGaFBoRGRpcHNCQ3I0MTVldTNCaCIA";
-    String finalizeWalletResponse2 = "EnEKb3hwdWI2OUttZ0R4cEhDYnRjM2tzY3BONE1LMnlYRVVhNDZ2c1hjZlp5aW9HYUpSMUF6M1ZpcHNwY3NYWG1tR1I0Mzc3S3ZMZEtRVHBZejgyZFgySjVybXAzYjgxRlM4YWVQMlZMNFlyUEFadUhmdSIA";
-    String finalizeWalletResponse3 = "EnEKb3hwdWI2OFRuRUhnNjVuYUtrRkJ6UFBja0p2Y3Y1Zm9DWDdoUVh5bU5xNGRkRUVtd2M0WnBLZnR5S2VLeHZmUk15OE5UZk42U1dWTXNSa2dRQkRyVFVFTU5KZVBiQU1mbU1HeldjSjR4cTJqTjFMcSIA";
-    String finalizeWalletResponse4 = "EnEKb3hwdWI2OGU3VkJ5ZXU2WU1YdExvdmd5TUJNQ2VxUkVBYTFkRVdOQWIydmJVUlBnSnNiNEtFWWd5YXFtUXAzNTFOVjlvdzQ5blNaODNSSFdVVG9iUUJYZDZzdmpKbnc0dkxiYUo3bXE1TkN1eFBnUiIA";
+    String finalizeWalletResponse1 = "EnEKb3hwdWI2OFNXclRmdGJaNVdDazJQVEJtbUg4VlZlOWJFMm05a0d5aGFRbzZzM0JkdGNKTjloREFBSjRxa2txOFpRdWtSa25FdW1aemYzYlNoY2NvTTlkOU1BemZCMkhROUVocjI3TXRuV2ZpeVNxQyIA";
+    String finalizeWalletResponse2 = "EnEKb3hwdWI2OHh2N2hab241UWkxZks5bnpORUQ2QVkzcXRqRlRaaTQybnZCdmo5NTFZZTNTOVZDQnQ1SGFVeFdxS1VqNmRSWlRuaW9oY1VuMWd1QVFtakY3dExORlpmS1hKY2tWZ1lSVnNWQkppUnViMiIA";
+    String finalizeWalletResponse3 = "EnEKb3hwdWI2OTFlYUdKVFdNTUxrZjNKd1kxanFGYTQ4Rjh6dEtaQVplS0J3MXJ6ZFZqaE13MlZlVmZIdlFMc0JLdVRuMXhXOEtBRmtvV0NmcWRRWnlRMjd2ekJpTWZGbWpkdGFyYWZYNW5BZ0VpU2ptWSIA";
+    String finalizeWalletResponse4 = "EnEKb3hwdWI2ODJvMXFxRkRpaWRpMng2ajdQeFlURzVlc3d5eDhqZHFzNWlkV0dtSllHS1J6M3pSM2NGVE50c3hWU1Bzb0h0ZDRmQTVVYmJQQTdHbW40NDFlMktGYmlMVHB3MW5GU0g5b2NydkpMTkF3ZSIA";
 
     String pubKey1 = CommandResponse.parseFrom(Base64.decode(finalizeWalletResponse1))
         .getFinalizeWalletOrThrow()
@@ -108,60 +105,53 @@ public class ColdWalletCreationAndSigningMainnetTest {
         .getPubKeyOrThrow()
         .toStringUtf8();
 
-    assertThat(pubKey1).isEqualTo("xpub69YcN4bY3K4r3NQMmaVZGNrps96cCVRaFDKdVQ5cKLm8caQeWd8BbupQGwZ5V82xGSC7UWmi2BAGfGQU8vpag1XFhPhDdipsBCr415eu3Bh");
-    assertThat(pubKey2).isEqualTo("xpub69KmgDxpHCbtc3kscpN4MK2yXEUa46vsXcfZyioGaJR1Az3VipspcsXXmmGR4377KvLdKQTpYz82dX2J5rmp3b81FS8aeP2VL4YrPAZuHfu");
-    assertThat(pubKey3).isEqualTo("xpub68TnEHg65naKkFBzPPckJvcv5foCX7hQXymNq4ddEEmwc4ZpKftyKeKxvfRMy8NTfN6SWVMsRkgQBDrTUEMNJePbAMfmMGzWcJ4xq2jN1Lq");
-    assertThat(pubKey4).isEqualTo("xpub68e7VByeu6YMXtLovgyMBMCeqREAa1dEWNAb2vbURPgJsb4KEYgyaqmQp351NV9ow49nSZ83RHWUTobQBXd6svjJnw4vLbaJ7mq5NCuxPgR");
+    assertThat(pubKey1).isEqualTo("xpub68SWrTftbZ5WCk2PTBmmH8VVe9bE2m9kGyhaQo6s3BdtcJN9hDAAJ4qkkq8ZQukRknEumZzf3bShccoM9d9MAzfB2HQ9Ehr27MtnWfiySqC");
+    assertThat(pubKey2).isEqualTo("xpub68xv7hZon5Qi1fK9nzNED6AY3qtjFTZi42nvBvj951Ye3S9VCBt5HaUxWqKUj6dRZTniohcUn1guAQmjF7tLNFZfKXJckVgYRVsVBJiRub2");
+    assertThat(pubKey3).isEqualTo("xpub691eaGJTWMMLkf3JwY1jqFa48F8ztKZAZeKBw1rzdVjhMw2VeVfHvQLsBKuTn1xW8KAFkoWCfqdQZyQ27vzBiMfFmjdtarafX5nAgEiSjmY");
+    assertThat(pubKey4).isEqualTo("xpub682o1qqFDiidi2x6j7PxYTG5eswyx8jdqs5idWGmJYGKRz3zR3cFTNtsxVSPsoHtd4fA5UbbPA7Gmn441e2KFbiLTpw1nFSH9ocrvJLNAwe");
 
     // Path was picked randomly. It's important to never reuse addresses!
     Path path = Path.newBuilder()
-        .setAccount(6211)
         .setIsChange(false)
         .setIndex(3172)
         .build();
 
     List<String> addresses = ImmutableList.of(pubKey1, pubKey2, pubKey3, pubKey4);
-    String gateway = "xpub69kTAN2XXad5k39pCzEwBRwu76pX3kNUyPAgxe3vbgoZ4M4FzqxyeMe8FgsCSkTbT797YuP2u4Hhc4kgV8tAeiH7hFnk9obqxyJ7bzeuroC";
+    String gateway = "xpub68Jb6w8Rt39nCkDgMaaSiTCCEyZTx6vjeFJHfKgvxz4JkePneCfRpe82vECwHxfWkAdUysRxa4d59RbC8RqVFDKYB5hWQ8ebUecbS5qwHN7";
 
     ColdWallet coldWallet = new ColdWallet(MainNetParams.get(), walletId, addresses, gateway);
     String coldWalletAddress = coldWallet.address(path).toBase58();
-    assertThat(coldWalletAddress).isEqualTo("3ASqAsrWKzV2qsGdKwJh7m9idjRtL3cKee");
+    assertThat(coldWalletAddress).isEqualTo("38j52zh1XCpjWEgAgEQXaEdfwHV1gSBSQY");
 
     // You can see the transaction which funds this address here:
-    // https://live.blockcypher.com/btc/tx/f9e21886a6b8216ec0717728ecc4433a0b765b0f81ea1d4cd5b982fcbf293f8d/
+    // https://live.blockcypher.com/btc/tx/356ef5e00c897257e56c9bef9cadbe1858cac648faf3072caa471e4e8378b92d/
   }
 
-  @Test public void createSignTxQrCode() {
+  @Test public void createSignTxRequest() {
     Path inputPath = Path.newBuilder()
-        .setAccount(6211)
         .setIsChange(false)
         .setIndex(3172)
         .build();
 
     Path outputPath = Path.newBuilder()
-        .setAccount(0)
         .setIsChange(false)
         .setIndex(0)
         .build();
 
     List<String> addresses = new LinkedList<>();
-    addresses.add(
-        "xpub69YcN4bY3K4r3NQMmaVZGNrps96cCVRaFDKdVQ5cKLm8caQeWd8BbupQGwZ5V82xGSC7UWmi2BAGfGQU8vpag1XFhPhDdipsBCr415eu3Bh");
-    addresses.add(
-        "xpub69KmgDxpHCbtc3kscpN4MK2yXEUa46vsXcfZyioGaJR1Az3VipspcsXXmmGR4377KvLdKQTpYz82dX2J5rmp3b81FS8aeP2VL4YrPAZuHfu");
-    addresses.add(
-        "xpub68TnEHg65naKkFBzPPckJvcv5foCX7hQXymNq4ddEEmwc4ZpKftyKeKxvfRMy8NTfN6SWVMsRkgQBDrTUEMNJePbAMfmMGzWcJ4xq2jN1Lq");
-    addresses.add(
-        "xpub68e7VByeu6YMXtLovgyMBMCeqREAa1dEWNAb2vbURPgJsb4KEYgyaqmQp351NV9ow49nSZ83RHWUTobQBXd6svjJnw4vLbaJ7mq5NCuxPgR");
+    addresses.add("xpub68SWrTftbZ5WCk2PTBmmH8VVe9bE2m9kGyhaQo6s3BdtcJN9hDAAJ4qkkq8ZQukRknEumZzf3bShccoM9d9MAzfB2HQ9Ehr27MtnWfiySqC");
+    addresses.add("xpub68xv7hZon5Qi1fK9nzNED6AY3qtjFTZi42nvBvj951Ye3S9VCBt5HaUxWqKUj6dRZTniohcUn1guAQmjF7tLNFZfKXJckVgYRVsVBJiRub2");
+    addresses.add("xpub691eaGJTWMMLkf3JwY1jqFa48F8ztKZAZeKBw1rzdVjhMw2VeVfHvQLsBKuTn1xW8KAFkoWCfqdQZyQ27vzBiMfFmjdtarafX5nAgEiSjmY");
+    addresses.add("xpub682o1qqFDiidi2x6j7PxYTG5eswyx8jdqs5idWGmJYGKRz3zR3cFTNtsxVSPsoHtd4fA5UbbPA7Gmn441e2KFbiLTpw1nFSH9ocrvJLNAwe");
 
-    String gateway = "xpub69kTAN2XXad5k39pCzEwBRwu76pX3kNUyPAgxe3vbgoZ4M4FzqxyeMe8FgsCSkTbT797YuP2u4Hhc4kgV8tAeiH7hFnk9obqxyJ7bzeuroC";
+    String gateway = "xpub68Jb6w8Rt39nCkDgMaaSiTCCEyZTx6vjeFJHfKgvxz4JkePneCfRpe82vECwHxfWkAdUysRxa4d59RbC8RqVFDKYB5hWQ8ebUecbS5qwHN7";
 
     ColdWallet coldWallet = new ColdWallet(MainNetParams.get(), walletId, addresses, gateway);
     CommandRequest commandRequest = coldWallet.startTransaction(
         ImmutableList.of(TxInput.newBuilder()
             .setPrevHash(ByteString.copyFrom(
-                Hex.decode("f9e21886a6b8216ec0717728ecc4433a0b765b0f81ea1d4cd5b982fcbf293f8d")))
-            .setPrevIndex(1)
+                Hex.decode("356ef5e00c897257e56c9bef9cadbe1858cac648faf3072caa471e4e8378b92d")))
+            .setPrevIndex(0)
             .setAmount(100000)
             .setPath(inputPath)
             .build()),
@@ -174,7 +164,7 @@ public class ColdWalletCreationAndSigningMainnetTest {
     SubzeroUtils.validateCommandRequest(commandRequest);
 
     String signTxRequest = Base64.toBase64String(commandRequest.toByteArray());
-    assertThat(signTxRequest).isEqualTo("EAEqRgoyCiD54hiGprghbsBxdyjsxEM6C3ZbD4HqHUzVuYL8vyk/jRABGKCNBiIICMMwEAAY5BgSDgiQ2AUQAhoGCAAQABgAGAA=");
+    assertThat(signTxRequest).isEqualTo("ELOn0AkqQQovCiA1bvXgDIlyV+Vsm++crb4YWMrGSPrzByyqRx5Og3i5LRAAGKCNBiIFEAAY5BgSDAiQ2AUQAhoEEAAYABgA");
 
     // This QR code is scanned on two offline machine, and results in 2 responses:
     // signTxResponse1, and signTxResponse2
@@ -184,28 +174,21 @@ public class ColdWalletCreationAndSigningMainnetTest {
     // We use signTxResponse1 and signTxResponse2 to create the transaction.
     // The gateway address we use here must match what's hardcoded in Subzero's CodeSafe module or
     // the signature will fail to verify.
-    CommandRequest signTxRequest = CommandRequest.parseFrom(Base64.decode(
-        "EAEqRgoyCiD54hiGprghbsBxdyjsxEM6C3ZbD4HqHUzVuYL8vyk/jRABGKCNBiIICMMwEAAY5BgSDgiQ2AUQAhoGCAAQABgAGAA="));
+    CommandRequest signTxRequest = CommandRequest.parseFrom(Base64.decode("ELOn0AkqQQovCiA1bvXgDIlyV+Vsm++crb4YWMrGSPrzByyqRx5Og3i5LRAAGKCNBiIFEAAY5BgSDAiQ2AUQAhoEEAAYABgA"));
 
-    String signTxResponse1 =
-        "Gm0KawpHMEUCIQCJJWmmh+4E+crFreeG5wfO4T8YDxpkVQa6UraQGGZt6AIgNfWa50vuoEwtLd1nc5O6yNpMOmU+WVrGMFkOU5SWStwSIK6oB2Egliv9dn0Zu7s5ZBwaTLkEkYZ8/Y5C7uCY0vnKIgA=";
-    String signTxResponse2 =
-        "Gm0KawpHMEUCIQDHKMVUWwHGFj7ed9qA2EeHmQ3hsUffFCqOf1KuxeUC/gIgevf1GKX0PuYuzEJhgwOtTUwCZtaPJqljfodbmgGcFUsSIK6oB2Egliv9dn0Zu7s5ZBwaTLkEkYZ8/Y5C7uCY0vnKIgA=";
+    String signTxResponse1 = "Gm0KawpHMEUCIQDUXBg5iwrPZM/cAksdOeS9zqcyQYYlNuRBLuWkM5G12AIgJGg432LwX24k769nxPKwpb2qq3NML+AWkE4D5YWXzkoSIMOwIFJ866tzZeeuY6yqkA7dfGiSWbz/Lzk3eF5ffqMsIgA=";
+    String signTxResponse2 = "GmwKagpGMEQCIDytUkc3PR7YqOnEapeDV2sG9oarzo8Y9gyvSeqx1Uv0AiAlfWitoSHkhPo65ub+Ef0qBPdP6K7cGw+zp50UVwaQxRIgw7AgUnzrq3Nl565jrKqQDt18aJJZvP8vOTd4Xl9+oywiAA==";
 
     CommandResponse sig1 = CommandResponse.parseFrom(Base64.decode(signTxResponse1));
     CommandResponse sig2 = CommandResponse.parseFrom(Base64.decode(signTxResponse2));
 
     List<String> addresses = new LinkedList<>();
-    addresses.add(
-        "xpub69YcN4bY3K4r3NQMmaVZGNrps96cCVRaFDKdVQ5cKLm8caQeWd8BbupQGwZ5V82xGSC7UWmi2BAGfGQU8vpag1XFhPhDdipsBCr415eu3Bh");
-    addresses.add(
-        "xpub69KmgDxpHCbtc3kscpN4MK2yXEUa46vsXcfZyioGaJR1Az3VipspcsXXmmGR4377KvLdKQTpYz82dX2J5rmp3b81FS8aeP2VL4YrPAZuHfu");
-    addresses.add(
-        "xpub68TnEHg65naKkFBzPPckJvcv5foCX7hQXymNq4ddEEmwc4ZpKftyKeKxvfRMy8NTfN6SWVMsRkgQBDrTUEMNJePbAMfmMGzWcJ4xq2jN1Lq");
-    addresses.add(
-        "xpub68e7VByeu6YMXtLovgyMBMCeqREAa1dEWNAb2vbURPgJsb4KEYgyaqmQp351NV9ow49nSZ83RHWUTobQBXd6svjJnw4vLbaJ7mq5NCuxPgR");
+    addresses.add("xpub68SWrTftbZ5WCk2PTBmmH8VVe9bE2m9kGyhaQo6s3BdtcJN9hDAAJ4qkkq8ZQukRknEumZzf3bShccoM9d9MAzfB2HQ9Ehr27MtnWfiySqC");
+    addresses.add("xpub68xv7hZon5Qi1fK9nzNED6AY3qtjFTZi42nvBvj951Ye3S9VCBt5HaUxWqKUj6dRZTniohcUn1guAQmjF7tLNFZfKXJckVgYRVsVBJiRub2");
+    addresses.add("xpub691eaGJTWMMLkf3JwY1jqFa48F8ztKZAZeKBw1rzdVjhMw2VeVfHvQLsBKuTn1xW8KAFkoWCfqdQZyQ27vzBiMfFmjdtarafX5nAgEiSjmY");
+    addresses.add("xpub682o1qqFDiidi2x6j7PxYTG5eswyx8jdqs5idWGmJYGKRz3zR3cFTNtsxVSPsoHtd4fA5UbbPA7Gmn441e2KFbiLTpw1nFSH9ocrvJLNAwe");
 
-    String gateway = "xpub69kTAN2XXad5k39pCzEwBRwu76pX3kNUyPAgxe3vbgoZ4M4FzqxyeMe8FgsCSkTbT797YuP2u4Hhc4kgV8tAeiH7hFnk9obqxyJ7bzeuroC";
+    String gateway = "xpub68Jb6w8Rt39nCkDgMaaSiTCCEyZTx6vjeFJHfKgvxz4JkePneCfRpe82vECwHxfWkAdUysRxa4d59RbC8RqVFDKYB5hWQ8ebUecbS5qwHN7";
 
     List<List<Signature>> signatures = ImmutableList.of(sig1.getSignTx().getSignaturesList(), sig2.getSignTx().getSignaturesList());
 
@@ -214,9 +197,9 @@ public class ColdWalletCreationAndSigningMainnetTest {
         toHexString(coldWallet.createTransaction(signTxRequest.getSignTxOrThrow().getInputsList(),
             signTxRequest.getSignTxOrThrow().getOutputsList(), signatures));
     assertThat(transaction).isEqualTo(
-        "010000000001018d3f29bffc82b9d54c1dea810f5b760b3a43c4ec287771c06e21b8a68618e2f90100000023220020dcf584a95e6a494dcb5649c7509e85d3f6636666be4c4bd5a9364da7de5c3aa8feffffff01106c0100000000001976a914549d588666a4e07bd6f51a7668d6053edc75b80388ac0400483045022100c728c5545b01c6163ede77da80d84787990de1b147df142a8e7f52aec5e502fe02207af7f518a5f43ee62ecc42618303ad4d4c0266d68f26a9637e875b9a019c154b01483045022100892569a687ee04f9cac5ade786e707cee13f180f1a645506ba52b69018666de8022035f59ae74beea04c2d2ddd677393bac8da4c3a653e595ac630590e5394964adc018b522102da4cf48efc2850c65ba457b2a8061eea39055fbdcc874cb949eccdf535127f4e2102fceb5a84868c4247c7c75cf376cc102aa930f33e65f40d3694aab5fb874f574e21033a866b1b0b3466a5d121201f2bdd853b50bdbe8cf447dbf5b4cd20068c9d3c13210363481eaac39ca765d6262bc63ec47baded5c6d7bfaf539e8eca4c6de6bec447254ae00000000");
+        "010000000001012db978834e1e47aa2c07f3fa48c6ca5818bead9cef9b6ce55772890ce0f56e350000000023220020c35e8fbe611a5a157ddfe54d1c6e8d9cbe7edd76a9a9578fb39b0390a52b6e07feffffff01106c0100000000001976a914dd12ae4d57cfa4bcb78214f9669aaf9e6215664f88ac0400483045022100d45c18398b0acf64cfdc024b1d39e4bdcea73241862536e4412ee5a43391b5d80220246838df62f05f6e24efaf67c4f2b0a5bdaaab734c2fe016904e03e58597ce4a0147304402203cad5247373d1ed8a8e9c46a9783576b06f686abce8f18f60caf49eab1d54bf40220257d68ada121e484fa3ae6e6fe11fd2a04f74fe8aedc1b0fb3a79d14570690c5018b5221021fe5210be064b91d356a02a0e42cae57c9ceadcde5a500af2a2f44a525985587210254d20970c867d6abc582716731221a6fa9aa6e92621d28cda71d541939290594210379d0c27c46d6f9ea3b741ac7cfeef110f6e8849a827620e57d0ac5affe3c96412103b78cfc42d8285f73ea8e57a86d62e588f9833dd8a69f1d4da3e029aac922d1b054ae00000000");
 
     // You can see this transaction here:
-    // https://live.blockcypher.com/btc/tx/607cf3511f0fa527b67d1790fa35d54c0d045c6cb65da1343fe103679e85dd9b/
+    // https://live.blockcypher.com/btc/tx/0283e8d4c2385ecd89beb7062581d32b990c3f2055a16ba1934221a872e22a9a/
   }
 }

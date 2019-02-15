@@ -70,8 +70,6 @@ static int construct_request(InternalCommandRequest_SignTxRequest *tx) {
   tx->inputs[0].amount = 1000000;
 
   tx->inputs[0].has_path = true;
-  tx->inputs[0].path.has_account = true;
-  tx->inputs[0].path.account = 0;
   tx->inputs[0].path.has_is_change = true;
   tx->inputs[0].path.is_change = false;
   tx->inputs[0].path.has_index = true;
@@ -82,8 +80,6 @@ static int construct_request(InternalCommandRequest_SignTxRequest *tx) {
   tx->outputs[0].amount = 999334;
 
   tx->outputs[0].has_path = true;
-  tx->outputs[0].path.has_account = true;
-  tx->outputs[0].path.account = 0;
   tx->outputs[0].path.has_is_change = true;
   tx->outputs[0].path.is_change = false;
   tx->outputs[0].path.has_index = true;
@@ -127,9 +123,8 @@ int verify_sign_tx(void) {
   if (memcmp(resp.signatures[0].der.bytes, expected_der,
              resp.signatures[0].der.size) != 0) {
     ERROR("der mismatch.");
-    for (int i=0; i<resp.signatures[0].der.size; i++) {
-      printf("0x%02x, ", resp.signatures[0].der.bytes[i]);
-    }
+    print_bytes(expected_der, sizeof(expected_der));
+    print_bytes(resp.signatures[0].der.bytes, resp.signatures[0].der.size);
     return -1;
   }
   INFO("sign_tx passed");
