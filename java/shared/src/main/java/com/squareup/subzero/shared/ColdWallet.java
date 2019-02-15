@@ -75,26 +75,12 @@ public class ColdWallet {
    * This creates a SignTx CommandRequest to begin a transaction.
    * After you call startTransaction and have cold storage sign the request, you'll pass that
    * to createTransaction.
-   *
-   * @param inputs The inputs to spend
-   * @param outputs The outputs to receive coin
-   * @param token A token reflected into the response for tracking
-   * @return The SignTx command
    */
   public CommandRequest startTransaction(List<TxInput> inputs, List<TxOutput> outputs,
-      String token) {
-    return startTransaction(Constants.VERSION, inputs, outputs, token);
-  }
-
-  /**
-   * Useful for tests.
-   */
-  public CommandRequest startTransaction(int version, List<TxInput> inputs, List<TxOutput> outputs,
       String token) {
     int lockTime = 0;
     return CommandRequest.newBuilder()
         .setOrClearToken(token)
-        .setVersion(Constants.VERSION)
         .setWalletId(walletId)
         .setSignTx(
             CommandRequest.SignTxRequest.newBuilder()
