@@ -1,7 +1,7 @@
 package com.squareup.subzero.shared;
 
 public class Constants {
-  public static final int VERSION = 205;
+  public static final int VERSION = 207;
   public static final int TEMP_DEFAULT_WALLET_ID = 9999;
 
   public static final int MULTISIG_PARTICIPANTS = 4;
