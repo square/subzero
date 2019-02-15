@@ -530,6 +530,8 @@ Result handle_sign_tx(InternalCommandRequest_SignTxRequest *request,
     DEBUG("Loaded pubkey %d: %s", i, xpub[i]);
   }
 
+  DEBUG("Gateway: %s", GATEWAY);
+
   // Compute what BIP 0143 calls "midstate": three hashes shared by all
   // signatures below.
   uint8_t prevoutsHash[HASHER_DIGEST_LENGTH];

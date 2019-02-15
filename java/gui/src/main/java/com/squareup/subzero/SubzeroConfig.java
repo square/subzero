@@ -25,14 +25,19 @@ public class SubzeroConfig {
   /**
    * SubzeroGui does not use ServiceContainer, so we implement our own config loading.
    */
-  public static SubzeroConfig load() throws IOException {
+  public static SubzeroConfig load(boolean nCipher) throws IOException {
     // load subzero.yaml
     EnvironmentsMap environmentsMap = loadEnvMap();
 
     // Get HSM's security world. Default to dev.
-    EnvironmentsMap.Environments env;
-    String securityWorld = new NCipher().getSecurityWorld();
-    env = environmentsMap.environments.get(securityWorld);
+    EnvironmentsMap.Environments env = null;
+    if (nCipher) {
+      String securityWorld = new NCipher().getSecurityWorld();
+      System.out.println(format("Looking up env with %s", securityWorld));
+      env = environmentsMap.environments.get(securityWorld);
+    } else {
+      System.out.println("skipping nCipher check");
+    }
     if (env == null) {
       env = EnvironmentsMap.Environments.development;
     }

@@ -32,6 +32,9 @@ public class SubzeroGui {
   // Almost always you want to talk to subzero on localhost
   @Parameter(names = "--hostname") public String hostname = "localhost";
 
+  // Needed for bootstrapping
+  @Parameter(names = "--create-pub-key-encryption-key") public Boolean createPubKeyEncryptionKey = false;
+
   public SubzeroConfig config;
   private Screens screens;
 
@@ -47,7 +50,6 @@ public class SubzeroGui {
 
   public static void main(String[] args) throws Exception {
     SubzeroGui subzero = new SubzeroGui();
-    subzero.config = SubzeroConfig.load();
 
     JCommander jCommander = JCommander.newBuilder()
         .addObject(subzero)
@@ -61,6 +63,8 @@ public class SubzeroGui {
 
     System.out.println("This program draws to a framebuffer. If you are only seeing this output,");
     System.out.println("then something has gone wrong. Please report this error.");
+
+    subzero.config = SubzeroConfig.load(subzero.nCipher);
 
     if (subzero.uiTest) {
       subzero.uiTest();
