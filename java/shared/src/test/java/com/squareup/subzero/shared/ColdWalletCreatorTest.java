@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * These tests exercise the lifecycle of creating a cold wallet.
@@ -68,13 +69,12 @@ public class ColdWalletCreatorTest {
     map.put("token-d", encryptedPubKeyD);
     int walletId = 123;
 
-    Optional<CommandRequest> request = ColdWalletCreator.combine(map, tokenA, walletId);
-    assertThat(request).isPresent();
-    assertThat(request.get().getToken()).isEqualTo(tokenA);
-    assertThat(request.get().getWalletIdOrThrow()).isEqualTo(walletId);
-    assertThat(request.get().getFinalizeWalletOrThrow().getEncryptedPubKeysCount())
+    CommandRequest request = ColdWalletCreator.combine(map, tokenA, walletId);
+    assertThat(request.getToken()).isEqualTo(tokenA);
+    assertThat(request.getWalletIdOrThrow()).isEqualTo(walletId);
+    assertThat(request.getFinalizeWalletOrThrow().getEncryptedPubKeysCount())
         .isEqualTo(map.size());
-    assertThat(request.get().getFinalizeWallet().getEncryptedPubKeysList())
+    assertThat(request.getFinalizeWallet().getEncryptedPubKeysList())
         .containsExactlyInAnyOrder(encryptedPubKeyA, encryptedPubKeyB, encryptedPubKeyC,
             encryptedPubKeyD);
   }
@@ -104,8 +104,8 @@ public class ColdWalletCreatorTest {
     map.put("token-d", encryptedPubKeyD);
     int walletId = 123;
 
-    Optional<CommandRequest> request = ColdWalletCreator.combine(map, tokenA, walletId);
-    assertThat(request).isEmpty();
+    assertThatThrownBy(() -> ColdWalletCreator.combine(map, tokenA, walletId))
+        .isInstanceOf(IllegalArgumentException.class);
   }
 
   /**
@@ -120,9 +120,9 @@ public class ColdWalletCreatorTest {
     String tokenA = "token-a";
     map.put(tokenA, encryptedPubKeyA);
     int walletId = 123;
-    Optional<CommandRequest> request = ColdWalletCreator.combine(map, tokenA, walletId);
     assertThat(map.size()).isNotEqualTo(Constants.ENCRYPTED_PUB_KEYS_MAX_COUNT);
-    assertThat(request).isEmpty();
+    assertThatThrownBy(() -> ColdWalletCreator.combine(map, tokenA, walletId))
+        .isInstanceOf(IllegalArgumentException.class);
   }
 
   /**
@@ -141,8 +141,8 @@ public class ColdWalletCreatorTest {
     map.put("token-d", null);
     int walletId = 123;
 
-    Optional<CommandRequest> request = ColdWalletCreator.combine(map, tokenA, walletId);
-    assertThat(request).isEmpty();
+    assertThatThrownBy(() -> ColdWalletCreator.combine(map, tokenA, walletId))
+        .isInstanceOf(IllegalArgumentException.class);
   }
 
   /**
