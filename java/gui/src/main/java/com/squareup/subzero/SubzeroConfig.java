@@ -17,7 +17,7 @@ public class PlutusConfig {
   public String framebuffer;         // path
   public String framebufferSize;     // either "<width>,<height>" or "!!<path>"
   public boolean window;             // set to true to render framebuffer in an AWT window.
-  public String softcard;            // hex
+  public String softcard;            // hex or name
   public String softcardPassword;    // either "<password>" or "!!<path>"
   public String pubKeyEncryptionKey; // hex
   public String teamName;            // either "<name>" or "!!<path>"
