@@ -208,7 +208,7 @@ public class PlutusUtils {
     return hash.digest(hash.digest());
   }
 
-  // A helper constructor, because proto builders are verboase
+  // A helper constructor, because proto builders are verbose
   public static Path newPath(int account, boolean ischange, int index) {
     return Path.newBuilder().setAccount(account).setIsChange(ischange).setIndex(index).build();
   }
