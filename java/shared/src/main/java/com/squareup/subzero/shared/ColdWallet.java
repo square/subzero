@@ -13,6 +13,7 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.NetworkParameters;
@@ -75,18 +76,27 @@ public class ColdWallet {
    * This creates a SignTx CommandRequest to begin a transaction.
    * After you call startTransaction and have cold storage sign the request, you'll pass that
    * to createTransaction.
+   *
+   * @param inputs the inputs to the transaction.
+   * @param outputs the outputs of the transaction.
+   * @param token a unique token used to uniquely identify this transaction.
+   * @param localRate the current exchange rate in USD per satoshi, or null if not available.
+   * @return a new subzero CommandRequest object.
    */
   public CommandRequest startTransaction(List<TxInput> inputs, List<TxOutput> outputs,
-      String token) {
+      String token, @Nullable Double localRate) {
     int lockTime = 0;
+    CommandRequest.SignTxRequest.Builder signRequestBuilder = CommandRequest.SignTxRequest.newBuilder()
+        .addAllInputs(inputs)
+        .addAllOutputs(outputs)
+        .setLockTime(lockTime);
+    if (localRate != null) {
+        signRequestBuilder.setLocalRate(localRate).setLocalCurrency("USD");
+    }
     return CommandRequest.newBuilder()
         .setOrClearToken(token)
         .setWalletId(walletId)
-        .setSignTx(
-            CommandRequest.SignTxRequest.newBuilder()
-                .addAllInputs(inputs)
-                .addAllOutputs(outputs)
-                .setLockTime(lockTime))
+        .setSignTx(signRequestBuilder)
         .build();
   }
 
@@ -283,5 +293,4 @@ public class ColdWallet {
       throw new RuntimeException(e);
     }
   }
-
 }
