@@ -1,6 +1,6 @@
 package com.squareup.subzero.shared;
 
-import com.squareup.core.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import com.squareup.protos.subzero.service.Common.Path;
 import com.squareup.protos.subzero.service.Common.Signature;
 import com.squareup.protos.subzero.service.Common.TxInput;
@@ -93,8 +93,12 @@ public class ColdWallet {
     if (localRate != null) {
         signRequestBuilder.setLocalRate(localRate).setLocalCurrency("USD");
     }
-    return CommandRequest.newBuilder()
-        .setOrClearToken(token)
+
+    CommandRequest.Builder builder = CommandRequest.newBuilder();
+    if (token != null) {
+      builder.setToken(token);
+    }
+    return builder
         .setWalletId(walletId)
         .setSignTx(signRequestBuilder)
         .build();
@@ -176,8 +180,8 @@ public class ColdWallet {
 
       out.write(inputs.size()); // number of inputs
       for (TxInput input : inputs) {
-        byte[] prevHash = Utils.reverseBytes(input.getPrevHashOrThrow().toByteArray());
-        Integer prevIndex = input.getPrevIndexOrThrow();
+        byte[] prevHash = Utils.reverseBytes(input.getPrevHash().toByteArray());
+        Integer prevIndex = input.getPrevIndex();
         out.write(prevHash);
         Utils.uint32ToByteStreamLE(prevIndex, out);
         hashPrevouts.update(prevHash);
@@ -187,14 +191,14 @@ public class ColdWallet {
         // Derive the public keys from the roots
         List<ECKey> publicKeys = new ArrayList<>();
         for (DeterministicKey publicRootKey : publicRootKeys) {
-          Path path = input.getPathOrThrow();
+          Path path = input.getPath();
           DeterministicKey publicKey = derivePublicKey(publicRootKey, path);
           publicKeys.add(publicKey);
         }
 
         Script witnessScript =
             ScriptBuilder.createRedeemScript(2 /* required multisig participants */, publicKeys);
-        witnesses.add(new Pair(publicKeys, witnessScript));
+        witnesses.add(Pair.of(publicKeys, witnessScript));
         byte[] scriptHash = Sha256Hash.of(witnessScript.getProgram()).getBytes();
 
         // checkArgument(scriptHash.length == 20);
@@ -216,19 +220,19 @@ public class ColdWallet {
       out.write(outputs.size()); // number of outputs
       for (TxOutput output : outputs) {
         // Each output starts with the amount:
-        Long amount = output.getAmountOrThrow();
+        Long amount = output.getAmount();
         Utils.uint64ToByteStreamLE(BigInteger.valueOf(amount), out);
         SubzeroUtils.hashUint64LE(amount, hashOutputs);
 
         Address address;
         switch (output.getDestination()) {
           case GATEWAY:
-            DeterministicKey to = derivePublicKey(gateway, output.getPathOrThrow());
+            DeterministicKey to = derivePublicKey(gateway, output.getPath());
             address = new Address(params, to.getPubKeyHash());
             break;
           case CHANGE:
             address = SubzeroUtils.deriveP2SHP2WSH(params, Constants.MULTISIG_THRESHOLD,
-                publicRootKeys, output.getPathOrThrow());
+                publicRootKeys, output.getPath());
             break;
           default:
             throw new IllegalStateException("unreachable");
@@ -249,7 +253,7 @@ public class ColdWallet {
       // Each txin is associated with a witness field.
       for (int i=0; i< witnesses.size(); i++) {
         Pair<List<ECKey>, Script> witness = witnesses.get(i);
-        byte[] witnessProgram = witness.right.getProgram();
+        byte[] witnessProgram = witness.getRight().getProgram();
         TxInput input = inputs.get(i);
 
         byte[] hash = SubzeroUtils.bip0143hash(prevoutsDoubleSha, sequenceDoubleSha, outputsDoubleSha, input,
@@ -268,7 +272,7 @@ public class ColdWallet {
 
         // We need the signatures sorted in the same order as the public keys.
         // This function validates the signatures and sorts them.
-        List<byte[]> sortedSigs = SubzeroUtils.validateAndSort(witness.left, hash, signatures.get(0).get(i),
+        List<byte[]> sortedSigs = SubzeroUtils.validateAndSort(witness.getLeft(), hash, signatures.get(0).get(i),
             signatures.get(1).get(i));
 
         // Write two signatures out.  It's length + 1 because of the extra byte for the signature type

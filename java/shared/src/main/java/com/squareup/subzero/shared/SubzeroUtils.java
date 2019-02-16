@@ -182,8 +182,8 @@ public class SubzeroUtils {
     hash.update(hashSequence);
 
     //     4. outpoint (32-byte hash + 4-byte little endian)
-    hash.update(Utils.reverseBytes(input.getPrevHashOrThrow().toByteArray()));
-    hashUint32LE(input.getPrevIndexOrThrow(), hash);
+    hash.update(Utils.reverseBytes(input.getPrevHash().toByteArray()));
+    hashUint32LE(input.getPrevIndex(), hash);
 
     //     5. scriptCode of the input (serialized as scripts inside CTxOuts)
     hash.update(new VarInt(script.length).encode());
@@ -214,18 +214,15 @@ public class SubzeroUtils {
   }
 
   protected static DeterministicKey derivePublicKey(DeterministicKey key, Path path) {
-    if (path.getAccountOrThrow() < 0) {
-      throw new IllegalStateException("account should be between 0 and 2^31-1");
-    }
-    if (path.getIndexOrThrow() < 0) {
+    if (path.getIndex() < 0) {
       throw new IllegalStateException("index should be between 0 and 2^31-1");
     }
 
     // note: key might be m/0 for prod, but it's m/ for testnet. Investigate if this is some kind of
     // BitcoinJ quirk?
-    key = HDKeyDerivation.deriveChildKey(key, new ChildNumber(path.getIsChangeOrThrow() ? 1 : 0, false));
+    key = HDKeyDerivation.deriveChildKey(key, new ChildNumber(path.getIsChange() ? 1 : 0, false));
 
-    key = HDKeyDerivation.deriveChildKey(key, new ChildNumber(path.getIndexOrThrow(), false));
+    key = HDKeyDerivation.deriveChildKey(key, new ChildNumber(path.getIndex(), false));
 
     int length = key.getPubKey().length;
     if (length != 33) {
@@ -297,10 +294,10 @@ public class SubzeroUtils {
         // We don't need to validate anything.
         break;
       case FINALIZEWALLET:
-        validateFinalizeWalletCommandRequest(request.getFinalizeWalletOrThrow());
+        validateFinalizeWalletCommandRequest(request.getFinalizeWallet());
         break;
       case SIGNTX:
-        CommandRequest.SignTxRequest signRequest = request.getSignTxOrThrow();
+        CommandRequest.SignTxRequest signRequest = request.getSignTx();
         validateSignTxCommandRequest(signRequest);
         validateFees(signRequest);
         break;
@@ -323,10 +320,10 @@ public class SubzeroUtils {
         validateInitWalletInternalCommandRequest(request);
         break;
       case FINALIZEWALLET:
-        validateFinalizeWalletInternalCommandRequest(request.getFinalizeWalletOrThrow());
+        validateFinalizeWalletInternalCommandRequest(request.getFinalizeWallet());
         break;
       case SIGNTX:
-        validateSignTxInternalCommandRequest(request.getSignTxOrThrow());
+        validateSignTxInternalCommandRequest(request.getSignTx());
         break;
       default:
         throw new IllegalStateException("unreachable");
@@ -364,12 +361,12 @@ public class SubzeroUtils {
     for (TxOutput output : request.getOutputsList()) {
       switch (output.getDestination()) {
         case CHANGE:
-          if (!output.getPathOrThrow().getIsChangeOrThrow()) {
+          if (!output.getPath().getIsChange()) {
             throw new VerificationException(ERROR_INCONSISTENT_IS_CHANGE);
           }
           break;
         case GATEWAY:
-          if (output.getPathOrThrow().getIsChangeOrThrow()) {
+          if (output.getPath().getIsChange()) {
             throw new VerificationException(ERROR_INCONSISTENT_IS_CHANGE);
           }
           break;
@@ -388,14 +385,14 @@ public class SubzeroUtils {
    */
   private static void validateInitWalletInternalCommandRequest(
       InternalCommandRequest request) throws VerificationException {
-    if (request.getMasterSeedEncryptionKeyTicketOrThrow().size() >
+    if (request.getMasterSeedEncryptionKeyTicket().size() >
         Constants.MASTER_SEED_ENCRYPTION_KEY_TICKET_MAX_SIZE) {
       throw new VerificationException(ERROR_MASTER_SEED_ENCRYPTION_KEY_TICKET_SIZE);
     }
-    if (request.getPubKeyEncryptionKeyTicketOrThrow().size() > Constants.PUB_KEY_ENCRYPTION_KEY_TICKET_MAX_SIZE) {
+    if (request.getPubKeyEncryptionKeyTicket().size() > Constants.PUB_KEY_ENCRYPTION_KEY_TICKET_MAX_SIZE) {
       throw new VerificationException(ERROR_PUB_KEY_ENCRYPTION_KEY_TICKET_SIZE);
     }
-    if (request.getInitWalletOrThrow().getRandomBytesOrThrow().size() > Constants.RANDOM_BYTES_MAX_SIZE) {
+    if (request.getInitWallet().getRandomBytes().size() > Constants.RANDOM_BYTES_MAX_SIZE) {
       throw new VerificationException(ERROR_RANDOM_BYTES_SIZE);
     }
   }
@@ -411,7 +408,7 @@ public class SubzeroUtils {
       InternalCommandRequest.FinalizeWalletRequest request) throws VerificationException {
     validateEncPubKeys(request.getEncryptedPubKeysList());
 
-    if (request.getEncryptedMasterSeed().getEncryptedMasterSeedOrThrow().size() > Constants.ENCRYPTED_MASTER_SEED_MAX_SIZE) {
+    if (request.getEncryptedMasterSeed().getEncryptedMasterSeed().size() > Constants.ENCRYPTED_MASTER_SEED_MAX_SIZE) {
       throw new VerificationException(ERROR_ENCRYPTED_MASTER_SEED_SIZE);
     }
   }
@@ -430,7 +427,7 @@ public class SubzeroUtils {
     if (request.getOutputsCount() > Constants.OUTPUTS_COUNT_MAX) {
       throw new VerificationException(ERROR_OUTPUTS_COUNT);
     }
-    if (request.getEncryptedMasterSeed().getEncryptedMasterSeedOrThrow().size() > Constants.ENCRYPTED_MASTER_SEED_MAX_SIZE) {
+    if (request.getEncryptedMasterSeed().getEncryptedMasterSeed().size() > Constants.ENCRYPTED_MASTER_SEED_MAX_SIZE) {
       throw new VerificationException(ERROR_ENCRYPTED_MASTER_SEED_SIZE);
     }
   }
@@ -446,7 +443,7 @@ public class SubzeroUtils {
       throw new VerificationException(ERROR_INPUTS_COUNT);
     }
     for (TxInput input : inputs) {
-      if (input.getPrevHashOrThrow().size() > Constants.TXINPUT_PREV_HASH_MAX_SIZE) {
+      if (input.getPrevHash().size() > Constants.TXINPUT_PREV_HASH_MAX_SIZE) {
         throw new VerificationException(ERROR_TXINPUT_PREV_HASH_SIZE);
       }
     }
@@ -463,7 +460,7 @@ public class SubzeroUtils {
       throw new VerificationException(ERROR_ENCRYPTED_PUB_KEYS_COUNT);
     }
     for (EncryptedPubKey pubKey : pubKeys) {
-      if (pubKey.getEncryptedPubKeyOrThrow().size() > Constants.ENCRYPTED_PUB_KEY_MAX_SIZE) {
+      if (pubKey.getEncryptedPubKey().size() > Constants.ENCRYPTED_PUB_KEY_MAX_SIZE) {
         throw new VerificationException(ERROR_ENCRYPTED_PUB_KEY_SIZE);
       }
     }
