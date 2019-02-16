@@ -185,7 +185,7 @@ public class NCipher {
 
   public void loadSoftcard(String softcardName, String password, String pubKeyEncryptionKeyName) throws NFException {
     // Load the softcard and pubkey encryption key.
-    softcard = getSoftcardById(softcardName);
+    softcard = getSoftcardByNameOrId(softcardName);
     softcard.load(module, new NCipherLoadSoftcard(password));
 
     if (Strings.isNullOrEmpty(pubKeyEncryptionKeyName)) {
@@ -232,8 +232,11 @@ public class NCipher {
     return ((M_Cmd_Reply_GetTicket)(rep.reply)).ticket;
   }
 
-  private SoftCard getSoftcardById(String softcard) throws NFException {
+  private SoftCard getSoftcardByNameOrId(String softcard) throws NFException {
     for (SoftCard card : securityWorld.getSoftCards()) {
+      if (card.getName().equals(softcard)) {
+        return card;
+      }
       String ident = Hex.toHexString(card.getID().value);
       if (ident.equals(softcard)) {
         return card;
