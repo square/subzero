@@ -72,7 +72,7 @@ public class ColdWalletTest {
     }
 
     String token = "TokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenToken";
-    CommandRequest request = coldWallet.startTransaction(inputs, outputs, token);
+    CommandRequest request = coldWallet.startTransaction(inputs, outputs, token, null);
     assertThat(request.getSerializedSize()).isLessThan(Constants.MAX_QR_PROTO_BYTES);
 
     // The response consists of signatures.  We know bitcoin signatures are, in worst-case, 73 bytes
@@ -167,5 +167,42 @@ public class ColdWalletTest {
         + "0000");
 
     Assert.assertArrayEquals("Expected transactions to match", expected, Hex.decode(tx));
+  }
+
+  @Test
+  public void testExchangeRate() {
+    Path.Builder path = Path.newBuilder()
+        .setAccount(0x7FFFFFFF)
+        .setIsChange(false)
+        .setIndex(0x7FFFFFFF);
+
+    // This input is as big as possible.
+    TxInput input = TxInput.newBuilder()
+        .setPrevHash(ByteString.copyFrom(Hex.decode("d37365c6a3c089576b1ea1cb8bee2baa005afc96d24080515635f852c680d127")))
+        .setPrevIndex(0x7FFFFFFF)
+        .setAmount(0x7FFFFFFF7FFFFFFFL)
+        .setPath(path)
+        .build();
+
+    TxOutput output = TxOutput.newBuilder()
+        .setAmount(0x7FFFFFFF7FFFFFFFL)
+        .setDestination(Destination.GATEWAY)
+        .setPath(path)
+        .build();
+
+    List<TxInput> inputs = new ArrayList<>();
+    for(int i = 0; i < Constants.INPUTS_COUNT_AT_LEAST; i++) {
+      inputs.add(input);
+    }
+
+    List<TxOutput> outputs = new ArrayList<>();
+    for(int i = 0; i < Constants.OUTPUTS_COUNT_AT_LEAST; i++) {
+      outputs.add(output);
+    }
+
+    String token = "TokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenToken";
+    double localRate = 0.00123;
+    CommandRequest request = coldWallet.startTransaction(inputs, outputs, token, localRate);
+    assertThat(request.getSignTx().getLocalRate()).isEqualTo(localRate);
   }
 }

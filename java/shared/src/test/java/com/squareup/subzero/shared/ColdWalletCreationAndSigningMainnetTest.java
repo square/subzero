@@ -170,7 +170,7 @@ public class ColdWalletCreationAndSigningMainnetTest {
             .setDestination(Destination.GATEWAY)
             .setPath(outputPath)
             .build()),
-        null);
+        null, null);
     PlutusUtils.validateCommandRequest(commandRequest);
 
     String signTxRequest = Base64.toBase64String(commandRequest.toByteArray());
