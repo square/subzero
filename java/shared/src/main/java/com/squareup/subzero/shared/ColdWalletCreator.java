@@ -37,19 +37,28 @@ public class ColdWalletCreator {
    * @param walletId id of cold wallet in Plutus that will be finalized with this request
    * @return FinalizeWallet CommandRequests for Plutus to execute. Will return
    */
-  public static Optional<CommandRequest> combine(
+  public static CommandRequest combine(
       Map<String, EncryptedPubKey> tokenToEncryptedPubKeyMap, String elementToken, int walletId) {
-    if (!tokenToEncryptedPubKeyMap.containsKey(elementToken)
-        || tokenToEncryptedPubKeyMap.containsValue(null)
-        || tokenToEncryptedPubKeyMap.size() != Constants.ENCRYPTED_PUB_KEYS_MAX_COUNT) {
-      return Optional.empty();
+    if (!tokenToEncryptedPubKeyMap.containsKey(elementToken)) {
+      throw new IllegalArgumentException("Map did not contain elementToken: " + elementToken);
     }
-    return Optional.of(CommandRequest.newBuilder()
+
+    if (tokenToEncryptedPubKeyMap.containsValue(null)) {
+      throw new IllegalArgumentException("Map contained a null value");
+    }
+
+    if (tokenToEncryptedPubKeyMap.size() != Constants.ENCRYPTED_PUB_KEYS_MAX_COUNT) {
+      throw new IllegalArgumentException(String.format("Map should contain %s values, but "
+          + "contained %s.", Constants.ENCRYPTED_PUB_KEYS_MAX_COUNT,
+          tokenToEncryptedPubKeyMap.size()));
+    }
+
+    return CommandRequest.newBuilder()
         .setToken(elementToken)
         .setWalletId(walletId)
         .setFinalizeWallet(CommandRequest.FinalizeWalletRequest.newBuilder()
             .addAllEncryptedPubKeys(tokenToEncryptedPubKeyMap.values()))
-        .build());
+        .build();
   }
 
   /**

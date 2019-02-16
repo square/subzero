@@ -287,11 +287,13 @@ public class PlutusUtils {
 
   /**
    * Verifies size/count limits for CommandRequest proto fields
+   *
    * @param request CommandRequest to validate
+   * @return the provided request to allow chaining
    * @throws VerificationException if limits are exceeded
    * @throws IllegalArgumentException if CommandRequest doesn't contain matching message
    */
-  public static void validateCommandRequest(CommandRequest request)
+  public static CommandRequest validateCommandRequest(CommandRequest request)
       throws VerificationException, IllegalArgumentException {
     switch (request.getCommandCase()) {
       case INITWALLET:
@@ -308,6 +310,7 @@ public class PlutusUtils {
       default:
         throw new IllegalStateException("unreachable");
     }
+    return request;
   }
 
   /**
