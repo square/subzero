@@ -1,5 +1,10 @@
 # mapping of security worlds to environments
-# This mapping enables having a single DVD which works with different envs.
+# This mapping enables having a single DVD which works across different environments.
+#
+# You'll typically want one or more development, staging, and production environments.
+#
+# Note: the entries have to be kept in sync with the
+# com.squareup.subzero.PlutusConfig.EnvironmentsMap.Environments enum.
 
 environments:
-
+  "c32a7be942ee91385889c4ca4c7b1ab7bdafc1ff": development
