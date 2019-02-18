@@ -1,5 +1,6 @@
 package com.squareup.subzero;
 
+import com.squareup.subzero.SubzeroConfig.EnvironmentsMap.Environments;
 import com.squareup.subzero.ncipher.NCipher;
 import java.io.IOException;
 import java.net.URL;
@@ -25,16 +26,18 @@ public class SubzeroConfig {
   /**
    * SubzeroGui does not use ServiceContainer, so we implement our own config loading.
    */
-  public static SubzeroConfig load() throws IOException {
+  public static SubzeroConfig load(boolean nCipher) throws IOException {
     // load subzero.yaml
     EnvironmentsMap environmentsMap = loadEnvMap();
 
-    // Get HSM's security world. Default to dev.
-    EnvironmentsMap.Environments env;
-    String securityWorld = new NCipher().getSecurityWorld();
-    env = environmentsMap.environments.get(securityWorld);
-    if (env == null) {
-      env = EnvironmentsMap.Environments.development;
+    Environments env = Environments.development;
+    if (nCipher) {
+      // Get HSM's security world. Default to dev.
+      String securityWorld = new NCipher().getSecurityWorld();
+      env = environmentsMap.environments.get(securityWorld);
+      if (env == null) {
+        env = Environments.development;
+      }
     }
     System.out.printf("Env: %s\n", env.name());
 

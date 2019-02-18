@@ -47,7 +47,6 @@ public class SubzeroGui {
 
   public static void main(String[] args) throws Exception {
     SubzeroGui subzero = new SubzeroGui();
-    subzero.config = SubzeroConfig.load();
 
     JCommander jCommander = JCommander.newBuilder()
         .addObject(subzero)
@@ -58,6 +57,9 @@ public class SubzeroGui {
       jCommander.usage();
       return;
     }
+
+    subzero.config = SubzeroConfig.load(subzero.nCipher);
+
 
     System.out.println("This program draws to a framebuffer. If you are only seeing this output,");
     System.out.println("then something has gone wrong. Please report this error.");
