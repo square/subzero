@@ -55,12 +55,12 @@ message CommandRequest {
 message CommandResponse {
   message InitWalletResponse {
     /* An encrypted response from the HSM, to be used in a FinalizeWalletRequest */
-    optional EncryptedPubKey encrypted_pub_key = 1 [(squareup.validation.required) = true];
+    optional EncryptedPubKey encrypted_pub_key = 1;
   }
 
   message FinalizeWalletResponse {
     /* The extended public key to use when constructing cold wallet addresses */
-    optional bytes pub_key = 1 [(squareup.validation.required) = true];
+    optional bytes pub_key = 1;
   }
 
   message SignTxResponse {
