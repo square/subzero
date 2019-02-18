@@ -36,7 +36,7 @@ public class Constants {
 
   /**
    * MAX_QR_PROTO_BYTES is the maximum size a protobuf can be for encoding into a QR code sent to
-   * or from Plutus.
+   * or from Subzero.
    * 2,953 (40, L, Binary) * 3 / 4 (Base64 is 3 bytes in 4 chars)
    * http://www.qrcode.com/en/about/version.html contains the sizes for each type of QR code.
    */

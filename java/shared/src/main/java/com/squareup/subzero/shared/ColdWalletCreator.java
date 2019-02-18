@@ -17,8 +17,8 @@ public class ColdWalletCreator {
    *
    * @param token A token for tracking this request.
    * @param walletId An arbitrary wallet ID number,  used to identify the wallet in all requests to
-   * subzero.  A Plutus instance will reject this request if a wallet with that ID already exists.
-   * @return The request to send to Plutus
+   * subzero.  A Subzero instance will reject this request if a wallet with that ID already exists.
+   * @return The request to send to Subzero
    */
   public static CommandRequest init(String token, int walletId) {
     return CommandRequest.newBuilder()
@@ -34,8 +34,8 @@ public class ColdWalletCreator {
    *
    * @param tokenToEncryptedPubKeyMap map of Persephone element tokens to those element's encrypted public key.
    * @param elementToken token of element who's request we want to construct.
-   * @param walletId id of cold wallet in Plutus that will be finalized with this request
-   * @return FinalizeWallet CommandRequests for Plutus to execute. Will return
+   * @param walletId id of cold wallet in Subzero that will be finalized with this request
+   * @return FinalizeWallet CommandRequests for Subzero to execute. Will return
    */
   public static CommandRequest combine(
       Map<String, EncryptedPubKey> tokenToEncryptedPubKeyMap, String elementToken, int walletId) {
@@ -64,7 +64,7 @@ public class ColdWalletCreator {
   /**
    * Get the "xpub..." public key, which you can pass to the ColdWallet constructor.
    *
-   * @param finalizeWalletResponses The response from Plutus, completing wallet setup.
+   * @param finalizeWalletResponses The response from Subzero, completing wallet setup.
    * @return A public key string suitable for passing to DeterministicKey.deserializeB58
    */
   public static String finalize(CommandResponse finalizeWalletResponses) {

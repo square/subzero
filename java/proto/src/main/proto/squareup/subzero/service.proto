@@ -10,10 +10,10 @@ import "common.proto";
 /**
  * Proto used to communicate between the Coordinator Service and the Java CLI.
  *
- * Also used by PlutusService for integration testing purpose.
+ * Also used by SubzeroService for integration testing purpose.
  */
 
-service PlutusService {
+service SubzeroService {
   rpc Command (CommandRequest) returns (CommandResponse);
 }
 

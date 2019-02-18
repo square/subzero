@@ -48,7 +48,7 @@ public class ColdWalletCreationAndSigningTestnetTest {
         .setWalletId(walletId)
         .setInitWallet(CommandRequest.InitWalletRequest.newBuilder())
         .build();
-    PlutusUtils.validateCommandRequest(commandRequest);
+    SubzeroUtils.validateCommandRequest(commandRequest);
 
     String initWalletRequest = Base64.toBase64String(commandRequest.toByteArray());
     assertThat(initWalletRequest).isEqualTo("EAIaAA==");
@@ -85,7 +85,7 @@ public class ColdWalletCreationAndSigningTestnetTest {
             .addEncryptedPubKeys(encPubKey3)
             .addEncryptedPubKeys(encPubKey4))
         .build();
-    PlutusUtils.validateCommandRequest(commandRequest);
+    SubzeroUtils.validateCommandRequest(commandRequest);
 
     String finalizeWalletRequest = Base64.toBase64String(commandRequest.toByteArray());
     assertThat(finalizeWalletRequest).isEqualTo("EAIizAMKcQpv3trfyO6S++vP39DJ75n63/7t38icz+6Y7/vSmf/Jz/j/5sntx/7m7v/F+p/D8/nBnMTy592c4Oby3vD86fLm05ve68v9+8udz/jB5M7Dz5nQ8M/p/PPi/+ne/NLN78ni78TE/83sxe7d/eTzy+bLCnEKb97a38juks7Ln+7H253I3pLBw8Ln4JLLxNjomMX++eaS7/vf28LzzdOT0/qYyfjw2JPBn+375Ov5ksLL5snF2fnPn/6eyeHJ0Ovc8ufZ4vjd+MPNksnuzenr2vrv8pmd+pPNwc/70/rC/dme6M/vyQpxCm/e2t/I7pPPx9na7uzAmMvPy/3b3tOS4MP44szOm83skvDL3/Dm3cz60PPL0PnIxNjk2cnHzNzn6/Pw7fuZ2pKcyPDI2vPBme2TnuKSyNLi6Pz+2MfA7M3+w+TfwZjFx5/O6PDH3fza8MLP3OTP58AKcQpv3trfyO6S8O+Z/MXcw8jvzMLg2+/DxN7w7evOnc/fw+Lf4ejQzv7d/d7D//2d08WewObr3Zjr//7ok9Kd7MHi5pn9w93m4f/47Mfb+d3H8OL5x+aY5v3p/vvQ/cvs3NqYnsz+5sHHmMfv8N355O7M");
@@ -193,7 +193,7 @@ public class ColdWalletCreationAndSigningTestnetTest {
                 .build()
             ),
         null, null);
-    PlutusUtils.validateCommandRequest(commandRequest);
+    SubzeroUtils.validateCommandRequest(commandRequest);
 
     String signTxRequest = Base64.toBase64String(commandRequest.toByteArray());
     assertThat(signTxRequest).isEqualTo("EAIqXQozCiAn78RiRgz6/TIj+AHn3RNjxS33SktlRlEk+abH60XgexABGIDJ/j0iCAjXExAAGMs+EhEIwMHAFBABGggI1xMQARi8IRIRCICDgSkQARoICNcTEAEYvSEYAA==");
@@ -204,7 +204,7 @@ public class ColdWalletCreationAndSigningTestnetTest {
 
   @Test public void createTransaction1() throws Exception {
     // We use signTxResponse1 and signTxResponse2 to create the transaction.
-    // The gateway address we use here must match what's hardcoded in Plutus' CodeSafe module or
+    // The gateway address we use here must match what's hardcoded in Subzero's CodeSafe module or
     // the signature will fail to verify.
     CommandRequest signTxRequest = CommandRequest.parseFrom(Base64.decode(
         "EAIqXQozCiAn78RiRgz6/TIj+AHn3RNjxS33SktlRlEk+abH60XgexABGIDJ/j0iCAjXExAAGMs+EhEIwMHAFBABGggI1xMQARi8IRIRCICDgSkQARoICNcTEAEYvSEYAA=="));
@@ -322,7 +322,7 @@ public class ColdWalletCreationAndSigningTestnetTest {
                 .build()
         ),
         null, null);
-    PlutusUtils.validateCommandRequest(commandRequest);
+    SubzeroUtils.validateCommandRequest(commandRequest);
 
     String signTxRequest = Base64.toBase64String(commandRequest.toByteArray());
     assertThat(signTxRequest).isEqualTo("EAIq/AEKMwogIDfjRA6EzNYCZD81T3nh5ZaCHqkn8NNC3JTj5I8tRlIQARiAyf49IggI1xMQABjMPgozCiA924I2dp/meTQaiVI7rRXhTExnNnEpLOFXXLlHTRbnPxAAGMCk/x4iCAjXExAAGM0+CjMKIMa2nWeML1OJKXMB+4pSkIkYkcoiRl+eFriIbpSI8PVnEAAYwMHAFCIICNcTEAEYvCEKMwogxradZ4wvU4kpcwH7ilKQiRiRyiJGX54WuIhulIjw9WcQARiAg4EpIggI1xMQARi9IRIRCOq5qzMQAhoICNcTEAAYnD0SEQjU89ZmEAIaCAjXExAAGJ09GAA=");
@@ -333,7 +333,7 @@ public class ColdWalletCreationAndSigningTestnetTest {
 
   @Test public void createTransaction2() throws Exception {
     // We use signTxResponse1 and signTxResponse2 to create the transaction.
-    // The gateway address we use here must match what's hardcoded in Plutus' CodeSafe module or
+    // The gateway address we use here must match what's hardcoded in Subzero's CodeSafe module or
     // the signature will fail to verify.
     CommandRequest signTxRequest = CommandRequest.parseFrom(Base64.decode("EAIq/AEKMwogIDfjRA6EzNYCZD81T3nh5ZaCHqkn8NNC3JTj5I8tRlIQARiAyf49IggI1xMQABjMPgozCiA924I2dp/meTQaiVI7rRXhTExnNnEpLOFXXLlHTRbnPxAAGMCk/x4iCAjXExAAGM0+CjMKIMa2nWeML1OJKXMB+4pSkIkYkcoiRl+eFriIbpSI8PVnEAAYwMHAFCIICNcTEAEYvCEKMwogxradZ4wvU4kpcwH7ilKQiRiRyiJGX54WuIhulIjw9WcQARiAg4EpIggI1xMQARi9IRIRCOq5qzMQAhoICNcTEAAYnD0SEQjU89ZmEAIaCAjXExAAGJ09GAA="));
 

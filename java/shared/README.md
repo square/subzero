@@ -14,9 +14,9 @@ process (InitWallet and FinalizeWallet), which are handled by three static funct
 
 The setup flow looks like this:
 1. `ColdWallet.init()` returns an `InitWalletRequest`
-2. Plutus runs InitWalletRequest and return `InitWalletResponse`
+2. Subzero runs InitWalletRequest and return `InitWalletResponse`
 3. `ColdWallet.combine()` on the `InitWalletResponse ` returning `FinalizeWalletRequest`s
-4. Plutus runs `FinalizeWalletRequest` and return `FinalizeWalletResponse`s
+4. Subzero runs `FinalizeWalletRequest` and return `FinalizeWalletResponse`s
 5. `ColdWallet.finalize()` on those `FinalizeWalletResponse` to obtain the public keys
 
 
@@ -43,7 +43,7 @@ signed offline, and then those signatures are combined to produce the final tran
 
  A class with various constants.
 
- ### PlutusUtils
+ ### SubzeroUtils
 
 This is a grab-bag of stuff, used for implementing the above classes.  Ideally the implementation
 details here should be considered private and we have a nice API to hand off.

@@ -133,14 +133,14 @@ public class ColdWalletTest {
         .setPrevHash(ByteString.copyFrom(prev_hash))
         .setPrevIndex(prev_index)
         .setAmount(1000000)
-        .setPath(PlutusUtils.newPath(0, false, 0))
+        .setPath(SubzeroUtils.newPath(0, false, 0))
         .build();
     inputs.add(input);
 
     List<TxOutput> outputs = new ArrayList<>();
     TxOutput output = TxOutput.newBuilder()
         .setAmount(999334)
-        .setPath(PlutusUtils.newPath(0, false, 0))
+        .setPath(SubzeroUtils.newPath(0, false, 0))
         .setDestination(Destination.GATEWAY)
         .build();
     outputs.add(output);

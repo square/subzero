@@ -2,7 +2,7 @@ package com.squareup.subzero.framebuffer;
 
 import com.google.common.base.Strings;
 import com.squareup.subzero.SubzeroGui;
-import com.squareup.subzero.PlutusConfig;
+import com.squareup.subzero.SubzeroConfig;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -46,7 +46,7 @@ public class Framebuffer {
   private int height;
   private int bytesPerPixel;
   private Refresh refreshThread;
-  private PlutusConfig config;
+  private SubzeroConfig config;
   Canvas canvas;
   private AtomicReference<Integer> asyncInput = new AtomicReference<>();
   private static Map<Integer, Font> fontCache = new HashMap<>();
@@ -56,7 +56,7 @@ public class Framebuffer {
    * @param config
    * @throws IOException Exceptions from opening and mapping the framebuffer.
    */
-  public Framebuffer(PlutusConfig config) throws IOException {
+  public Framebuffer(SubzeroConfig config) throws IOException {
     this.config = config;
     readFramebufferSize();
 
@@ -83,7 +83,7 @@ public class Framebuffer {
     System.setProperty("java.awt.headless", "false");
 
     // Create and set up the window.
-    Frame frame = new Frame("Plutus");
+    Frame frame = new Frame("Subzero");
     frame.addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent e) {
         System.exit(0);

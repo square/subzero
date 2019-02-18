@@ -32,7 +32,7 @@ public class ColdWalletCreatorTest {
   }
 
   /**
-   * You'd normally get this from Plutus.  This is a helper for making something
+   * You'd normally get this from Subzero.  This is a helper for making something
    * that looks like those responses.
    */
   private static CommandResponse initWalletResponse(String token, String pubkey) {

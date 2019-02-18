@@ -6,7 +6,7 @@ import com.google.protobuf.TextFormat;
 import com.squareup.subzero.framebuffer.Framebuffer;
 import com.squareup.subzero.framebuffer.Screens;
 import com.squareup.subzero.ncipher.NCipher;
-import com.squareup.subzero.shared.PlutusUtils;
+import com.squareup.subzero.shared.SubzeroUtils;
 import com.squareup.protos.subzero.service.Service.CommandRequest;
 import com.squareup.protos.subzero.service.Service.CommandResponse;
 
@@ -18,7 +18,7 @@ public class SubzeroGui {
 
   @Parameter(names = "--debug") public String debug = null;
 
-  // UI test runs through all the screens without needing an HSM or Plutus server
+  // UI test runs through all the screens without needing an HSM or Subzero server
   @Parameter(names = "--uitest") public Boolean uiTest = false;
 
   @Parameter(names = "--ncipher") public Boolean nCipher = false;
@@ -32,7 +32,7 @@ public class SubzeroGui {
   // Almost always you want to talk to subzero on localhost
   @Parameter(names = "--hostname") public String hostname = "localhost";
 
-  public PlutusConfig config;
+  public SubzeroConfig config;
   private Screens screens;
 
   /**
@@ -47,12 +47,12 @@ public class SubzeroGui {
 
   public static void main(String[] args) throws Exception {
     SubzeroGui subzero = new SubzeroGui();
-    subzero.config = PlutusConfig.load();
+    subzero.config = SubzeroConfig.load();
 
     JCommander jCommander = JCommander.newBuilder()
         .addObject(subzero)
         .build();
-    jCommander.setProgramName("Plutus");
+    jCommander.setProgramName("Subzero");
     jCommander.parse(args);
     if (subzero.help) {
       jCommander.usage();
@@ -85,7 +85,7 @@ public class SubzeroGui {
     System.out.println(debugString);
 
     // The response is what the server will receive via QR-Code.
-    PlutusUtils.printQrCode(response);
+    SubzeroUtils.printQrCode(response);
     System.out.println(response);
   }
 
@@ -122,7 +122,7 @@ public class SubzeroGui {
 
   /**
    * This goes through the various screens, so you can test changes to them without needing to
-   * worry about any system state, run Plutus, etc.
+   * worry about any system state, run Subzero, etc.
    */
   private void uiTest() throws Exception {
     screens = new Screens(new Framebuffer(config), config.getTeamName());
