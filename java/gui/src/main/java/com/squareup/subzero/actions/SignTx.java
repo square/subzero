@@ -29,15 +29,15 @@ public class SignTx {
       // Compute amount being sent
       long amount = 0L;
       long fee = 0L;
-      CommandRequest.SignTxRequest signTxRequest = request.getSignTxOrThrow();
+      CommandRequest.SignTxRequest signTxRequest = request.getSignTx();
       for (TxInput input : signTxRequest.getInputsList()) {
-        fee += input.getAmountOrThrow();
+        fee += input.getAmount();
       }
       for (TxOutput output : signTxRequest.getOutputsList()) {
         if (output.getDestination() == Destination.GATEWAY) {
-          amount += output.getAmountOrThrow();
+          amount += output.getAmount();
         }
-        fee -= output.getAmountOrThrow();
+        fee -= output.getAmount();
       }
 
       // Tell user what is going on in interactive mode
@@ -45,7 +45,7 @@ public class SignTx {
       DecimalFormat formatter2 = new DecimalFormat("#,##0.00");
 
       StringBuilder s = new StringBuilder();
-      s.append(format("SignTx. Wallet %s sending:\n\n", request.getWalletIdOrThrow()));
+      s.append(format("SignTx. Wallet %s sending:\n\n", request.getWalletId()));
       s.append(format("%s Satoshi with fee %s Satoshi\n\n",
           formatter1.format(amount), formatter1.format(fee)));
       s.append(format("%f Bitcoin with fee %f Bitcoin\n\n",
@@ -68,7 +68,7 @@ public class SignTx {
 
     // Load wallet file
     WalletLoader walletLoader = new WalletLoader();
-    Wallet wallet = walletLoader.load(request.getWalletIdOrThrow());
+    Wallet wallet = walletLoader.load(request.getWalletId());
 
     // Check that the wallet file has enc_pub_keys
     if (wallet.getEncryptedPubKeysCount() == 0) {
@@ -79,12 +79,12 @@ public class SignTx {
     InternalCommandRequest.SignTxRequest.Builder signTx =
         InternalCommandRequest.SignTxRequest.newBuilder();
 
-    signTx.setEncryptedMasterSeed(wallet.getEncryptedMasterSeedOrThrow());
+    signTx.setEncryptedMasterSeed(wallet.getEncryptedMasterSeed());
     signTx.addAllEncryptedPubKeys(wallet.getEncryptedPubKeysList());
 
-    signTx.addAllInputs(request.getSignTxOrThrow().getInputsList());
-    signTx.addAllOutputs(request.getSignTxOrThrow().getOutputsList());
-    signTx.setLockTime(request.getSignTxOrThrow().getLockTime());
+    signTx.addAllInputs(request.getSignTx().getInputsList());
+    signTx.addAllOutputs(request.getSignTx().getOutputsList());
+    signTx.setLockTime(request.getSignTx().getLockTime());
 
     NCipher nCipher = null;
     if (subzero.nCipher) {
@@ -94,7 +94,7 @@ public class SignTx {
       // TODO: the wallet contains a backup of the OCS files. We could drop them if they are
       // missing. It might make wallet recovery easier?
 
-      nCipher.loadMasterSeedEncryptionKey(wallet.getMasterSeedEncryptionKeyIdOrThrow());
+      nCipher.loadMasterSeedEncryptionKey(wallet.getMasterSeedEncryptionKeyId());
       byte[] ticket = nCipher.getMasterSeedEncryptionKeyTicket();
       internalRequest.setMasterSeedEncryptionKeyTicket(ByteString.copyFrom(ticket));
 
@@ -105,7 +105,7 @@ public class SignTx {
 
     // Send Request
     internalRequest.setSignTx(signTx);
-    InternalCommandResponse.SignTxResponse iresp = conn.run(internalRequest.build()).getSignTxOrThrow();
+    InternalCommandResponse.SignTxResponse iresp = conn.run(internalRequest.build()).getSignTx();
 
     if (subzero.nCipher) {
       nCipher.unloadOcs();

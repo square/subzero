@@ -6,6 +6,7 @@ import com.ncipher.nfast.NFException;
 import com.squareup.subzero.InternalCommandConnector;
 import com.squareup.subzero.ncipher.NCipher;
 import com.squareup.subzero.SubzeroGui;
+import com.squareup.subzero.shared.SubzeroUtils;
 import com.squareup.subzero.wallet.WalletLoader;
 import com.squareup.protos.subzero.service.Internal.InternalCommandRequest;
 import com.squareup.protos.subzero.service.Internal.InternalCommandResponse;
@@ -33,7 +34,7 @@ public class FinalizeWallet {
 
     // Load wallet file
     WalletLoader walletLoader = new WalletLoader();
-    Wallet wallet = walletLoader.load(request.getWalletIdOrThrow());
+    Wallet wallet = walletLoader.load(request.getWalletId());
 
     // Check that the wallet file does not have any enc_pub_keys
     if (wallet.getEncryptedPubKeysCount() > 0) {
@@ -44,15 +45,15 @@ public class FinalizeWallet {
     InternalCommandRequest.FinalizeWalletRequest.Builder finalizeWallet =
         InternalCommandRequest.FinalizeWalletRequest.newBuilder();
 
-    finalizeWallet.setEncryptedMasterSeed(wallet.getEncryptedMasterSeedOrThrow());
-    finalizeWallet.addAllEncryptedPubKeys(request.getFinalizeWalletOrThrow().getEncryptedPubKeysList());
+    finalizeWallet.setEncryptedMasterSeed(wallet.getEncryptedMasterSeed());
+    finalizeWallet.addAllEncryptedPubKeys(request.getFinalizeWallet().getEncryptedPubKeysList());
 
     NCipher nCipher = null;
     if (subzero.nCipher) {
       nCipher = new NCipher();
       nCipher.loadOcs(subzero.ocsPassword, subzero.getScreens());
 
-      nCipher.loadMasterSeedEncryptionKey(wallet.getMasterSeedEncryptionKeyIdOrThrow());
+      nCipher.loadMasterSeedEncryptionKey(wallet.getMasterSeedEncryptionKeyId());
       byte[] ticket = nCipher.getMasterSeedEncryptionKeyTicket();
       internalRequest.setMasterSeedEncryptionKeyTicket(ByteString.copyFrom(ticket));
 
@@ -64,7 +65,7 @@ public class FinalizeWallet {
     // Send Request
     internalRequest.setFinalizeWallet(finalizeWallet);
     InternalCommandResponse.FinalizeWalletResponse iresp =
-        conn.run(internalRequest.build()).getFinalizeWalletOrThrow();
+        conn.run(internalRequest.build()).getFinalizeWallet();
 
     if (subzero.nCipher) {
       nCipher.unloadOcs();
@@ -75,9 +76,9 @@ public class FinalizeWallet {
 
     // Save the encrypted pubkeys to the wallet
     Wallet newWallet = Wallet.newBuilder(wallet)
-        .addAllEncryptedPubKeys(request.getFinalizeWalletOrThrow().getEncryptedPubKeysList())
+        .addAllEncryptedPubKeys(request.getFinalizeWallet().getEncryptedPubKeysList())
         .build();
-    walletLoader.save(request.getWalletIdOrThrow(), newWallet);
+    walletLoader.save(request.getWalletId(), newWallet);
 
     // Build response
     return CommandResponse.FinalizeWalletResponse.newBuilder().setPubKey(iresp.getPubKey()).build();

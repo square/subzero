@@ -32,7 +32,7 @@ public class InitWallet {
 
     // Ensure we don't already have a wallet
     WalletLoader walletLoader = new WalletLoader();
-    walletLoader.ensureDoesNotExist(request.getWalletIdOrThrow());
+    walletLoader.ensureDoesNotExist(request.getWalletId());
     Wallet.Builder wallet = Wallet.newBuilder()
         .setCurrency(Wallet.Currency.TEST_NET);
 
@@ -66,7 +66,7 @@ public class InitWallet {
 
       // Check if we need to create the pub key encryption key (only needs to happen once, on one machine)
       if (subzero.createPubKeyEncryptionKey) {
-        nCipher.createPubKeyEncryptionKey();
+        nCipher.createPubKeyEncryptionKeyTicket();
       }
 
       internalRequest.setPubKeyEncryptionKeyTicket(ByteString.copyFrom(nCipher.getPubKeyEncryptionKeyTicket()));
@@ -83,16 +83,16 @@ public class InitWallet {
       }
     }
 
-    InternalCommandResponse.InitWalletResponse initWalletResponse = response.getInitWalletOrThrow();
+    InternalCommandResponse.InitWalletResponse initWalletResponse = response.getInitWallet();
 
     // Save result
-    System.out.println(Hex.toHexString(initWalletResponse.getEncryptedMasterSeed().getEncryptedMasterSeedOrThrow().toByteArray()));
+    System.out.println(Hex.toHexString(initWalletResponse.getEncryptedMasterSeed().getEncryptedMasterSeed().toByteArray()));
     wallet.setEncryptedMasterSeed(initWalletResponse.getEncryptedMasterSeed());
 
     System.out.println("encryptedPubKey: ");
-    System.out.println(Hex.toHexString(initWalletResponse.getEncryptedPubKey().getEncryptedPubKeyOrThrow().toByteArray()));
+    System.out.println(Hex.toHexString(initWalletResponse.getEncryptedPubKey().getEncryptedPubKey().toByteArray()));
 
-    walletLoader.save(request.getWalletIdOrThrow(), wallet.build());
+    walletLoader.save(request.getWalletId(), wallet.build());
 
     CommandResponse.InitWalletResponse.Builder initResponse = CommandResponse.InitWalletResponse.newBuilder();
     initResponse.setEncryptedPubKey(initWalletResponse.getEncryptedPubKey());
