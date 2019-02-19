@@ -61,10 +61,6 @@ static Result derive_public_key(const char *xpub, Path *path,
     return Result_DERIVE_PUBKEY_DESERIALIZE_FAILURE;
   }
 
-  if (!path->has_account) {
-    ERROR("path is missing account.");
-    return Result_DERIVE_PUBKEY_NO_ACCOUNT_FAILURE;
-  }
   if (!path->has_is_change) {
     ERROR("path is missing is_change.");
     return Result_DERIVE_PUBKEY_NO_IS_CHANGE_FAILURE;
@@ -72,11 +68,6 @@ static Result derive_public_key(const char *xpub, Path *path,
   if (!path->has_index) {
     ERROR("path is missing index.");
     return Result_DERIVE_PUBKEY_NO_INDEX_FAILURE;
-  }
-
-  if (!hdnode_public_ckd(&node, path->account)) {
-    ERROR("Error deriving public key path (for account)");
-    return Result_DERIVE_PUBKEY_ACCOUNT_FAILURE;
   }
 
   if (!hdnode_public_ckd(&node, path->is_change ? 1 : 0)) {
@@ -106,21 +97,13 @@ static Result derive_private_key(uint8_t seed[static SHA512_DIGEST_LENGTH],
     return Result_DERIVE_PRIVATE_KEY_HDNODE_FROM_SEED_FAILURE;
   }
 
-  if (!path->has_account) {
-    ERROR("path is missing account.");
-    return Result_DERIVE_PRIVATE_KEY_NO_ACCOUNT_FAILURE;
-  }
   if (!path->has_is_change) {
     ERROR("path is missing is_change.");
     return Result_DERIVE_PRIVATE_KEY_NO_IS_CHANGE_FAILURE;
   }
-  if (!path->has_account) {
-    ERROR("path is missing index.");
-    return Result_DERIVE_PRIVATE_KEY_NO_INDEX_FAILURE;
-  }
 
-  // derive address m/cointype/address/change/index
-  // where cointype is 0' for BTC mainnet and 1' for BTC testnet.
+  // derive address m/coin'/change/index
+  // where coin is 0' for BTC mainnet and 1' for BTC testnet.
   // See https://github.com/satoshilabs/slips/blob/master/slip-0044.md for the full list of coin types.
   if (!hdnode_private_ckd_prime(out, COIN_TYPE)) {
     ERROR("Error deriving private key path (for coin type)");
@@ -128,11 +111,6 @@ static Result derive_private_key(uint8_t seed[static SHA512_DIGEST_LENGTH],
   }
 
   // This derivation should match the public key derivation above this.
-  if (!hdnode_private_ckd(out, path->account)) {
-    ERROR("Error deriving private key path (for account)");
-    return Result_DERIVE_PRIVATE_KEY_ACCOUNT_FAILURE;
-  }
-
   if (!hdnode_private_ckd(out, path->is_change ? 1 : 0)) {
     ERROR("Error deriving private key path (for is_change");
     return Result_DERIVE_PRIVATE_KEY_IS_CHANGE_FAILURE;

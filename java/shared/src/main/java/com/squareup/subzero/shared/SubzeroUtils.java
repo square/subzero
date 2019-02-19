@@ -209,10 +209,9 @@ public class SubzeroUtils {
   }
 
   // A helper constructor, because proto builders are verbose
-  public static Path newPath(int account, boolean ischange, int index) {
-    return Path.newBuilder().setAccount(account).setIsChange(ischange).setIndex(index).build();
+  public static Path newPath(boolean ischange, int index) {
+    return Path.newBuilder().setIsChange(ischange).setIndex(index).build();
   }
-
 
   protected static DeterministicKey derivePublicKey(DeterministicKey key, Path path) {
     if (path.getAccountOrThrow() < 0) {
@@ -224,8 +223,6 @@ public class SubzeroUtils {
 
     // note: key might be m/0 for prod, but it's m/ for testnet. Investigate if this is some kind of
     // BitcoinJ quirk?
-    key = HDKeyDerivation.deriveChildKey(key, new ChildNumber(path.getAccountOrThrow(), false));
-
     key = HDKeyDerivation.deriveChildKey(key, new ChildNumber(path.getIsChangeOrThrow() ? 1 : 0, false));
 
     key = HDKeyDerivation.deriveChildKey(key, new ChildNumber(path.getIndexOrThrow(), false));
