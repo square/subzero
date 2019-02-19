@@ -1,0 +1,51 @@
+@font-face {
+  font-family: "SQMarket";
+  src: url("sqmarket-light.woff2") format("woff2");
+}
+
+html {
+  margin:    0 auto;
+  max-width: 900px;
+  font-family: "SQMarket";
+}
+
+h2 {
+  margin-top: 2em;
+  border-top: 1px solid #678;
+}
+
+.group {
+  padding-left: 1em;
+  border-left: 1px solid #678;
+  margin-bottom: 1em;
+}
+
+.group p {
+  margin: 0;
+}
+
+textarea {
+  width: 100%;
+  display: block;
+}
+
+.response textarea {
+  height: 10em;
+  padding-left: 2px;
+  border-left: 20px solid #678;
+}
+
+.response canvas {
+  border: 1px solid #678;
+}
+
+.response div {
+  font-size: small;
+  word-break: break-all;
+}
+
+.small {
+  font-size: 8pt;
+  padding: 1px;
+  border-radius: 2px;
+}
