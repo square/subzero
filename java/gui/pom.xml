@@ -41,11 +41,6 @@
       <version>1.23</version>
     </dependency>
     <dependency>
-      <groupId>com.squareup.nonmaven</groupId>
-      <artifactId>ncipherkm</artifactId>
-      <version>1.0</version>
-    </dependency>
-    <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java-util</artifactId>
       <version>3.6.0</version>
