@@ -4,7 +4,6 @@ import com.squareup.protos.subzero.service.Common.EncryptedPubKey;
 import com.squareup.protos.subzero.service.Service.CommandRequest;
 import com.squareup.protos.subzero.service.Service.CommandResponse;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * ColdWalletCreator handles the creation of a new cold wallet.  There are two
@@ -71,6 +70,6 @@ public class ColdWalletCreator {
     // TODO: In the future, we should have a way of validating some kind of signature
     // so we know these genuinely came from our HSM-backed storage.
 
-    return finalizeWalletResponses.getFinalizeWallet().getPubKeyOrThrow().toStringUtf8();
+    return finalizeWalletResponses.getFinalizeWallet().getPubKey().toStringUtf8();
   }
 }

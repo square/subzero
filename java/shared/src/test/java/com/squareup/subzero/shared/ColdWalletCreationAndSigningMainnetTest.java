@@ -49,17 +49,17 @@ public class ColdWalletCreationAndSigningMainnetTest {
     String initWalletResponse4 = "CnMKcQpv0trfyJySmMWb29vs7sPDzsOY0pzAnfrS8/7tn8/Z3dPSksDO29mfw8797cfg8+3h+NCZ0PiZyez+5N7Z0vz5+tnF4t7Onszrn//IyPrrne3HxJ6em8+Y4ezIw+b+2t2bxOz54pPFydjc4Obk693PIgA=";
 
     EncryptedPubKey encPubKey1 = CommandResponse.parseFrom(Base64.decode(initWalletResponse1))
-            .getInitWalletOrThrow()
-            .getEncryptedPubKeyOrThrow();
+            .getInitWallet()
+            .getEncryptedPubKey();
     EncryptedPubKey encPubKey2 = CommandResponse.parseFrom(Base64.decode(initWalletResponse2))
-        .getInitWalletOrThrow()
-        .getEncryptedPubKeyOrThrow();
+        .getInitWallet()
+        .getEncryptedPubKey();
     EncryptedPubKey encPubKey3 = CommandResponse.parseFrom(Base64.decode(initWalletResponse3))
-        .getInitWalletOrThrow()
-        .getEncryptedPubKeyOrThrow();
+        .getInitWallet()
+        .getEncryptedPubKey();
     EncryptedPubKey encPubKey4 = CommandResponse.parseFrom(Base64.decode(initWalletResponse4))
-        .getInitWalletOrThrow()
-        .getEncryptedPubKeyOrThrow();
+        .getInitWallet()
+        .getEncryptedPubKey();
 
     CommandRequest commandRequest = CommandRequest.newBuilder()
         .setWalletId(walletId)
@@ -86,23 +86,23 @@ public class ColdWalletCreationAndSigningMainnetTest {
     String finalizeWalletResponse4 = "EnEKb3hwdWI2ODJvMXFxRkRpaWRpMng2ajdQeFlURzVlc3d5eDhqZHFzNWlkV0dtSllHS1J6M3pSM2NGVE50c3hWU1Bzb0h0ZDRmQTVVYmJQQTdHbW40NDFlMktGYmlMVHB3MW5GU0g5b2NydkpMTkF3ZSIA";
 
     String pubKey1 = CommandResponse.parseFrom(Base64.decode(finalizeWalletResponse1))
-        .getFinalizeWalletOrThrow()
-        .getPubKeyOrThrow()
+        .getFinalizeWallet()
+        .getPubKey()
         .toStringUtf8();
 
     String pubKey2 = CommandResponse.parseFrom(Base64.decode(finalizeWalletResponse2))
-        .getFinalizeWalletOrThrow()
-        .getPubKeyOrThrow()
+        .getFinalizeWallet()
+        .getPubKey()
         .toStringUtf8();
 
     String pubKey3 = CommandResponse.parseFrom(Base64.decode(finalizeWalletResponse3))
-        .getFinalizeWalletOrThrow()
-        .getPubKeyOrThrow()
+        .getFinalizeWallet()
+        .getPubKey()
         .toStringUtf8();
 
     String pubKey4 = CommandResponse.parseFrom(Base64.decode(finalizeWalletResponse4))
-        .getFinalizeWalletOrThrow()
-        .getPubKeyOrThrow()
+        .getFinalizeWallet()
+        .getPubKey()
         .toStringUtf8();
 
     assertThat(pubKey1).isEqualTo("xpub68SWrTftbZ5WCk2PTBmmH8VVe9bE2m9kGyhaQo6s3BdtcJN9hDAAJ4qkkq8ZQukRknEumZzf3bShccoM9d9MAzfB2HQ9Ehr27MtnWfiySqC");
@@ -194,8 +194,8 @@ public class ColdWalletCreationAndSigningMainnetTest {
 
     ColdWallet coldWallet = new ColdWallet(MainNetParams.get(), walletId, addresses, gateway);
     String transaction =
-        toHexString(coldWallet.createTransaction(signTxRequest.getSignTxOrThrow().getInputsList(),
-            signTxRequest.getSignTxOrThrow().getOutputsList(), signatures));
+        toHexString(coldWallet.createTransaction(signTxRequest.getSignTx().getInputsList(),
+            signTxRequest.getSignTx().getOutputsList(), signatures));
     assertThat(transaction).isEqualTo(
         "010000000001012db978834e1e47aa2c07f3fa48c6ca5818bead9cef9b6ce55772890ce0f56e350000000023220020c35e8fbe611a5a157ddfe54d1c6e8d9cbe7edd76a9a9578fb39b0390a52b6e07feffffff01106c0100000000001976a914dd12ae4d57cfa4bcb78214f9669aaf9e6215664f88ac0400483045022100d45c18398b0acf64cfdc024b1d39e4bdcea73241862536e4412ee5a43391b5d80220246838df62f05f6e24efaf67c4f2b0a5bdaaab734c2fe016904e03e58597ce4a0147304402203cad5247373d1ed8a8e9c46a9783576b06f686abce8f18f60caf49eab1d54bf40220257d68ada121e484fa3ae6e6fe11fd2a04f74fe8aedc1b0fb3a79d14570690c5018b5221021fe5210be064b91d356a02a0e42cae57c9ceadcde5a500af2a2f44a525985587210254d20970c867d6abc582716731221a6fa9aa6e92621d28cda71d541939290594210379d0c27c46d6f9ea3b741ac7cfeef110f6e8849a827620e57d0ac5affe3c96412103b78cfc42d8285f73ea8e57a86d62e588f9833dd8a69f1d4da3e029aac922d1b054ae00000000");
 

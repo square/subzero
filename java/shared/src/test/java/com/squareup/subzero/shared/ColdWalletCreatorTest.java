@@ -7,7 +7,6 @@ import com.squareup.protos.subzero.service.Service.CommandRequest;
 import com.squareup.protos.subzero.service.Service.CommandResponse;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,8 +70,8 @@ public class ColdWalletCreatorTest {
 
     CommandRequest request = ColdWalletCreator.combine(map, tokenA, walletId);
     assertThat(request.getToken()).isEqualTo(tokenA);
-    assertThat(request.getWalletIdOrThrow()).isEqualTo(walletId);
-    assertThat(request.getFinalizeWalletOrThrow().getEncryptedPubKeysCount())
+    assertThat(request.getWalletId()).isEqualTo(walletId);
+    assertThat(request.getFinalizeWallet().getEncryptedPubKeysCount())
         .isEqualTo(map.size());
     assertThat(request.getFinalizeWallet().getEncryptedPubKeysList())
         .containsExactlyInAnyOrder(encryptedPubKeyA, encryptedPubKeyB, encryptedPubKeyC,
