@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <link rel="stylesheet" type="text/css" href="server.css">
+</head>
+<body>
+  <script src="jquery-3.3.1.min.js"></script>
+  <script src="server.js"></script>
+
+  <h1>Subzero server</h1>
+  <p>
+    This server enables creating request QR codes and processing of the responses. The server is currently very
+    minimalistic. For instance, there is no wallet management and no state persistence.
+  </p>
+  <p>
+    Note: M, N, and the gateway address are hardcoded in <a href="https://github.com/square/subzero/blob/master/core/include/config.h">config.h</a>
+    and <a href="https://github.com/square/subzero/blob/master/java/shared/src/main/java/com/squareup/subzero/shared/Constants.java">Constants.java</a>.
+  </p>
+
+  <h2>Pretty print</h2>
+  <p>Display the contents of a request or response. Useful for debugging purpose.</p>
+  <p>raw: <textarea id="pretty_print_raw"></textarea></p>
+  <p><button onClick="pretty_print_request()">decode request</button> <button onClick="pretty_print_response()">decode response</button></p>
+  <div id="pretty_print_response" class="response" style="display: none">
+    <p>json: <textarea disabled="true" id="pretty_print_json"></textarea></p>
+  </div>
+
+  <h2>Configuration</h2>
+  <p>Wallet id is a generic string, the recommended value is the wallet's creation date in <i>yyyymmdd</i> format.</p>
+  <p>M=<span id="M"></span>, N=<span id="N"></span></p>
+  <p>Wallet id: <input id="wallet" type="text" size="10" placeholder="yyymmdd"></p>
+  <p>Currency: <input id="currency" type="text" placeholder="USD" size="3"></p>
+  <p>Exchange rate (in currency per Satoshi): <input id="exchange_rate" type="text"></p>
+
+  <h2>Initialize a wallet</h2>
+  <p>Generates a QR code which will create a M-of-N wallet.</p>
+  <p><button onClick="init_wallet_request()">generate QR code</button></p>
+  <div id="init_wallet_response" class="response" style="display: none">
+    <canvas id="init_wallet_response_qr" width="400"></canvas>
+    <div id="init_wallet_response_data"></div>
+  </div>
+
+  <h2>Finalize a wallet</h2>
+  <p>Once you have the N responses from the initialization phase, enter them here to create the
+    wallet finalization QR code.</p>
+  <div id="init_responses">
+  </div>
+  <p><button onClick="finalize_wallet_request()">generate QR code</button></p>
+  <div id="finalize_wallet_response" class="response" style="display: none">
+    <canvas id="finalize_wallet_response_qr" width="400"></canvas>
+    <div id="finalize_wallet_response_data"></div>
+  </div>
+
+  <h2>Reveal wallet xpubs</h2>
+  <p>Once you have the N responses from the finalization phase, enter them here to reveal the
+    wallet xpubs.</p>
+  <div id="finalize_response">
+  </div>
+  <p><button onClick="reveal_xpubs()">reveal xpubs</button></p>
+  <div id="reveal_xpubs_response" class="response" style="display: none">
+    <p>xpubs: <textarea disabled="true" id="reveal_xpubs_response_data"></textarea></p>
+  </div>
+
+  <h2>Sign a transaction</h2>
+  <p>You will need to generate M responses.</p>
+  <p>lock time: <input id="lock_time" type="text" value="0"> (typically 0)</p>
+
+  <h3>inputs</h3>
+  <div id="inputs">
+  </div>
+  <p><button class="small" style="margin-left: 2em;" onClick="addInput(false)">add more inputs</button></p>
+
+  <h3>outputs</h3>
+  <div id="outputs">
+  </div>
+  <p><button class="small" style="margin-left: 2em;" onClick="addOutput(false)">add more outputs</button></p>
+
+  <p><button onClick="sign_tx_request()">generate QR code</button></p>
+  <div id="sign_tx_response" class="response" style="display: none">
+    <canvas id="sign_tx_response_qr" width="400"></canvas>
+    <div id="sign_tx_response_data"></div>
+  </div>
+
+  <h2>Merge signatures</h2>
+  <p>Once you have M responses, you can merge the signatures.</p>
+  <p>For broadcasting the resulting transaction, you can use <a href="https://testnet.smartbit.com.au/txs/pushtx">testnet.smartbit.com.au</a>
+    and <a href="https://www.blockchain.com/btc/pushtx">www.blockchain.com</a>, run your own Bitcoin node,
+    or talk to a public node.</p>
+  <p>Initial sign transaction request: <textarea id="initial_sign_tx_request"></textarea></p>
+  <div id="initial_finalize_responses"></div>
+  <p>Gateway address: <textarea id="gateway"></textarea></p>
+  <div id="merge_responses"></div>
+  <p><button onClick="show_final_transaction()">show final transaction</button></p>
+  <div id="show_final_transaction_response" class="response" style="display: none">
+    <p>transaction: <textarea disabled="true" id="show_final_transaction_response_data"></textarea></p>
+  </div>
+</body>
+</html>
