@@ -39,7 +39,9 @@ public class CommandHandler {
       default:
         throw new RuntimeException("Invalid request");
     }
-    builder.setOrClearToken(serviceRequest.getToken());
+    if (serviceRequest.hasToken()) {
+      builder.setToken(serviceRequest.getToken());
+    }
     return builder.build();
   }
 }

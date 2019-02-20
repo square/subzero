@@ -1,7 +1,7 @@
 package com.squareup.subzero.wallet;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.protobuf.JsonFormat;
+import com.google.protobuf.util.JsonFormat;
 import com.squareup.protos.subzero.wallet.WalletProto.Wallet;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -56,7 +56,7 @@ public class WalletLoader {
     OutputStreamWriter osw = new OutputStreamWriter(fos, UTF_8);
 
     // We save the wallet in JSON format, because it's simpler if we need to fix anything manually.
-    JsonFormat.print(wallet, osw);
+    JsonFormat.printer().preservingProtoFieldNames().omittingInsignificantWhitespace().appendTo(wallet, osw);
     osw.flush();
     fos.getFD().sync();
 
@@ -68,7 +68,7 @@ public class WalletLoader {
     System.out.println(format("Loading wallet file from: %s", path));
     FileReader fr = new FileReader(path.toFile());
     Wallet.Builder wallet = Wallet.newBuilder();
-    JsonFormat.merge(fr, wallet);
+    JsonFormat.parser().merge(fr, wallet);
 
     // TODO: copy and load from USB backup drive if the file is not found.
 
