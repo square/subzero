@@ -26,17 +26,13 @@ extern NFast_AppHandle app;
  * HSMs NVRAM. The NVRAM is protected using ACLs, so only the Codesafe code can
  * write to it.
  *
- * The magic number prevents swapping NVRAM between applications. For instance,
- * CodeCassone as its own magic number. The version number is a high water mark,
- * used to track which versions of the signed code have been seen.
+ * The magic number prevents swapping NVRAM between applications. The version
+ * number is a high water mark, used to track which versions of the signed code
+ * have been seen.
  *
  * Creating a fresh NVRAM requires an ACS quorum.
  * TODO: document NVRAM creation + ACL setup process.
  * TODO: experiment with the INCR ACL.
- *
- * Note: this code is very similar to rollback.c, currently being added
- * CodeCassone. The nCipher API we use however differs.
- * https://stash.corp.squareup.com/projects/INFOSEC/repos/codecassone/commits/f5495b09f511c797b49b04084d9b65101b060efc#module-utac/rollback.c
  *
  * To delete or allocate the NVRAM. By default, the NVRAM is 100 bytes:
  * /opt/nfast/bin/nvram-sw -d
