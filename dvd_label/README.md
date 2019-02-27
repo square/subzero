@@ -4,7 +4,8 @@ Small piece of code to generate DVD labels. The code is meant to work with [Aver
 
 ## Building
 
+Requires Go1.11:
 ```
-glide install
+go mod download
 go run dvd_label.go --ver 0.0.1
 ```
