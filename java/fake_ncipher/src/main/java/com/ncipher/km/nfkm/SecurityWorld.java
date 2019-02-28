@@ -6,6 +6,8 @@ import com.ncipher.nfast.NFException;
 import com.ncipher.nfast.connect.NFConnection;
 
 public class SecurityWorld {
+  public static final int NFKM_KNSO = 0;
+
   public boolean isInitialised() throws NFException {
     throw new RuntimeException("fake nCipher");
   }
@@ -43,6 +45,10 @@ public class SecurityWorld {
   }
 
   public SoftCard[] getSoftCards() throws NFException {
+    throw new RuntimeException("fake nCipher");
+  }
+
+  public AdminKeys loadAdminKeys(Slot var1, int[] var2, CmdCallBack var3) throws NFException {
     throw new RuntimeException("fake nCipher");
   }
 }

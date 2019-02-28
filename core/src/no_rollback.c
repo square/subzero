@@ -9,13 +9,13 @@
  * The magic number prevents accidentally mixing rollback protection code from another application. The version is
  * a high water mark and gets automatically bumped if needed when the application starts.
  *
- * dev/no_rollback.c uses a file (/tmp/subzero00).
+ * dev/no_rollback.c uses a file (/tmp/subzero0001).
  * ncipher/no_rollback.c uses the NVRAM, which needs to be configured with the proper ACLs when the HSM is enrolled.
  */
 Result no_rollback(void) {
   INFO("in no_rollback");
 
-  return no_rollback_check("subzero00", true, VERSION_MAGIC, VERSION);
+  return no_rollback_check("subzero0001", true, VERSION_MAGIC, VERSION);
 }
 
 Result no_rollback_check(const char* filename, bool allow_upgrade, uint32_t expected_magic, uint32_t expected_version) {

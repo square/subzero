@@ -14,27 +14,20 @@
 extern NFast_AppHandle app;
 
 /**
- * Creating a fresh NVRAM requires an ACS quorum.
- *
- * The process to create the NVRAM and setup the ACLs will live in the Java gui app.
+ * Creating a fresh NVRAM requires an ACS quorum. The easiest way to setup the
+ * NVRAM is to use the Java GUI application with --init-nvram.
  *
  * Note: we decided not to use the INCR instruction. We feel it's overly complicated.
  *
- * When testing, the following commands can be used to delete or allocate the NVRAM.
+ * For testing purposes, the following commands can be used to delete or allocate the NVRAM.
  * By default, the NVRAM is 100 bytes:
- * /opt/nfast/bin/nvram-sw -d
- * /opt/nfast/bin/nvram-sw -a
+ * /opt/nfast/bin/nvram-sw -a -n "subzero0001" (or -n "selfcheck01")
+ * /opt/nfast/bin/nvram-sw -d -n "subzero0001" (or -n "selfcheck01")
  *
  * To initialize the NVRAM to some initial state:
  * printf "%-99s %s" "8414-100" | tr ' ' '\0' > nvram
- * /opt/nfast/bin/nvram-sw --write -m 1 -f nvram
- * /opt/nfast/bin/nvram-sw --read | xxd
- *
- * TODO: write some tests
- * - ensure code fails if the MAGIC number mismatches
- * - ensure code works and upgrades if the version number is smaller.
- * - ensure code works if the version number is an exact match
- * - ensure code fails if the version number is greater.
+ * /opt/nfast/bin/nvram-sw --write -f nvram -n "subzero0001" (or -n "selfcheck01")
+ * /opt/nfast/bin/nvram-sw --read -n "subzero0001" (or -n "selfcheck01") | xxd
  */
 
 Result no_rollback_read(const char* filename, char buf[static VERSION_SIZE]) {

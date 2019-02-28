@@ -3,7 +3,7 @@
 #include "no_rollback.h"
 
 int verify_no_rollback() {
-  char verify_file[] = "selfcheck";
+  char verify_file[] = "selfcheck01";
   Result r;
   r = no_rollback_write_version(verify_file, 1, 1);
   if (r != Result_SUCCESS) {

@@ -2,6 +2,7 @@ package com.squareup.subzero.ncipher;
 
 import com.google.common.base.Strings;
 import com.ncipher.km.marshall.NFKM_ModuleState;
+import com.ncipher.km.nfkm.AdminKeys;
 import com.ncipher.km.nfkm.CardSet;
 import com.ncipher.km.nfkm.Key;
 import com.ncipher.km.nfkm.KeyGenerator;
@@ -10,34 +11,58 @@ import com.ncipher.km.nfkm.SecurityWorld;
 import com.ncipher.km.nfkm.Slot;
 import com.ncipher.km.nfkm.SoftCard;
 import com.ncipher.nfast.NFException;
-import com.ncipher.nfast.connect.ClientException;
-import com.ncipher.nfast.connect.CommandTooBig;
-import com.ncipher.nfast.connect.ConnectionClosed;
+import com.ncipher.nfast.connect.NFConnection;
+import com.ncipher.nfast.connect.StatusNotOK;
+import com.ncipher.nfast.marshall.M_ACL;
+import com.ncipher.nfast.marshall.M_Act_Details_NVMemOpPerms;
+import com.ncipher.nfast.marshall.M_Action;
+import com.ncipher.nfast.marshall.M_ByteBlock;
+import com.ncipher.nfast.marshall.M_CertType;
+import com.ncipher.nfast.marshall.M_CertType_CertBody_SigningKey;
+import com.ncipher.nfast.marshall.M_Certificate;
+import com.ncipher.nfast.marshall.M_CertificateList;
 import com.ncipher.nfast.marshall.M_Cmd;
 import com.ncipher.nfast.marshall.M_Cmd_Args_GetTicket;
+import com.ncipher.nfast.marshall.M_Cmd_Args_NVMemAlloc;
+import com.ncipher.nfast.marshall.M_Cmd_Args_NVMemOp;
 import com.ncipher.nfast.marshall.M_Cmd_Reply_GetTicket;
 import com.ncipher.nfast.marshall.M_Command;
+import com.ncipher.nfast.marshall.M_FileID;
+import com.ncipher.nfast.marshall.M_FileInfo;
+import com.ncipher.nfast.marshall.M_Hash;
 import com.ncipher.nfast.marshall.M_KeyGenParams;
+import com.ncipher.nfast.marshall.M_KeyHash;
 import com.ncipher.nfast.marshall.M_KeyID;
 import com.ncipher.nfast.marshall.M_KeyType;
 import com.ncipher.nfast.marshall.M_KeyType_GenParams_Random;
+import com.ncipher.nfast.marshall.M_ModuleID;
+import com.ncipher.nfast.marshall.M_NVMemOpType;
+import com.ncipher.nfast.marshall.M_NVMemOpType_OpVal_Write;
+import com.ncipher.nfast.marshall.M_PermissionGroup;
 import com.ncipher.nfast.marshall.M_Reply;
+import com.ncipher.nfast.marshall.M_SlotType;
+import com.ncipher.nfast.marshall.M_Status;
 import com.ncipher.nfast.marshall.M_Ticket;
 import com.ncipher.nfast.marshall.M_TicketDestination;
+import com.ncipher.nfast.marshall.M_UseLimit;
 import com.ncipher.nfast.marshall.MarshallContext;
-import com.ncipher.nfast.marshall.MarshallTypeError;
 import com.ncipher.provider.km.nCipherKM;
 import com.ncipher.provider.nCRuntimeException;
 import com.squareup.subzero.framebuffer.Screens;
+import com.squareup.subzero.shared.Constants;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.util.Arrays;
 import org.spongycastle.util.encoders.Hex;
 
+import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.BaseEncoding.base64;
+import static com.ncipher.nfast.marshall.M_Act.NVMemOpPerms;
 import static java.lang.String.format;
 
 /**
@@ -48,8 +73,6 @@ import static java.lang.String.format;
  * doing things.
  */
 public class NCipher {
-  private static final String DATA_SIGNING_KEY_NAME = "subzerodatasigner";
-
   private SecurityWorld securityWorld;
   private Module module;
   private CardSet ocsCardSet;
@@ -111,7 +134,7 @@ public class NCipher {
     return fileToByteString(format("card_%s_1", getOcsId()));
   }
 
-  public void loadOcs(String defaultPassword, Screens screens) throws NFException, IOException {
+  public void loadOcs(String dataSigner, String defaultPassword, Screens screens) throws NFException, IOException {
     // Unless we have more than one HSM in our server, the first module is going to be usable.
     module = securityWorld.getModule(1);
 
@@ -152,9 +175,9 @@ public class NCipher {
     screens.renderLoading();
 
     // Get the data signing key
-    dataSigningKey = securityWorld.getKey("seeinteg", DATA_SIGNING_KEY_NAME);
+    dataSigningKey = securityWorld.getKey("seeinteg", dataSigner);
     if (dataSigningKey == null) {
-      throw new IllegalStateException(format("seeinteg key %s not found", DATA_SIGNING_KEY_NAME));
+      throw new IllegalStateException(format("seeinteg key %s not found", dataSigner));
     }
   }
 
@@ -166,6 +189,100 @@ public class NCipher {
       ocsCardSet.unLoad();
       ocsCardSet = null;
     }
+  }
+
+  /**
+   * Attempt to:
+   * 1. allocate a NVRAM.
+   * 2. write magic-version to it.
+   * 3. change the ACL to require the data signer key.
+   */
+  public void initNvram(String dataSignerKey, Screens screens) throws Exception {
+    // Load the ACS
+    M_CertificateList acsCert = loadAcs(screens);
+
+    // Get data signer key hash
+    Key datasigner_key = securityWorld.getKey("seeinteg", dataSignerKey);
+    M_KeyHash dataKey = toKeyHash(datasigner_key.getData().hash);
+
+    // Create both NVRAM files
+    for (String file : new String[] { "selfcheck01", "subzero0001"}) {
+      // Permissions are going to be:
+      // - anyone can read and inspect ACLs
+      // - datasigner can write
+      // - ACS can write
+      M_FileInfo fileInfo = new M_FileInfo(0, 100, new M_FileID(file.getBytes(UTF_8)));
+      M_PermissionGroup[] permissionGroups = new M_PermissionGroup[] {
+          new M_PermissionGroup(0, new M_UseLimit[] {}, new M_Action[] {
+              new M_Action(NVMemOpPerms, new M_Act_Details_NVMemOpPerms(
+                  M_Act_Details_NVMemOpPerms.perms_Write))
+          }),
+          new M_PermissionGroup(0, new M_UseLimit[] {}, new M_Action[] {
+              new M_Action(NVMemOpPerms, new M_Act_Details_NVMemOpPerms(
+                  M_Act_Details_NVMemOpPerms.perms_Write))
+          }),
+          new M_PermissionGroup(0, new M_UseLimit[] {}, new M_Action[] {
+              new M_Action(NVMemOpPerms, new M_Act_Details_NVMemOpPerms(
+                  M_Act_Details_NVMemOpPerms.perms_Read | M_Act_Details_NVMemOpPerms.perms_GetACL))
+          }),
+      };
+      permissionGroups[0].set_certifier(dataKey);
+      permissionGroups[1].set_certifier(acsCert.certs[0].keyhash);
+
+      M_ACL acl = new M_ACL(permissionGroups);
+      M_Cmd_Args_NVMemAlloc args = new M_Cmd_Args_NVMemAlloc(new M_ModuleID(1), 0, fileInfo, acl);
+      M_Command m_command = new M_Command(M_Cmd.NVMemAlloc, 0, args);
+      m_command.set_certs(acsCert);
+      xact(m_command);
+
+      // Write initial value.
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      byte[] initialValue = format("%d-%d", Constants.MAGIC, Constants.VERSION).getBytes(UTF_8);
+      baos.write(initialValue);
+      for (int i = initialValue.length; i < 100; i++) {
+        baos.write(0x00);
+      }
+      byte[] data = baos.toByteArray();
+      M_Cmd_Args_NVMemOp args2 = new M_Cmd_Args_NVMemOp(new M_ModuleID(1), 0,
+          new M_FileID(file.getBytes(UTF_8)),
+          M_NVMemOpType.Write, new M_NVMemOpType_OpVal_Write(new M_ByteBlock(data)));
+      m_command = new M_Command(M_Cmd.NVMemOp, 0, args2);
+      m_command.set_certs(acsCert);
+      xact(m_command);
+      System.out.println(format("nvram initialized: %s", file));
+    }
+  }
+
+  private static Slot getSlot(Module module, int slotType) {
+    Slot[] smartCardSlots = Arrays.stream(module.getSlots())
+        .filter(s -> s.getData().phystype == slotType)
+        .toArray(Slot[]::new);
+    if (smartCardSlots.length == 0) {
+      throw new IllegalStateException(format("no slots of type '%s' found", M_SlotType.toString(slotType)));
+    } else if (smartCardSlots.length > 1) {
+      throw new IllegalStateException(format("too many slots of type '%s' found", M_SlotType.toString(slotType)));
+    }
+    return smartCardSlots[0];
+  }
+
+  private static M_KeyHash toKeyHash(M_Hash key) {
+    M_KeyHash r = new M_KeyHash();
+    r.value = key.value;
+    return r;
+  }
+
+  private M_CertificateList loadAcs(Screens screens) throws NFException, IOException {
+    // Unless we have more than one HSM in our server, the first module is going to be usable.
+    Slot slot = getSlot(securityWorld.getModule(1), M_SlotType.SmartCard);
+    AdminKeys adminKeys = securityWorld.loadAdminKeys(slot, new int[] {SecurityWorld.NFKM_KNSO},
+        new NCipherLoadACS(screens));
+
+    M_KeyID cardSetKeyId = adminKeys.KeyIds[0];
+    M_Hash hknsoKeyHash = securityWorld.getData().hknso;
+
+    return new M_CertificateList(new M_Certificate[] {
+        new M_Certificate(toKeyHash(hknsoKeyHash), M_CertType.SigningKey,
+            new M_CertType_CertBody_SigningKey(cardSetKeyId))});
   }
 
   public String createMasterSeedEncryptionKey() throws NFException {
@@ -191,8 +308,7 @@ public class NCipher {
     masterSeedEncryptionKey = key.load(ocsCardSet, module);
   }
 
-  public byte[] getMasterSeedEncryptionKeyTicket()
-      throws MarshallTypeError, ClientException, ConnectionClosed, CommandTooBig {
+  public byte[] getMasterSeedEncryptionKeyTicket() throws NFException {
     M_Ticket masterSeedEncryptionKeyTicket = getTicket(masterSeedEncryptionKey);
 
     byte[] ticket = MarshallContext.marshall(masterSeedEncryptionKeyTicket);
@@ -221,10 +337,9 @@ public class NCipher {
     return ticket;
   }
 
-  private M_Ticket getTicket(M_KeyID k) throws
-      ClientException, CommandTooBig, MarshallTypeError, ConnectionClosed {
+  private M_Ticket getTicket(M_KeyID k) throws NFException {
     M_Cmd_Args_GetTicket args = new M_Cmd_Args_GetTicket(0, k, M_TicketDestination.Any, null);
-    M_Reply rep = securityWorld.getConnection().transact(new M_Command(M_Cmd.GetTicket, 0, args));
+    M_Reply rep = xact(new M_Command(M_Cmd.GetTicket, 0, args));
     return ((M_Cmd_Reply_GetTicket) (rep.reply)).ticket;
   }
 
@@ -245,4 +360,18 @@ public class NCipher {
     Path kmdata = Paths.get("/opt/nfast/kmdata/local");
     return Files.readAllBytes(kmdata.resolve(filename));
   }
+
+  public M_Reply xact(M_Command cmd) throws NFException {
+    NFConnection conn = securityWorld.getConnection();
+    M_Reply rep = conn.transact(cmd);
+    if (rep.status != M_Status.OK) {
+      throw new StatusNotOK("Status "
+          + M_Status.toString(rep.status)
+          + " from "
+          + M_Cmd.toString(cmd.cmd)
+          + " command");
+    }
+    return rep;
+  }
+
 }

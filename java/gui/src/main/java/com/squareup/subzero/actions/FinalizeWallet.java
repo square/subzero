@@ -4,15 +4,14 @@ import com.google.common.base.Strings;
 import com.google.protobuf.ByteString;
 import com.ncipher.nfast.NFException;
 import com.squareup.subzero.InternalCommandConnector;
-import com.squareup.subzero.ncipher.NCipher;
 import com.squareup.subzero.SubzeroGui;
-import com.squareup.subzero.shared.SubzeroUtils;
-import com.squareup.subzero.wallet.WalletLoader;
+import com.squareup.subzero.ncipher.NCipher;
 import com.squareup.subzero.proto.service.Internal.InternalCommandRequest;
 import com.squareup.subzero.proto.service.Internal.InternalCommandResponse;
 import com.squareup.subzero.proto.service.Service.CommandRequest;
 import com.squareup.subzero.proto.service.Service.CommandResponse;
 import com.squareup.subzero.proto.wallet.WalletProto.Wallet;
+import com.squareup.subzero.wallet.WalletLoader;
 import java.io.IOException;
 
 import static java.lang.String.format;
@@ -51,7 +50,7 @@ public class FinalizeWallet {
     NCipher nCipher = null;
     if (subzero.nCipher) {
       nCipher = new NCipher();
-      nCipher.loadOcs(subzero.ocsPassword, subzero.getScreens());
+      nCipher.loadOcs(subzero.config.dataSignerKey, subzero.ocsPassword, subzero.getScreens());
 
       nCipher.loadMasterSeedEncryptionKey(wallet.getMasterSeedEncryptionKeyId());
       byte[] ticket = nCipher.getMasterSeedEncryptionKeyTicket();

@@ -1,5 +1,6 @@
 package com.ncipher.km.nfkm;
 
+import com.ncipher.km.marshall.NFKM_Key;
 import com.ncipher.nfast.NFException;
 import com.ncipher.nfast.marshall.M_KeyID;
 
@@ -13,10 +14,6 @@ public class Key {
   }
 
   public void makeBlobs(CardSet cardset) throws NFException {
-    throw new RuntimeException("fake nCipher");
-  }
-
-  public void makeBlobs(SoftCard softcard) throws NFException {
     throw new RuntimeException("fake nCipher");
   }
 
@@ -40,7 +37,11 @@ public class Key {
     throw new RuntimeException("fake nCipher");
   }
 
-  public void unLoad() throws NFException {
+  public M_KeyID load(Slot var1) throws NFException {
+    throw new RuntimeException("fake nCipher");
+  }
+
+  public NFKM_Key getData() {
     throw new RuntimeException("fake nCipher");
   }
 }
