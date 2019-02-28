@@ -120,6 +120,7 @@
       <plugin>
         <groupId>org.skife.maven</groupId>
         <artifactId>really-executable-jar-maven-plugin</artifactId>
+        <version>1.5.0</version>
         <executions>
           <execution>
             <phase>package</phase>
