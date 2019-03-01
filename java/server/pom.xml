@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.squareup.subzero</groupId>
         <artifactId>parent</artifactId>
-        <version>0.1.1</version>
+        <version>0.1.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>server</artifactId>
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>com.squareup.subzero</groupId>
             <artifactId>proto</artifactId>
-            <version>0.1.1</version>
+            <version>0.1.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -53,7 +53,7 @@
       <dependency>
         <groupId>com.squareup.subzero</groupId>
         <artifactId>shared</artifactId>
-        <version>0.1.1</version>
+        <version>0.1.2-SNAPSHOT</version>
         <scope>compile</scope>
       </dependency>
         <dependency>
