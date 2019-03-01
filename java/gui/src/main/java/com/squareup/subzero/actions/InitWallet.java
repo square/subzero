@@ -6,11 +6,11 @@ import com.squareup.subzero.InternalCommandConnector;
 import com.squareup.subzero.ncipher.NCipher;
 import com.squareup.subzero.SubzeroGui;
 import com.squareup.subzero.wallet.WalletLoader;
-import com.squareup.protos.subzero.service.Internal.InternalCommandRequest;
-import com.squareup.protos.subzero.service.Internal.InternalCommandResponse;
-import com.squareup.protos.subzero.service.Service.CommandRequest;
-import com.squareup.protos.subzero.service.Service.CommandResponse;
-import com.squareup.protos.subzero.wallet.WalletProto.Wallet;
+import com.squareup.subzero.proto.service.Internal.InternalCommandRequest;
+import com.squareup.subzero.proto.service.Internal.InternalCommandResponse;
+import com.squareup.subzero.proto.service.Service.CommandRequest;
+import com.squareup.subzero.proto.service.Service.CommandResponse;
+import com.squareup.subzero.proto.wallet.WalletProto.Wallet;
 import java.security.SecureRandom;
 import org.spongycastle.util.encoders.Hex;
 

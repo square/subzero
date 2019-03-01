@@ -2,7 +2,7 @@ package com.squareup.subzero.wallet;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.util.JsonFormat;
-import com.squareup.protos.subzero.wallet.WalletProto.Wallet;
+import com.squareup.subzero.proto.wallet.WalletProto.Wallet;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;

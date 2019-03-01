@@ -7,8 +7,8 @@ import com.squareup.subzero.framebuffer.Framebuffer;
 import com.squareup.subzero.framebuffer.Screens;
 import com.squareup.subzero.ncipher.NCipher;
 import com.squareup.subzero.shared.SubzeroUtils;
-import com.squareup.protos.subzero.service.Service.CommandRequest;
-import com.squareup.protos.subzero.service.Service.CommandResponse;
+import com.squareup.subzero.proto.service.Service.CommandRequest;
+import com.squareup.subzero.proto.service.Service.CommandResponse;
 
 import static com.google.common.io.BaseEncoding.base64;
 

@@ -1,11 +1,10 @@
 package com.squareup.subzero.shared;
 
-import org.apache.commons.lang3.tuple.Pair;
-import com.squareup.protos.subzero.service.Common.Path;
-import com.squareup.protos.subzero.service.Common.Signature;
-import com.squareup.protos.subzero.service.Common.TxInput;
-import com.squareup.protos.subzero.service.Common.TxOutput;
-import com.squareup.protos.subzero.service.Service.CommandRequest;
+import com.squareup.subzero.proto.service.Common.Path;
+import com.squareup.subzero.proto.service.Common.Signature;
+import com.squareup.subzero.proto.service.Common.TxInput;
+import com.squareup.subzero.proto.service.Common.TxOutput;
+import com.squareup.subzero.proto.service.Service.CommandRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.NetworkParameters;

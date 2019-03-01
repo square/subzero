@@ -1,8 +1,6 @@
 syntax = "proto2";
 
-package squareup.subzero.wallet;
-
-option java_package = "com.squareup.protos.subzero.wallet";
+package com.squareup.subzero.proto.wallet;
 
 import "common.proto";
 

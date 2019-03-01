@@ -4,9 +4,9 @@ import com.squareup.subzero.actions.FinalizeWallet;
 import com.squareup.subzero.actions.InitWallet;
 import com.squareup.subzero.actions.SignTx;
 import com.squareup.subzero.shared.Constants;
-import com.squareup.protos.subzero.service.Internal.InternalCommandRequest;
-import com.squareup.protos.subzero.service.Service.CommandRequest;
-import com.squareup.protos.subzero.service.Service.CommandResponse;
+import com.squareup.subzero.proto.service.Internal.InternalCommandRequest;
+import com.squareup.subzero.proto.service.Service.CommandRequest;
+import com.squareup.subzero.proto.service.Service.CommandResponse;
 
 /**
  * CommandHandler dispatches CommandRequests to an appropriate handler, which will make an
