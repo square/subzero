@@ -3,7 +3,7 @@ package com.squareup.subzero.server.resources;
 import com.google.common.collect.Lists;
 import com.google.common.io.BaseEncoding;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.squareup.protos.subzero.service.Service;
+import com.squareup.subzero.proto.service.Service;
 import com.squareup.subzero.shared.ColdWalletCreator;
 import com.squareup.subzero.shared.Constants;
 import java.util.List;

@@ -1,8 +1,6 @@
 syntax = "proto2";
 
-package squareup.subzero.service;
-
-option java_package = "com.squareup.protos.subzero.service";
+package com.squareup.subzero.proto.service;
 
 /**
  * Shared protobuf between internal.proto and service.proto.

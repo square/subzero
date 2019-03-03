@@ -4,8 +4,8 @@ import com.squareup.subzero.exceptions.HsmConnectionException;
 import com.squareup.subzero.exceptions.MismatchedVersionException;
 import com.squareup.subzero.exceptions.SelfCheckException;
 import com.squareup.subzero.exceptions.UnknownException;
-import com.squareup.protos.subzero.service.Internal.InternalCommandRequest;
-import com.squareup.protos.subzero.service.Internal.InternalCommandResponse;
+import com.squareup.subzero.proto.service.Internal.InternalCommandRequest;
+import com.squareup.subzero.proto.service.Internal.InternalCommandResponse;
 import java.io.IOException;
 import java.net.Socket;
 

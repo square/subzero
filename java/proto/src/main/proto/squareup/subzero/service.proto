@@ -1,8 +1,7 @@
 syntax = "proto2";
 
-package squareup.subzero.service;
+package com.squareup.subzero.proto.service;
 
-option java_package = "com.squareup.protos.subzero.service";
 option java_generic_services = true;
 
 import "common.proto";

@@ -2,9 +2,9 @@ package com.squareup.subzero.wallet;
 
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
-import com.squareup.protos.subzero.service.Common.EncryptedMasterSeed;
-import com.squareup.protos.subzero.service.Common.EncryptedPubKey;
-import com.squareup.protos.subzero.wallet.WalletProto.Wallet;
+import com.squareup.subzero.proto.service.Common.EncryptedMasterSeed;
+import com.squareup.subzero.proto.service.Common.EncryptedPubKey;
+import com.squareup.subzero.proto.wallet.WalletProto.Wallet;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

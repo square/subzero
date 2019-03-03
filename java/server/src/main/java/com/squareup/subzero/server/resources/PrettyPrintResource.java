@@ -2,7 +2,7 @@ package com.squareup.subzero.server.resources;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
-import com.squareup.protos.subzero.service.Service;
+import com.squareup.subzero.proto.service.Service;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
