@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package com.squareup.subzero.proto.wallet;
 
-import "common.proto";
+import "squareup/subzero/common.proto";
 
 /**
  * The wallet file lives on the Subzero host machine's hard drive. It is also backed up to a USB
