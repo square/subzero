@@ -38,11 +38,9 @@
               <goal>run</goal>
             </goals>
             <configuration>
-              <includeDirectories>
-                <include>src/main/proto/squareup/subzero</include>
-              </includeDirectories>
+              <addProtoSources>all</addProtoSources>
               <inputDirectories>
-                <include>src/main/proto/squareup/subzero</include>
+                <include>src/main/proto</include>
               </inputDirectories>
             </configuration>
           </execution>
