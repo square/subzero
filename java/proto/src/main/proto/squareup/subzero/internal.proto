@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package com.squareup.subzero.proto.service;
 
-import "common.proto";
+import "squareup/subzero/common.proto";
 
 /**
  * Proto used to communicate between the Java CLI and the CodeSafe code.

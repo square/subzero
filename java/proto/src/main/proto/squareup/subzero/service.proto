@@ -4,7 +4,7 @@ package com.squareup.subzero.proto.service;
 
 option java_generic_services = true;
 
-import "common.proto";
+import "squareup/subzero/common.proto";
 
 /**
  * Proto used to communicate between the Coordinator Service and the Java CLI.

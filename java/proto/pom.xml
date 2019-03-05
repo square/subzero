@@ -42,6 +42,9 @@
               <inputDirectories>
                 <include>src/main/proto</include>
               </inputDirectories>
+              <includeDirectories>
+                <includeDirectory>src/main/proto</includeDirectory>
+              </includeDirectories>
             </configuration>
           </execution>
         </executions>
