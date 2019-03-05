@@ -30,6 +30,13 @@
     </license>
   </licenses>
 
+  <scm>
+    <url>https://github.com/square/subzero/</url>
+    <connection>scm:git:https://github.com/square/subzero.git</connection>
+    <developerConnection>scm:git:git@github.com:square/subzero.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
   <build>
     <plugins>
       <plugin>
