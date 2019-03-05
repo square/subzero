@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.squareup.subzero</groupId>
   <artifactId>parent</artifactId>
-  <version>0.1.2-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -28,20 +30,6 @@
     </license>
   </licenses>
 
-  <distributionManagement>
-    <repository>
-      <id>jar-releases</id>
-      <url>https://maven.global.square/artifactory/jar-releases</url>
-    </repository>
-  </distributionManagement>
-
-  <scm>
-    <url>https://github.com/square/subzero/</url>
-    <connection>scm:git:https://github.com/square/subzero.git</connection>
-    <developerConnection>scm:git:git@github.com:square/subzero.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-
   <build>
     <plugins>
       <plugin>
@@ -56,18 +44,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
         <version>3.0.0-M1</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>2.5.3</version>
-        <configuration>
-          <useReleaseProfile>false</useReleaseProfile>
-          <autoVersionSubmodules>true</autoVersionSubmodules>
-          <mavenExecutorId>forked-path</mavenExecutorId>
-          <tagNameFormat>v@{project.version}</tagNameFormat>
-          <preparationGoals>clean test</preparationGoals>
-        </configuration>
       </plugin>
     </plugins>
   </build>
