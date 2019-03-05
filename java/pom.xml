@@ -4,7 +4,7 @@
 
   <groupId>com.squareup.subzero</groupId>
   <artifactId>parent</artifactId>
-  <version>0.1.2-SNAPSHOT</version>
+  <version>0.1.1</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -39,7 +39,7 @@
     <url>https://github.com/square/subzero/</url>
     <connection>scm:git:https://github.com/square/subzero.git</connection>
     <developerConnection>scm:git:git@github.com:square/subzero.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>v0.1.1</tag>
   </scm>
 
   <build>
