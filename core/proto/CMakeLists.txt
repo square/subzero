@@ -10,4 +10,4 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS}
     PROPERTIES GENERATED TRUE)
 
-add_library(PlutusProtos STATIC ${PROTO_SRCS} ${PROTO_HDRS})
+add_library(SubzeroProtos STATIC ${PROTO_SRCS} ${PROTO_HDRS})

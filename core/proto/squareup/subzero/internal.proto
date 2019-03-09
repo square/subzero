@@ -14,7 +14,7 @@ import "squareup/subzero/common.proto";
 
 message InternalCommandRequest {
   message InitWalletRequest {
-    // At master_seed creation time, we mix entropy from the Plutus host machine and the nCipher.
+    // At master_seed creation time, we mix entropy from the Subzero host machine and the nCipher.
     required bytes random_bytes = 1;
   }
 

@@ -97,4 +97,4 @@ else ()
 endif ()
 
 add_executable(subzero ${main_SRC})
-target_link_libraries(subzero TrezorCrypto PlutusProtos)
+target_link_libraries(subzero TrezorCrypto SubzeroProtos)

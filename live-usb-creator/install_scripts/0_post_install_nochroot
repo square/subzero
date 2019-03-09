@@ -60,7 +60,7 @@ rm -rf /tmp/nfast_install
 cp /vagrant/syslinux-splash.png /mnt/sysimage/usr/share/anaconda/boot/syslinux-splash.png
 
 ###############################################################################
-# Plutus DVD stuff
+# Subzero DVD stuff
 ###############################################################################
 
 mkdir -p /mnt/sysimage/data/app/subzero
