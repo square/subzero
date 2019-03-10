@@ -6,18 +6,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "check_ver.h"
+#include "no_rollback.h"
 #include "config.h"
 #include "log.h"
 
-static void check_ver_write(void);
-static int check_ver_read(void);
+static void no_rollback_write(void);
+static int no_rollback_read(void);
 
 extern NFastApp_Connection conn;
 extern NFast_AppHandle app;
 
 /**
- * check_ver() provides rollback protection. The code prevents using older
+ * no_rollback() provides rollback protection. The code prevents using older
  * versions of signed CodeSafe code after a newer version has been deployed. We
  * thus limit the attack surface to only the latest version of our code, as
  * opposed to any version which has ever been signed.
@@ -49,38 +49,38 @@ extern NFast_AppHandle app;
  * - ensure code works if the version number is an exact match
  * - ensure code fails if the version number is greater.
  *
- * TODO: we could put check_ver() in src/ and have check_ver_read() +
- * check_ver_write() live in the dev/ + ncipher/ folders.
+ * TODO: we could put no_rollback() in src/ and have no_rollback_read() +
+ * no_rollback_write() live in the dev/ + ncipher/ folders.
  */
 
-void check_ver() {
+void no_rollback() {
   int version;
 
-  version = check_ver_read();
+  version = no_rollback_read();
   if (version == -1) {
-    ERROR("check_ver: check_ver_read() failed. Exiting.");
+    ERROR("no_rollback: no_rollback_read() failed. Exiting.");
     exit(-1);
   }
-  DEBUG("check_ver: NVRAM version is %d.", version);
+  DEBUG("no_rollback: NVRAM version is %d.", version);
 
   if (version > VERSION) {
-    ERROR("check_ver: rollback detected! Exiting");
+    ERROR("no_rollback: rollback detected! Exiting");
     exit(-1);
   } else if (version < VERSION) {
-    ERROR("check_ver: updating version stored in NVRAM.");
-    check_ver_write();
+    ERROR("no_rollback: updating version stored in NVRAM.");
+    no_rollback_write();
     // todo: we should re-read!
   } else {
     assert(version == VERSION);
-    INFO("check_ver: version match.");
+    INFO("no_rollback: version match.");
   }
 }
 
 // For some unknown reason, NFastApp_Transact with -O2 requires
 // heap allocated buffers.
-uint8_t check_ver_buf[VERSION_SIZE] = {0};
+uint8_t no_rollback_buf[VERSION_SIZE] = {0};
 
-static void check_ver_write() {
+static void no_rollback_write() {
   M_Command command = {0};
   M_Reply reply = {0};
   M_Status rc;
@@ -92,31 +92,31 @@ static void check_ver_write() {
   // TODO: assert file_name is <= 10 bytes + NULL
   memcpy(&(command.args.nvmemop.name), &file_name, strlen(file_name));
 
-  snprintf((char *)check_ver_buf, sizeof(check_ver_buf), "%d-%d", VERSION_MAGIC,
+  snprintf((char *)no_rollback_buf, sizeof(no_rollback_buf), "%d-%d", VERSION_MAGIC,
            VERSION);
 
-  command.args.nvmemop.val.write.data.len = sizeof(check_ver_buf);
-  command.args.nvmemop.val.write.data.ptr = check_ver_buf;
+  command.args.nvmemop.val.write.data.len = sizeof(no_rollback_buf);
+  command.args.nvmemop.val.write.data.ptr = no_rollback_buf;
 
   if ((rc = NFastApp_Transact(conn, NULL, &command, &reply, NULL)) !=
       Status_OK) {
-    ERROR("check_ver_write: NFastApp_Transact failed (%s).",
+    ERROR("no_rollback_write: NFastApp_Transact failed (%s).",
           NF_Lookup(rc, NF_Status_enumtable));
     goto exit;
   }
 
   if (reply.status != Status_OK) {
-    ERROR("check_ver_write: NFastApp_Transact returned error (%d).",
+    ERROR("no_rollback_write: NFastApp_Transact returned error (%d).",
           reply.status);
     goto exit;
   }
-  INFO("check_ver_write: write success");
+  INFO("no_rollback_write: write success");
 
 exit:
   NFastApp_Free_Reply(app, NULL, NULL, &reply);
 }
 
-static int check_ver_read() {
+static int no_rollback_read() {
   int version = -1;
 
   M_Command command = {0};
@@ -131,19 +131,19 @@ static int check_ver_read() {
 
   if ((rc = NFastApp_Transact(conn, NULL, &command, &reply, NULL)) !=
       Status_OK) {
-    ERROR("check_ver_read: NFastApp_Transact failed (%s).",
+    ERROR("no_rollback_read: NFastApp_Transact failed (%s).",
           NF_Lookup(rc, NF_Status_enumtable));
     goto exit;
   }
 
   if (reply.status != Status_OK) {
-    ERROR("check_ver_read: NFastApp_Transact returned error (%d).",
+    ERROR("no_rollback_read: NFastApp_Transact returned error (%d).",
           reply.status);
     goto exit;
   }
 
   // Validate magic string and return the version
-  DEBUG("check_ver_read: nvram contents: (%d) ",
+  DEBUG("no_rollback_read: nvram contents: (%d) ",
         reply.reply.nvmemop.res.read.data.len);
   for (unsigned int i = 0; i < reply.reply.nvmemop.res.read.data.len; i++) {
     DEBUG_("%02x", reply.reply.nvmemop.res.read.data.ptr[i]);
@@ -153,12 +153,12 @@ static int check_ver_read() {
   int magic;
   if (sscanf((const char *)reply.reply.nvmemop.res.read.data.ptr, "%u-%u",
              &magic, &version) != 2) {
-    ERROR("check_ver_read: failed to parse nvram");
+    ERROR("no_rollback_read: failed to parse nvram");
     version = -1;
     goto exit;
   }
   if (magic != VERSION_MAGIC) {
-    ERROR("check_ver_read: unexpected magic number (%d)", magic);
+    ERROR("no_rollback_read: unexpected magic number (%d)", magic);
     version = -1;
     goto exit;
   }

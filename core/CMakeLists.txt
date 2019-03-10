@@ -49,17 +49,17 @@ list(APPEND main_SRC ${checks_SRC})
 
 set(include_SRC
     "include/aes_gcm.h"
-    "include/module_certificate.h"
-    "include/check_ver.h"
     "include/checks.h"
     "include/config.h"
     "include/conv.h"
     "include/hash.h"
-    "include/init.h"
     "include/init_wallet.h"
+    "include/init.h"
     "include/log.h"
     "include/memzero.h"
+    "include/module_certificate.h"
     "include/nanopb_stream.h"
+    "include/no_rollback.h"
     "include/print.h"
     "include/protection.h"
     "include/rpc.h"
@@ -70,23 +70,25 @@ list(APPEND main_SRC ${include_SRC})
 
 if ($ENV{TARGET} MATCHES "nCipher")
   set(extra_SRC
-       "src/ncipher/additional_checks.c"
-       "src/ncipher/aes_gcm.c"
-       "src/ncipher/module_certificate.c"
-       "src/ncipher/check_ver.c"
-       "src/ncipher/execute_command_hooks.c"
-       "src/ncipher/init.c"
-       "src/ncipher/init_wallet.c"
-       "src/ncipher/protection.c")
+      "src/ncipher/additional_checks.c"
+      "src/ncipher/aes_gcm.c"
+      "src/ncipher/execute_command_hooks.c"
+      "src/ncipher/init_wallet.c"
+      "src/ncipher/init.c"
+      "src/ncipher/module_certificate.c"
+      "src/ncipher/no_rollback.c"
+      "src/ncipher/protection.c"
+  )
   list(APPEND main_SRC ${extra_SRC})
 else ()
   set(extra_SRC
-       "src/dev/additional_checks.c"
-       "src/dev/check_ver.c"
-       "src/dev/execute_command_hooks.c"
-       "src/dev/init.c"
-       "src/dev/init_wallet.c"
-       "src/dev/protection.c")
+      "src/dev/additional_checks.c"
+      "src/dev/no_rollback.c"
+      "src/dev/execute_command_hooks.c"
+      "src/dev/init.c"
+      "src/dev/init_wallet.c"
+      "src/dev/protection.c"
+  )
   list(APPEND main_SRC ${extra_SRC})
 endif ()
 

@@ -3,14 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "check_ver.h"
+#include "no_rollback.h"
 #include "config.h"
 #include "log.h"
 
-static void check_ver_write(void);
+static void no_rollback_write(void);
 
 /**
- * In dev, check_ver simulates prod by uses a file instead.
+ * In dev, no_rollback simulates prod by uses a file instead.
  *
  * - if nvram/file doesn't exist:
  *   - write the current version to nvram/file.
@@ -21,11 +21,11 @@ static void check_ver_write(void);
  *   - else if the version is newer than the current version:
  *     - exit(-1).
  */
-void check_ver() {
+void no_rollback() {
   FILE *f = fopen(VERSION_FILE, "r");
   if (f == NULL) {
     // create the file
-    check_ver_write();
+    no_rollback_write();
     return;
   }
   // read & compare version
@@ -41,14 +41,14 @@ void check_ver() {
     ERROR("Rollback detected! Exiting");
     exit(-1);
   } else if (version < VERSION) {
-    check_ver_write();
+    no_rollback_write();
   } else {
     assert(version == VERSION);
     INFO("version match.");
   }
 }
 
-static void check_ver_write() {
+static void no_rollback_write() {
   // create the file
   FILE *f = fopen(VERSION_FILE, "w");
   if (f == NULL) {
