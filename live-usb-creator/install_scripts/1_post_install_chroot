@@ -38,7 +38,7 @@ rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
 systemctl disable kdump.service
 
 ###############################################################################
-# Plutus specific stuff
+# Subzero specific stuff
 ###############################################################################
 
 echo 'exec /data/app/subzero/subzero-cli.sh' >> /root/.bash_profile

@@ -4,7 +4,7 @@
 # You'll typically want one or more development, staging, and production environments.
 #
 # Note: the entries have to be kept in sync with the
-# com.squareup.subzero.PlutusConfig.EnvironmentsMap.Environments enum.
+# com.squareup.subzero.SubzeroConfig.EnvironmentsMap.Environments enum.
 
 environments:
   "c32a7be942ee91385889c4ca4c7b1ab7bdafc1ff": development

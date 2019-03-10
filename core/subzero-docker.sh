@@ -28,7 +28,7 @@ case "$1" in
     exec docker run --rm -i -t -p 32366:32366 --init subzero
     ;;
   dev)
-    echo "Plutus docker-dev:"
+    echo "Subzero docker-dev:"
     echo "You can edit sources, cd /build && ./subzero"
     exec docker run --rm -i -t -p 32366:32366 -v "$SRCDIR:/subzero:rw" subzero bash
     ;;
