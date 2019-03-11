@@ -5,6 +5,8 @@ nav:
     - Physical components: physical_components.md
     - Software components: software_components.md
     - Supply chain security: supply_chain_security.md
+    - Running the code:
+      - Running the code without HSMs: running_without_hsm.md
     - Initialization:
       - HSM initialization: hsm_initialization.md
       - Wallet initialization: wallet_initialization.md
