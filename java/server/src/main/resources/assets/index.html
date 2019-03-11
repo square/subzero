@@ -62,6 +62,17 @@
     <p>xpubs: <textarea disabled="true" id="reveal_xpubs_response_data"></textarea></p>
   </div>
 
+  <h2>Derive wallet address</h2>
+  <p>Once you have the N responses from the finalization phase, enter them here to derive wallet addresses.</p>
+  <div id="derive_address_finalize_response">
+  </div>
+  <p>change: <input type="checkbox" id="derive_address_change"></p>
+  <p>index: <input type="text" id="derive_address_index" size="10"> (BIP-32)</p>
+  <p><button onClick="derive_address()">derive address</button></p>
+  <div id="derive_address_response" class="response" style="display: none">
+    <p>address: <input type="text" size="70" disabled="true" id="derive_address_response_data"/></p>
+  </div>
+
   <h2>Sign a transaction</h2>
   <p>You will need to generate M responses.</p>
   <p>lock time: <input id="lock_time" type="text" value="0"> (typically 0)</p>

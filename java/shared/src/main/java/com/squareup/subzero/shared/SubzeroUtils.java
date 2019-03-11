@@ -1,5 +1,8 @@
 package com.squareup.subzero.shared;
 
+import com.google.common.collect.Lists;
+import com.google.common.io.BaseEncoding;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
@@ -10,6 +13,7 @@ import com.squareup.subzero.proto.service.Common.Signature;
 import com.squareup.subzero.proto.service.Common.TxInput;
 import com.squareup.subzero.proto.service.Common.TxOutput;
 import com.squareup.subzero.proto.service.Internal.InternalCommandRequest;
+import com.squareup.subzero.proto.service.Service;
 import com.squareup.subzero.proto.service.Service.CommandRequest;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -27,6 +31,7 @@ import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
+import org.bitcoinj.params.Networks;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
 import org.bitcoinj.script.ScriptChunk;
@@ -34,7 +39,7 @@ import org.bitcoinj.script.ScriptOpCodes;
 import org.spongycastle.util.encoders.Hex;
 
 import static java.lang.String.format;
-
+import static org.bitcoinj.crypto.DeterministicKey.deserializeB58;
 
 /**
  * Helper class which provides code to:
@@ -328,6 +333,36 @@ public class SubzeroUtils {
       default:
         throw new IllegalStateException("unreachable");
     }
+  }
+
+  public static NetworkParameters inferNetworkParameters(String base58address) {
+    NetworkParameters params = null;
+    for (NetworkParameters network : Networks.get()) {
+      try {
+        deserializeB58(base58address, network);
+        params = network;
+        break;
+      } catch (IllegalArgumentException e) {
+        continue;
+      }
+    }
+    return params;
+  }
+
+  public static List<String> finalizeResponsesToAddresses(List<String> finalizeResponses)
+      throws InvalidProtocolBufferException {
+    if (finalizeResponses.size() != Constants.MULTISIG_PARTICIPANTS) {
+      throw new IllegalArgumentException(format("Expecting %d finalizeResponses, got %d",
+          Constants.MULTISIG_PARTICIPANTS, finalizeResponses.size()));
+    }
+
+    List<String> r = Lists.newArrayList();
+    for (String finalizeResponse : finalizeResponses) {
+      byte[] rawFinalizeResponse = BaseEncoding.base64().decode(finalizeResponse);
+      Service.CommandResponse commandResponse = Service.CommandResponse.parseFrom(rawFinalizeResponse);
+      r.add(ColdWalletCreator.finalize(commandResponse));
+    }
+    return r;
   }
 
   /**
