@@ -18,7 +18,6 @@
 #include "rpc.h"
 #include "script.h"
 #include "sign.h"
-#include "squareup/subzero/internal.pb.h"
 
 static void compute_prevout_hash(TxInput *inputs, pb_size_t inputs_count,
                                  uint8_t hash[static HASHER_DIGEST_LENGTH]) {

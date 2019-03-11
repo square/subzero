@@ -9,7 +9,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "check_ver.h"
+#include "no_rollback.h"
 #include "checks.h"
 #include "config.h"
 #include "hash.h"
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
   }
 
   // check version and protect against rollback
-  check_ver();
+  no_rollback();
 
   INFO("running self checks.");
   r = run_self_checks();

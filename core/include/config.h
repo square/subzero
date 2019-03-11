@@ -77,9 +77,8 @@
 
 #define PORT 32366
 
-#define VERSION_FILE "/tmp/.subzero-ver"
-// VERSION_MAGIC is a constant picked randomly. Prevents swaping nvram/file
-// between applications.
+#define NO_ROLLBACK_DEV_FILE "/tmp/.subzero-no-rollback"
+// VERSION_MAGIC is a constant picked randomly. Prevents accidentally swapping nvram between different applications.
 #define VERSION_MAGIC 0x20de
 
 // VERSION of this code. Must match the value in java/shared/src/main/java/com/squareup/subzero/shared/Constants.java
@@ -88,7 +87,7 @@
 // size of the VERSION file / nvram.
 #define VERSION_SIZE 100
 
-// max number of signers for SEE certs (ncipher specific)
+// max number of signers for SEE certs (nCipher specific)
 #define SEE_CERT_SIGNER_SIZE 10
 
 // amount of random bytes used for initializing wallets
