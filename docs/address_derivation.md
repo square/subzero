@@ -6,10 +6,10 @@ addresses.
 The following derivation scheme is used inside the HSM:
 
 ```no-highlight
-m / coin_type' / account / change / address_index
+m / coin_type' / change / address_index
 ```
 
-The Coordinator service thus computes the `account / change / address_index` derivation.
+The Coordinator service thus computes the `change / address_index` derivation.
 
 # Multisig + segwit
 
