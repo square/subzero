@@ -4,7 +4,7 @@ import com.squareup.subzero.server.resources.AssetsResource;
 import com.squareup.subzero.server.resources.ConstantsResource;
 import com.squareup.subzero.server.resources.GenerateQrCodeResource;
 import com.squareup.subzero.server.resources.PrettyPrintResource;
-import com.squareup.subzero.server.resources.RevealXpubsResource;
+import com.squareup.subzero.server.resources.ComputeResource;
 import com.squareup.subzero.server.resources.ShowFinalTransactionResource;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
@@ -33,7 +33,7 @@ public class ServerApplication extends Application<ServerConfiguration> {
         environment.jersey().register(new ConstantsResource());
         environment.jersey().register(new PrettyPrintResource());
         environment.jersey().register(new GenerateQrCodeResource());
-        environment.jersey().register(new RevealXpubsResource());
+        environment.jersey().register(new ComputeResource());
         environment.jersey().register(new ShowFinalTransactionResource());
     }
 }

@@ -79,9 +79,25 @@ function reveal_xpubs() {
     data.finalizeResponses.push($('#finalize_response_' + i).val())
   }
 
-  $.ajax("/reveal-xpubs", {traditional: true, data: data})
+  $.ajax("/compute/xpubs", {traditional: true, data: data})
   .done(results => {
     reveal_xpubs_response_data.value = results.join("\n");
+  });
+}
+
+function derive_address() {
+  $('#derive_address_response').slideDown();
+
+  var data = {"finalizeResponses": []};
+  for (var i=1; i<=N.innerText; i++) {
+    data.finalizeResponses.push($('#derive_address_finalize_response_' + i).val())
+  }
+  data.change = $('#derive_address_change').prop('checked');
+  data.index = $('#derive_address_index').val();
+
+  $.ajax("/compute/address", {traditional: true, data: data})
+  .done(results => {
+    derive_address_response_data.value = results;
   });
 }
 
@@ -218,16 +234,25 @@ function saveState() {
   // Finalize section
   var encPubKeys = [];
   for (var i=1; i<=N.innerText; i++) {
-    encPubKeys.push($('#init_response_' + i).val())
+    encPubKeys.push($('#init_response_' + i).val());
   }
   state.encPubKeys = encPubKeys;
 
   // Reveal section
   var finalizeResponses = [];
   for (var i=1; i<=N.innerText; i++) {
-    finalizeResponses.push($('#finalize_response_' + i).val())
+    finalizeResponses.push($('#finalize_response_' + i).val());
   }
   state.finalizeResponses = finalizeResponses;
+
+  // Derive address section
+  var deriveAddressFinalizeResponses = [];
+  for (var i=1; i<=N.innerText; i++) {
+    deriveAddressFinalizeResponses.push($('#derive_address_finalize_response_' + i).val());
+  }
+  state.deriveAddressFinalizeResponses = deriveAddressFinalizeResponses;
+  state.deriveAddressChange = $('#derive_address_change').prop('checked');
+  state.deriveAddressIndex = $('#derive_address_index').val();
 
   // Sign transaction section
   state.lock_time = lock_time.value;
@@ -282,6 +307,13 @@ function loadState() {
     $('#finalize_response_' + i).val(state.finalizeResponses[i-1]);
   }
 
+  // Derive address section
+  for (var i=1; i<=N.innerText; i++) {
+    $('#derive_address_finalize_response_' + i).val(state.deriveAddressFinalizeResponses[i-1]);
+  }
+  $('#derive_address_change').prop('checked', state.deriveAddressChange);
+  $('#derive_address_index').val(state.deriveAddressIndex);
+
   // Sign transaction section
   lock_time.value = state.lock_time;
   for (var i=0; i<state.inputs.length; i++) {
@@ -323,6 +355,9 @@ $(document).ready(_ => {
 
       e = $('<p>Finalize response ' + i + ': <textarea id="finalize_response_' + i + '"></textarea></p>');
       $('#finalize_response').append(e);
+
+      e = $('<p>Finalize response ' + i + ': <textarea id="derive_address_finalize_response_' + i + '"></textarea></p>');
+      $('#derive_address_finalize_response').append(e);
 
       e = $('<p>Initial finalize response ' + i + ': <textarea id="initial_finalize_response_' + i + '"></textarea></p>');
       $('#initial_finalize_responses').append(e);

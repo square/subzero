@@ -6,8 +6,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.squareup.subzero.proto.service.Common;
 import com.squareup.subzero.proto.service.Service;
 import com.squareup.subzero.shared.ColdWallet;
-import com.squareup.subzero.shared.ColdWalletCreator;
 import com.squareup.subzero.shared.Constants;
+import com.squareup.subzero.shared.SubzeroUtils;
 import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -15,10 +15,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import org.bitcoinj.core.NetworkParameters;
-import org.bitcoinj.params.Networks;
 
 import static java.lang.String.format;
-import static org.bitcoinj.crypto.DeterministicKey.deserializeB58;
 
 /**
  * Verifies and merges signatures. Returns final transaction.
@@ -42,27 +40,12 @@ public class ShowFinalTransactionResource {
           Constants.MULTISIG_THRESHOLD, signTxResponses.size()));
     }
 
-    // TODO: network detection should probably live somewhere else.
-    NetworkParameters params = null;
-    for (NetworkParameters network : Networks.get()) {
-      try {
-        deserializeB58(gateway, network);
-        params = network;
-        break;
-      } catch (IllegalArgumentException e) {
-        continue;
-      }
-    }
+    NetworkParameters params = SubzeroUtils.inferNetworkParameters(gateway);
 
     Service.CommandRequest initialSignTxRequest = Service.CommandRequest.parseFrom(
         BaseEncoding.base64().decode(signTxRequest));
 
-    List<String> addresses = Lists.newArrayList();
-    for (String finalizeResponse : finalizeResponses) {
-      byte[] rawFinalizeResponse = BaseEncoding.base64().decode(finalizeResponse);
-      Service.CommandResponse commandResponse = Service.CommandResponse.parseFrom(rawFinalizeResponse);
-      addresses.add(ColdWalletCreator.finalize(commandResponse));
-    }
+    List<String> addresses = SubzeroUtils.finalizeResponsesToAddresses(finalizeResponses);
 
     ColdWallet coldWallet = new ColdWallet(params, initialSignTxRequest.getWalletId(), addresses, gateway);
 
