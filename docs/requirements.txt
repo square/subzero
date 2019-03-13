@@ -6,7 +6,7 @@ livereload==2.6.0
 Markdown==3.0.1
 MarkupSafe==1.1.1
 mkdocs==1.0.4
-PyYAML==3.13
+PyYAML==4.2b1
 singledispatch==3.4.0.3
 six==1.12.0
 tornado==5.1.1
