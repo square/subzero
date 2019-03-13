@@ -110,7 +110,7 @@ And 4 responses in TextEdit:
 You can now finalize each share. Using the Finalize a wallet section in the web browser, fill out each initialize
 response and click on "generate QR code":
 
-<img src="../finalize_wallet.png">
+<img src="../finalize_wallet_web.png">
 
 You can now finalize each wallet file. You will have to, one-by-one, copy wallet files from /data/app/subzero/wallets/initialized
 to /data/app/subzero/wallets/ and move the result to /data/app/subzero/wallets/finalized/.
