@@ -28,14 +28,29 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mpowerpc -mcpu=e5500 -mno-toc -mbig-endian 
 set(CMAKE_C_LINK_EXECUTABLE
     "${CODESAFE_GCC} -Wl,-wrap=read -Wl,-wrap=write -Wl,-wrap=socket -Wl,-wrap=send  -Wl,-wrap=sendto -Wl,-wrap=recv -Wl,-wrap=recvfrom -Wl,-wrap=listen -Wl,-wrap=connect -Wl,-wrap=bind -Wl,-wrap=setsockopt -Wl,-wrap=select -Wl,-wrap=accept -Wl,-wrap=poll -Bstatic -o <TARGET> <OBJECTS> <LINK_LIBRARIES> ${NFAST_PATH}/c/csd/lib-ppc-linux-gcc/hoststdioeinetsocks.o ${NFAST_PATH}/c/csd/lib-ppc-linux-gcc/libfaksys.a ${NFAST_PATH}/c/csd/lib-ppc-linux-gcc/libcutils.a ${NFAST_PATH}/c/csd/lib-ppc-linux-gcc/libvfsextras.a ${NFAST_PATH}/c/csd/lib-ppc-linux-gcc/libseewrpr.a ${NFAST_PATH}/c/csd/lib-ppc-linux-gcc/libipccore.a ${NFAST_PATH}/c/csd/lib-ppc-linux-gcc/libsolotrace.a ${NFAST_PATH}/c/csd/lib-ppc-linux-gcc/libnfstub.a ${NFAST_PATH}/c/csd/lib-ppc-linux-gcc/libfaksys.a ${NFAST_PATH}/c/csd/lib-ppc-linux-gcc/libseewrpr.a ${NFAST_PATH}/c/csd/lib-ppc-linux-gcc/seelib.a ${NFAST_PATH}/c/csd/lib-ppc-linux-gcc/libipccore.a -lpthread -lrt")
 
+add_custom_command(OUTPUT subzero-unsigned.ar
+  DEPENDS subzero
+  COMMAND ${NFAST_PATH}/bin/tct2 --pack --infile=subzero --outfile subzero-unsigned.ar
+)
+
+add_custom_command(OUTPUT subzero.cpio
+  COMMAND echo dummy > dummy
+  COMMAND ${NFAST_PATH}/bin/cpioc subzero.cpio dummy
+)
+
+add_custom_target(run-unsigned
+  DEPENDS subzero-unsigned.ar subzero.cpio
+  COMMAND sudo ${NFAST_PATH}/bin/nopclearfail -c -a
+  COMMAND sudo ${NFAST_PATH}/bin/see-stdioesock-serv --machine subzero-unsigned.ar --userdata-raw subzero.cpio
+)
+
 add_custom_command(OUTPUT subzero-signed.sar
   DEPENDS subzero
   COMMAND ${NFAST_PATH}/bin/tct2 --sign-and-pack --key=subzerosigner --is-machine --machine-type=PowerPCELF --infile=subzero --outfile subzero-signed.sar
 )
 
 add_custom_command(OUTPUT subzero-userdata-signed.sar
-  COMMAND echo dummy > dummy
-  COMMAND ${NFAST_PATH}/bin/cpioc subzero.cpio dummy
+  DEPENDS subzero.cpio
   COMMAND ${NFAST_PATH}/bin/tct2 --sign-and-pack --key=subzerodatasigner --machine-key-ident=subzerosigner --infile=subzero.cpio --outfile subzero-userdata-signed.sar
 )
 

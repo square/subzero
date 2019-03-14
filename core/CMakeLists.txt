@@ -9,6 +9,10 @@ add_definitions("-DSOURCE_PATH_SIZE=${SOURCE_PATH_SIZE}")
 
 if ($ENV{TARGET} MATCHES "nCipher")
   include(codesafe.cmake)
+
+  if ($ENV{UNSIGNED} MATCHES "yes")
+     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUNSIGNED")
+  endif ()
 endif ()
 
 add_subdirectory(trezor-crypto)
@@ -20,9 +24,9 @@ include_directories(include nanopb trezor-crypto "${CMAKE_BINARY_DIR}/proto")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -Wno-unknown-pragmas")
 
 if ($ENV{CURRENCY} MATCHES "btc-testnet")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DBTC_TESTNET -Werror -Wno-unknown-pragmas")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DBTC_TESTNET")
 elseif ($ENV{CURRENCY} MATCHES "btc-mainnet")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DBTC_MAINNET -Werror -Wno-unknown-pragmas")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DBTC_MAINNET")
 endif ()
 
 set(main_SRC
