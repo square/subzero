@@ -102,7 +102,6 @@ static void execute_command(InternalCommandRequest *cmd,
 
   if (r != Result_SUCCESS) {
     out->which_response = InternalCommandResponse_Error_tag;
-    // TODO: Set up error response properly, not just SELF_CHECK_FAILED.
     out->response.Error.code = r;
     snprintf(out->response.Error.message, sizeof(out->response.Error.message),
              "Error handling command tag %d; r = %d\n", cmd->which_command, r);

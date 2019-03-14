@@ -55,8 +55,6 @@ public class InternalCommandConnector {
       switch (error.getCode()) {
         case VERSION_MISMATCH:
           throw new MismatchedVersionException(error.toString());
-        case SELF_CHECK_FAILED:
-          throw new SelfCheckException(error.toString());
         default:
           throw new UnknownException("Unknown error:" + error.toString());
       }
