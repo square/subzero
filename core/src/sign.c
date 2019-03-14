@@ -258,6 +258,7 @@ static Result hash_input(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
   hash_uint32(&hasher, input->prev_index);
   print_rev_bytes(input->prev_hash, HASHER_DIGEST_LENGTH);
   print_uint32(input->prev_index);
+  DEBUG_("\n");
 
   // 5. scriptCode of the input (serialized as scripts inside CTxOuts)
   script_t script = SCRIPT_EMPTY;

@@ -1,45 +1,39 @@
-FROM centos:7
+# USAGE:
+#   docker build -t subzero .
+#   docker run -t -p 32366:32366 --name subzero subzero
 
-RUN yum -y install \
+FROM centos:8.1.1911
+
+RUN yum -y --enablerepo=extras install \
     autoconf \
     automake \
     clang \
     cmake \
+    dnf-plugins-core \
     gcc \
     gcc-c++ \
     git \
     libtool \
     make \
-    python-setuptools \
+    python2 \
     unzip \
     vim
 
-# Protobuf support: 3.5.2
-RUN mkdir protobuf && \
-    cd protobuf && \
-    curl -sSOL https://github.com/google/protobuf/archive/v3.5.2.zip && \
-    unzip v3.5.2.zip && \
-    cd protobuf-3.5.2 && \
-    ./autogen.sh && \
-    ./configure && \
-    make install && \
-    ldconfig && \
-    cd python && python setup.py install
+RUN yum config-manager --set-enabled PowerTools && \
+    yum install -y protobuf-devel && \
+    ln -s /usr/bin/python2 /usr/bin/python && \
+    pip2 install protobuf
 
-# Add nCipher tools, which unpack to /opt/nfast
-WORKDIR /
-RUN curl -sSL https://<insert your local url to ncipher-tools>/gccsrc-ppcdev_12.20.51.tar.gz | \
-    tar -xz && \
-    curl -sSL https://<insert your local url to ncipher-tools>/csd-agg_12.20.51.tar.gz | \
-    tar -xz
-
-ADD . /subzero
+ADD CMakeLists.txt /subzero/CMakeLists.txt
+ADD include /subzero/include
+ADD nanopb /subzero/nanopb
+ADD proto /subzero/proto
+ADD src /subzero/src
+ADD trezor-crypto /subzero/trezor-crypto
 
 WORKDIR /subzero
 
-RUN mkdir /build && cd /build && CURRENCY=btc-testnet cmake /subzero && make
-
-RUN mkdir /crossbuild && cd /crossbuild && TARGET=nCipher CURRENCY=btc-testnet cmake /subzero && make
+RUN mkdir /build && cd /build && TARGET=dev CURRENCY=btc-testnet cmake /subzero && make
 
 EXPOSE 32366
 

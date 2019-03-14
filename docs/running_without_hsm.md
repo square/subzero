@@ -1,16 +1,24 @@
 # Building and Running the code without HSMs
 
 Subzero can be used without HSMs. This is useful for evaluation purpose as well as development. The wallet is however
-not encrypted -- Subzero's security model assumes you are using a HSM in your production setup.
+not encrypted — Subzero's security model assumes you are using a HSM in your production setup.
 
 The instructions in this page work with Mac OS X. Linux users can simply skip irrelevant parts. Windows users are
 advised to use a virtualization layer (e.g. Ubuntu inside VirtualBox).
+
+The Core is compiled using _cmake_ and _gcc_. The web server and GUI are built using _maven_ and run with Java.
+Since we don't have a HSM, we'll be using stub classes (included with Subzero) to successfully compile the
+code — HSM-specific steps will then be skipped.
 
 ## Installing the tools and building the code
 
 This section goes over the minimal set of tools needed to build and run Subzero. If you would like to develop and
 contribute to Subzero, we recommend installing [Intellij IDEA](https://www.jetbrains.com/idea/) for the Java piece
 and [CLion](https://www.jetbrains.com/clion/) for the C core.
+
+(You can skip some of these steps if you prefer to use Docker instead. The command to build and run the Core is
+`cd core; docker build -t subzero . && docker run -t -p 32366:32366 --name subzero subzero`. In the future, we may
+provide additional docker files for running the GUI and web server).
 
     # Open Terminal and install Homebrew
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
