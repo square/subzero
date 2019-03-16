@@ -36,6 +36,7 @@ set(main_SRC
     "src/init_wallet.c"
     "src/memzero.c"
     "src/nanopb_stream.c"
+    "src/no_rollback.c"
     "src/print.c"
     "src/rpc.c"
     "src/script.c"
@@ -48,7 +49,8 @@ set(checks_SRC
     "src/checks/self_checks.c"
     "src/checks/validate_fees.c"
     "src/checks/verify_mix_entropy.c"
-    "src/checks/verify_protect_pubkey.c")
+    "src/checks/verify_protect_pubkey.c"
+    "src/checks/verify_no_rollback.c")
 list(APPEND main_SRC ${checks_SRC})
 
 set(include_SRC
@@ -82,6 +84,7 @@ if ($ENV{TARGET} MATCHES "nCipher")
       "src/ncipher/module_certificate.c"
       "src/ncipher/no_rollback.c"
       "src/ncipher/protection.c"
+      "src/ncipher/transact.c"
   )
   list(APPEND main_SRC ${extra_SRC})
 else ()

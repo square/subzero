@@ -18,10 +18,9 @@
 #include "protection.h"
 #include "rand.h"
 #include "rpc.h"
+#include "transact.h"
 
-extern NFastApp_Connection conn;
 extern NFast_AppHandle app;
-extern M_CertificateList cert_list;
 
 static Result gen_random(uint8_t *buffer, uint32_t buffer_len);
 
@@ -105,37 +104,27 @@ static Result gen_random(uint8_t *buffer, uint32_t buffer_len) {
     ERROR("buffer_len too large");
     return Result_GEN_RANDOM_BUFFER_TOO_LARGE_FAILURE;
   }
-  M_Status retcode;
   M_Command command = {0};
   M_Reply reply = {0};
+  Result r;
 
   command.cmd = Cmd_GenerateRandom;
   command.args.generaterandom.lenbytes = buffer_len;
-  command.certs = &cert_list;
-  command.flags |= Command_flags_certs_present;
 
-  if ((retcode = NFastApp_Transact(conn, NULL, &command, &reply, NULL)) !=
-      Status_OK) {
-    ERROR("NFastApp_Transact failed");
-    return Result_NFAST_APP_TRANSACT_FAILURE;
-  }
-  if ((retcode = reply.status) != Status_OK) {
-    ERROR("NFastApp_Transact not ok");
-    char buf[1000];
-    NFast_StrError(buf, sizeof(buf), reply.status, NULL);
-    ERROR("message: %s", buf);
-
+  r = transact(&command, &reply);
+  if (r != Result_SUCCESS) {
+    ERROR("gen_random: transact failed.");
     NFastApp_Free_Reply(app, NULL, NULL, &reply);
-    return Result_NFAST_APP_TRANSACT_STATUS_FAILURE;
+    return r;
   }
 
   if (reply.reply.generaterandom.data.len != buffer_len) {
-    ERROR("invalid data len");
+    ERROR("gen_random: invalid data len.");
     NFastApp_Free_Reply(app, NULL, NULL, &reply);
     return Result_GEN_RANDOM_UNEXPECTED_LEN_FAILURE;
   }
   memcpy(buffer, reply.reply.generaterandom.data.ptr, buffer_len);
-  NFastApp_Free_Reply(app, NULL, NULL, &reply);
 
+  NFastApp_Free_Reply(app, NULL, NULL, &reply);
   return Result_SUCCESS;
 }
