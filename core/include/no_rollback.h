@@ -1,3 +1,5 @@
 #pragma once
 
-void no_rollback(void);
+#include <squareup/subzero/internal.pb.h>
+
+Result no_rollback(void);

@@ -53,19 +53,20 @@ extern NFast_AppHandle app;
  * no_rollback_write() live in the dev/ + ncipher/ folders.
  */
 
-void no_rollback() {
+Result no_rollback() {
   int version;
 
   version = no_rollback_read();
   if (version == -1) {
     ERROR("no_rollback: no_rollback_read() failed. Exiting.");
-    exit(-1);
+    // TODO: convert no_rollback_read to return a Result
+    return Result_NO_ROLLBACK_INVALID_VERSION;
   }
   DEBUG("no_rollback: NVRAM version is %d.", version);
 
   if (version > VERSION) {
     ERROR("no_rollback: rollback detected! Exiting");
-    exit(-1);
+    return Result_NO_ROLLBACK_INVALID_VERSION;
   } else if (version < VERSION) {
     ERROR("no_rollback: updating version stored in NVRAM.");
     no_rollback_write();
@@ -74,6 +75,7 @@ void no_rollback() {
     assert(version == VERSION);
     INFO("no_rollback: version match.");
   }
+  return Result_SUCCESS;
 }
 
 // For some unknown reason, NFastApp_Transact with -O2 requires

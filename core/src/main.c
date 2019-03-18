@@ -35,7 +35,11 @@ int main(int argc, char **argv) {
   }
 
   // check version and protect against rollback
-  no_rollback();
+  Result res = no_rollback();
+  if (res != Result_SUCCESS) {
+    ERROR("no_rollback failed: %d", res);
+    return -1;
+  }
 
   INFO("running self checks.");
   r = run_self_checks();

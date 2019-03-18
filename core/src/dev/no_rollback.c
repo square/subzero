@@ -22,31 +22,34 @@ static void no_rollback_write(void);
  *   - else if the version is newer than the current version:
  *     - exit(-1).
  */
-void no_rollback() {
+Result no_rollback() {
   FILE *f = fopen(NO_ROLLBACK_DEV_FILE, "r");
   if (f == NULL) {
     // create the file
     no_rollback_write();
-    return;
+    return Result_SUCCESS;
   }
   // read & compare version
   uint32_t magic, version;
   DEBUG("reading version from %s", NO_ROLLBACK_DEV_FILE);
-  fscanf(f, "%u-%u", &magic, &version);
+  if (fscanf(f, "%u-%u", &magic, &version) != 2) {
+    return Result_NO_ROLLBACK_INVALID_FORMAT;
+  }
   fclose(f);
   if (magic != VERSION_MAGIC) {
     ERROR("Unexpected magic number. Exiting");
-    exit(-1);
+    return Result_NO_ROLLBACK_INVALID_MAGIC;
   }
   if (version > VERSION) {
     ERROR("Rollback detected! Exiting");
-    exit(-1);
+    return Result_NO_ROLLBACK_INVALID_VERSION;
   } else if (version < VERSION) {
     no_rollback_write();
   } else {
     assert(version == VERSION);
     INFO("version match.");
   }
+  return Result_SUCCESS;
 }
 
 static void no_rollback_write() {
