@@ -42,6 +42,9 @@ Result module_certificate_init(M_CertificateList *cert_list, M_Certificate *cert
   INFO("Got %d signers", signer_count);
   if (signer_count == 0) {
     NFastApp_Free_Reply(app, NULL, NULL, &reply);
+#ifdef UNSIGNED
+    return Result_SUCCESS;
+#endif
     return Result_GET_MODULE_CERTIFICATE_NO_SIGNERS;
   }
 
