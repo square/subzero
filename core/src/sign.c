@@ -22,7 +22,7 @@
 static void compute_prevout_hash(TxInput *inputs, pb_size_t inputs_count,
                                  uint8_t hash[static HASHER_DIGEST_LENGTH]) {
   Hasher hasher;
-  hasher_Init(&hasher, HASHER_SHA2);
+  hasher_Init(&hasher, HASHER_SHA2D);
   for (int i = 0; i < inputs_count; i++) {
     TxInput input = inputs[i];
     DEBUG("Computing prevout hash, input %d", i);
@@ -33,18 +33,18 @@ static void compute_prevout_hash(TxInput *inputs, pb_size_t inputs_count,
     print_uint32(input.prev_index);
     DEBUG_("\n");
   }
-  hasher_Double(&hasher, hash);
+  hasher_Final(&hasher, hash);
 }
 
 // This assumes all inputs have the same sequence value
 static void compute_sequence_hash(uint32_t sequence, pb_size_t inputs_count,
                                   uint8_t hash[static HASHER_DIGEST_LENGTH]) {
   Hasher hasher;
-  hasher_Init(&hasher, HASHER_SHA2);
+  hasher_Init(&hasher, HASHER_SHA2D);
   for (int i = 0; i < inputs_count; i++) {
     hash_uint32(&hasher, sequence);
   }
-  hasher_Double(&hasher, hash);
+  hasher_Final(&hasher, hash);
 }
 
 /**
@@ -240,7 +240,7 @@ static Result hash_input(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
   Hasher hasher;
 
   DEBUG("hash_input");
-  hasher_Init(&hasher, HASHER_SHA2);
+  hasher_Init(&hasher, HASHER_SHA2D);
   // 1. nVersion of the transaction (4-byte little endian)
   hash_uint32(&hasher, /*version*/ 1);
   print_uint32(1);
@@ -291,7 +291,7 @@ static Result hash_input(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
   print_uint32(1);
   DEBUG_("\n");
 
-  hasher_Double(&hasher, hash);
+  hasher_Final(&hasher, hash);
   DEBUG("That's it folks. Final input hash:");
   print_bytes(hash, HASHER_DIGEST_LENGTH);
   return Result_SUCCESS;
@@ -449,7 +449,7 @@ compute_output_hash(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
                     uint8_t output_hash[static HASHER_DIGEST_LENGTH]) {
 
   Hasher hasher;
-  hasher_Init(&hasher, HASHER_SHA2);
+  hasher_Init(&hasher, HASHER_SHA2D);
   for (int i = 0; i < outputs_count; i++) {
     TxOutput out = outputs[i];
 
@@ -469,7 +469,7 @@ compute_output_hash(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
       }
     }
   }
-  hasher_Double(&hasher, output_hash);
+  hasher_Final(&hasher, output_hash);
   return Result_SUCCESS;
 }
 
