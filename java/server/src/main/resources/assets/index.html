@@ -29,7 +29,7 @@
   <h2>Configuration</h2>
   <p>Wallet id is a generic string, the recommended value is the wallet's creation date in <i>yyyymmdd</i> format.</p>
   <p>M=<span id="M"></span>, N=<span id="N"></span></p>
-  <p>Wallet id: <input id="wallet" type="text" size="10" placeholder="yyymmdd"></p>
+  <p>Wallet id: <input id="wallet" type="text" size="10" placeholder="yyyymmdd"></p>
   <p>Currency: <input id="currency" type="text" placeholder="USD" size="3"></p>
   <p>Exchange rate (in currency per Satoshi): <input id="exchange_rate" type="text"></p>
 
@@ -100,7 +100,7 @@
     or talk to a public node.</p>
   <p>Initial sign transaction request: <textarea id="initial_sign_tx_request"></textarea></p>
   <div id="initial_finalize_responses"></div>
-  <p>Gateway address: <textarea id="gateway"></textarea></p>
+  <p>Gateway xpub: <textarea id="gateway"></textarea></p>
   <div id="merge_responses"></div>
   <p><button onClick="show_final_transaction()">show final transaction</button></p>
   <div id="show_final_transaction_response" class="response" style="display: none">
