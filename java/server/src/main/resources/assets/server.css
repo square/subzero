@@ -27,6 +27,11 @@ h2 {
 textarea {
   width: 100%;
   display: block;
+  font-family: monospace;
+}
+
+input[type=text] {
+  font-family: monospace;
 }
 
 .response textarea {
