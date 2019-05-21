@@ -6,8 +6,8 @@
 #include "module_certificate.h"
 #include "log.h"
 #include "memzero.h"
+#include "transact.h"
 
-extern NFastApp_Connection conn;
 extern NFast_AppHandle app;
 
 /**
@@ -19,23 +19,18 @@ Result module_certificate_init(M_CertificateList *cert_list, M_Certificate *cert
   int signer_count = 0;
   M_Command command;
   M_Reply reply;
-  M_Status retcode;
+  Result r;
 
   memzero(&command, sizeof(command));
   memzero(&reply, sizeof(reply));
 
   command.cmd = Cmd_GetWorldSigners;
 
-  retcode = NFastApp_Transact(conn, NULL, &command, &reply, NULL);
-  if (retcode != Status_OK) {
-    ERROR("NFastApp_Transact failed");
-    return Result_NFAST_APP_TRANSACT_FAILURE;
-  }
-
-  if ((retcode = reply.status) != Status_OK) {
-    ERROR("NFastApp_Transact failed");
+  r = transact(&command, &reply);
+  if (r != Result_SUCCESS) {
+    ERROR("module_certificate_init: transact failed.");
     NFastApp_Free_Reply(app, NULL, NULL, &reply);
-    return Result_NFAST_APP_TRANSACT_STATUS_FAILURE;
+    return r;
   }
 
   signer_count = reply.reply.getworldsigners.n_sigs;

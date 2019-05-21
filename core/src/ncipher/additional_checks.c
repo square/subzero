@@ -5,14 +5,10 @@
 #include "aes_gcm.h"
 #include "checks.h"
 #include "log.h"
-
-extern NFastApp_Connection conn;
-extern NFast_AppHandle app;
+#include "transact.h"
 
 extern M_KeyID master_seed_encryption_key;
 extern M_KeyID pub_key_encryption_key;
-
-extern M_CertificateList cert_list;
 
 M_PermissionGroup check_aes_gcm_pg = {0};
 M_Action check_aes_gcm_act = {0};
@@ -25,9 +21,9 @@ static int check_aes_gcm(void);
 int pre_run_self_checks(void) {
   // Create a temporary key, assign it to master_seed_encryption_key and
   // pub_key_encryption_key
-  M_Status retcode;
   M_Command command = {0};
   M_Reply reply = {0};
+  Result r;
 
   check_aes_gcm_act.type = Act_OpPermissions;
   check_aes_gcm_act.details.oppermissions.perms =
@@ -46,19 +42,10 @@ int pre_run_self_checks(void) {
   command.args.generatekey.acl.n_groups = 1;
   command.args.generatekey.acl.groups = &check_aes_gcm_pg;
   command.args.generatekey.appdata = NULL;
-  command.certs = &cert_list;
-  command.flags |= Command_flags_certs_present;
 
-  if ((retcode = NFastApp_Transact(conn, NULL, &command, &reply, NULL)) !=
-      Status_OK) {
-    ERROR("NFastApp_Transact failed");
-    return -1;
-  }
-  if ((retcode = reply.status) != Status_OK) {
-    char buf[1000];
-    NFast_StrError(buf, sizeof(buf), reply.status, NULL);
-    ERROR("NFastApp_Transact bad status (%s)", buf);
-    NFastApp_Free_Reply(app, NULL, NULL, &reply);
+  r = transact(&command, &reply);
+  if (r != Result_SUCCESS) {
+    ERROR("pre_run_self_checks: transact failed");
     return -1;
   }
 

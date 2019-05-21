@@ -18,14 +18,11 @@
 #include "protection.h"
 #include "rand.h"
 #include "rpc.h"
+#include "transact.h"
 
-extern NFastApp_Connection conn;
 extern NFast_AppHandle app;
 
-extern M_CertificateList cert_list;
-
-static Result ticket2keyId(const uint8_t *ticket_bytes, uint32_t ticket_len,
-                           M_KeyID *key_id);
+static Result ticket2keyId(const uint8_t *ticket_bytes, uint32_t ticket_len, M_KeyID *key_id);
 extern M_KeyID master_seed_encryption_key;
 extern M_KeyID pub_key_encryption_key;
 
@@ -98,10 +95,10 @@ static Result ticket2keyId(const uint8_t *ticket_bytes, uint32_t ticket_len,
     ERROR("ticket len too large");
     return Result_TICKET_LEN_OVERFLOW_FAILURE;
   }
-  M_Status retcode;
   M_Command command = {0};
   M_Reply reply = {0};
   M_ByteBlock ticket_block;
+  Result r;
 
   ticket_block.len = ticket_len;
   memcpy(ticket_buffer, ticket_bytes, ticket_len);
@@ -109,26 +106,16 @@ static Result ticket2keyId(const uint8_t *ticket_bytes, uint32_t ticket_len,
 
   command.cmd = Cmd_RedeemTicket;
   command.args.redeemticket.ticket = ticket_block;
-  command.certs = &cert_list;
-  command.flags |= Command_flags_certs_present;
 
-  if ((retcode = NFastApp_Transact(conn, NULL, &command, &reply, NULL)) !=
-      Status_OK) {
-    ERROR("NFastApp_Transact failed: (%d)", retcode);
-    return Result_NFAST_APP_TRANSACT_FAILURE;
-  }
-  if ((retcode = reply.status) != Status_OK) {
-    ERROR("NFastApp_Transact not ok");
-    char buf[1000];
-    NFast_StrError(buf, sizeof(buf), reply.status, NULL);
-    ERROR("message: %s", buf);
-
+  r = transact(&command, &reply);
+  if (r != Result_SUCCESS) {
+    ERROR("ticket2keyId: transact failed.");
     NFastApp_Free_Reply(app, NULL, NULL, &reply);
-    return Result_NFAST_APP_TRANSACT_STATUS_FAILURE;
+    return r;
   }
 
   *key_id = reply.reply.redeemticket.obj;
-  NFastApp_Free_Reply(app, NULL, NULL, &reply);
 
+  NFastApp_Free_Reply(app, NULL, NULL, &reply);
   return Result_SUCCESS;
 }

@@ -77,7 +77,6 @@
 
 #define PORT 32366
 
-#define NO_ROLLBACK_DEV_FILE "/tmp/.subzero-no-rollback"
 // VERSION_MAGIC is a constant picked randomly. Prevents accidentally swapping nvram between different applications.
 #define VERSION_MAGIC 0x20de
 

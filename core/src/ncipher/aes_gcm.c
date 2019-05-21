@@ -7,10 +7,9 @@
 #include "aes_gcm.h"
 #include "log.h"
 #include "memzero.h"
+#include "transact.h"
 
-extern NFastApp_Connection conn;
 extern NFast_AppHandle app;
-extern M_CertificateList cert_list;
 
 // For some unknown reason, NFastApp_Transact with -O2 requires heap allocated
 // buffers. 1000 bytes should be enough.
@@ -27,21 +26,21 @@ uint8_t aes_gcm_buffer[1000];
 Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
                        uint8_t *ciphertext, size_t ciphertext_len,
                        size_t *bytes_written) {
+  Result r;
   memzero(ciphertext, ciphertext_len);
 
   size_t expected_ciphertext_len = plaintext_len + 12 + 16;
   if (ciphertext_len < expected_ciphertext_len) {
-    ERROR("ciphertext buffer too small.");
+    ERROR("aes_gcm_encrypt: ciphertext buffer too small.");
     memzero(plaintext, plaintext_len);
     return Result_AES_GCM_ENCRYPT_BUFFER_TOO_SMALL_FAILURE;
   }
   if (expected_ciphertext_len > sizeof(aes_gcm_buffer)) {
-    ERROR("plaintext too long.");
+    ERROR("aes_gcm_encrypt: plaintext too long.");
     memzero(plaintext, plaintext_len);
     return Result_AES_GCM_ENCRYPT_PLAINTEXT_TOO_LONG_FAILURE;
   }
 
-  M_Status retcode;
   M_Command command = {0};
   M_Reply reply = {0};
 
@@ -55,33 +54,26 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
   memzero(plaintext, plaintext_len);
   command.args.encrypt.plain.data.bytes.data.len = plaintext_len;
   command.args.encrypt.plain.data.bytes.data.ptr = aes_gcm_buffer;
-  command.certs = &cert_list;
-  command.flags |= Command_flags_certs_present;
-  retcode = NFastApp_Transact(conn, NULL, &command, &reply, NULL);
+
+  r = transact(&command, &reply);
   memzero(aes_gcm_buffer, sizeof(aes_gcm_buffer));
 
-  if (retcode != Status_OK) {
-    ERROR("NFastApp_Transact failed");
-    return Result_NFAST_APP_TRANSACT_FAILURE;
-  }
-  if ((retcode = reply.status) != Status_OK) {
-    char buf[1000];
-    NFast_StrError(buf, sizeof(buf), reply.status, NULL);
-    ERROR("NFastApp_Transact bad status (%s)", buf);
+  if (r != Result_SUCCESS) {
+    ERROR("aes_gcm_encrypt: transact failed.");
     NFastApp_Free_Reply(app, NULL, NULL, &reply);
-    return Result_NFAST_APP_TRANSACT_STATUS_FAILURE;
+    return r;
   }
 
   if (reply.reply.encrypt.cipher.data.genericgcm128.cipher.len !=
       plaintext_len) {
+    ERROR("aes_gcm_encrypt: unexpected cipher len.");
     NFastApp_Free_Reply(app, NULL, NULL, &reply);
-    ERROR("unexpected cipher len");
     return Result_AES_GCM_ENCRYPT_UNEXPECTED_CIPHERTEXT_LEN_FAILURE;
   }
 
   if (reply.reply.encrypt.cipher.iv.genericgcm128.iv.len != 12) {
+    ERROR("aes_gcm_encrypt: unexpected IV len.");
     NFastApp_Free_Reply(app, NULL, NULL, &reply);
-    ERROR("unexpected IV len");
     return Result_AES_GCM_ENCRYPT_UNEXPECTED_IV_LEN_FAILURE;
   }
 
@@ -94,7 +86,6 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
   *bytes_written = expected_ciphertext_len;
 
   NFastApp_Free_Reply(app, NULL, NULL, &reply);
-
   return Result_SUCCESS;
 }
 
@@ -108,17 +99,17 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext,
 
   size_t expected_plaintext_len = ciphertext_len - 12 - 16;
   if (plaintext_len < expected_plaintext_len) {
-    ERROR("plaintext buffer too small.");
+    ERROR("aes_gcm_decrypt: plaintext buffer too small.");
     return Result_AES_GCM_DECRYPT_BUFFER_TOO_SMALL_FAILURE;
   }
   if (ciphertext_len > sizeof(aes_gcm_buffer)) {
-    ERROR("ciphertext too long.");
+    ERROR("aes_gcm_decrypt: ciphertext too long.");
     return Result_AES_GCM_DECRYPT_CIPHERTEXT_TOO_LONG_FAILURE;
   }
 
-  M_Status retcode;
   M_Command command = {0};
   M_Reply reply = {0};
+  Result r;
 
   command.cmd = Cmd_Decrypt;
   command.args.decrypt.key = keyId;
@@ -137,25 +128,17 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext,
   command.args.decrypt.cipher.iv.genericgcm128.iv.len = 12;
   command.args.decrypt.cipher.iv.genericgcm128.iv.ptr = aes_gcm_buffer;
   command.args.decrypt.cipher.iv.genericgcm128.header.len = 0;
-  command.certs = &cert_list;
-  command.flags |= Command_flags_certs_present;
 
-  if ((retcode = NFastApp_Transact(conn, NULL, &command, &reply, NULL)) !=
-      Status_OK) {
-    ERROR("NFastApp_Transact failed");
-    return Result_NFAST_APP_TRANSACT_FAILURE;
-  }
-  if ((retcode = reply.status) != Status_OK) {
-    char buf[1000];
-    NFast_StrError(buf, sizeof(buf), reply.status, NULL);
-    ERROR("NFastApp_Transact bad status (%s)", buf);
+  r = transact(&command, &reply);
+  if (r != Result_SUCCESS) {
+    ERROR("aes_gcm_decrypt: transact failed.");
     NFastApp_Free_Reply(app, NULL, NULL, &reply);
-    return Result_NFAST_APP_TRANSACT_STATUS_FAILURE;
+    return r;
   }
 
   if (reply.reply.decrypt.plain.data.bytes.data.len != expected_plaintext_len) {
+    ERROR("aes_gcm_decrypt: invalid plain len.");
     NFastApp_Free_Reply(app, NULL, NULL, &reply);
-    ERROR("invalid plain len");
     return Result_AES_GCM_DECRYPT_UNEXPECTED_PLAINTEXT_LEN_FAILURE;
   }
 
@@ -165,6 +148,5 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext,
   *bytes_written = expected_plaintext_len;
 
   NFastApp_Free_Reply(app, NULL, NULL, &reply);
-
   return Result_SUCCESS;
 }
