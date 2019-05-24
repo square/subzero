@@ -32,9 +32,6 @@ public class SubzeroGui {
   // Almost always you want to talk to subzero on localhost
   @Parameter(names = "--hostname") public String hostname = "localhost";
 
-  // Needed for bootstrapping
-  @Parameter(names = "--create-pub-key-encryption-key") public Boolean createPubKeyEncryptionKey = false;
-
   public SubzeroConfig config;
   private Screens screens;
 

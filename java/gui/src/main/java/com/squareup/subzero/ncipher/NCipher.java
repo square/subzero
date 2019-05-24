@@ -194,28 +194,6 @@ public class NCipher {
     pubKeyEncryptionKey = securityWorld.getKey("simple", pubKeyEncryptionKeyName);
   }
 
-  /**
-   * There is currently no way to call this code. We should either expose a flag in the CLI or
-   * move this into some kind of SecurityWorld initializer.
-   */
-  public void createPubKeyEncryptionKeyTicket() throws NFException {
-    // Create AES pubKeyEncryptionKey. In order to be able to use the key in CodeSafe, we
-    // must create a non-Java key.
-    KeyGenerator keyGenerator = securityWorld.getKeyGenerator();
-    M_KeyGenParams m_keyGenParams =
-        new M_KeyGenParams(M_KeyType.Rijndael, new M_KeyType_GenParams_Random(256 / 8));
-
-    pubKeyEncryptionKey = keyGenerator.generateUnrecordedKey(m_keyGenParams, module, softcard,
-        dataSigningKey,true);
-
-    pubKeyEncryptionKey.setName("PubKeyEncryptionKey");
-    pubKeyEncryptionKey.setAppName("simple");
-    pubKeyEncryptionKey.makeBlobs(softcard);
-    pubKeyEncryptionKey.save();
-    System.out.println(format("created pubKeyEncryptionKey: %s", pubKeyEncryptionKey.getIdent()));
-    pubKeyEncryptionKey.unLoad();
-  }
-
   public byte[] getPubKeyEncryptionKeyTicket()
       throws NFException {
     M_Ticket pubKeyEncryptionKeyTicket = getTicket( pubKeyEncryptionKey.load(softcard, module));

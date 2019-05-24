@@ -64,11 +64,6 @@ public class InitWallet {
 
       nCipher.loadSoftcard(subzero.config.softcard, subzero.config.getSoftcardPassword(), subzero.config.pubKeyEncryptionKey);
 
-      // Check if we need to create the pub key encryption key (only needs to happen once, on one machine)
-      if (subzero.createPubKeyEncryptionKey) {
-        nCipher.createPubKeyEncryptionKeyTicket();
-      }
-
       internalRequest.setPubKeyEncryptionKeyTicket(ByteString.copyFrom(nCipher.getPubKeyEncryptionKeyTicket()));
     }
 
