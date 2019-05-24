@@ -46,12 +46,12 @@ add_custom_target(run-unsigned
 
 add_custom_command(OUTPUT subzero-signed.sar
   DEPENDS subzero
-  COMMAND ${NFAST_PATH}/bin/tct2 --sign-and-pack --key=subzerosigner --is-machine --machine-type=PowerPCELF --infile=subzero --outfile subzero-signed.sar
+  COMMAND ${NFAST_PATH}/bin/tct2 --sign-and-pack --key=subzerocodesigner --is-machine --machine-type=PowerPCELF --infile=subzero --outfile subzero-signed.sar
 )
 
 add_custom_command(OUTPUT subzero-userdata-signed.sar
   DEPENDS subzero.cpio
-  COMMAND ${NFAST_PATH}/bin/tct2 --sign-and-pack --key=subzerodatasigner --machine-key-ident=subzerosigner --infile=subzero.cpio --outfile subzero-userdata-signed.sar
+  COMMAND ${NFAST_PATH}/bin/tct2 --sign-and-pack --key=subzerodatasigner --machine-key-ident=subzerocodesigner --infile=subzero.cpio --outfile subzero-userdata-signed.sar
 )
 
 add_custom_target(run-signed
