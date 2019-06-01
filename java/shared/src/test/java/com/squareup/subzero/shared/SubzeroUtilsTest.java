@@ -97,7 +97,7 @@ public class SubzeroUtilsTest {
         .stream().map(pub -> DeterministicKey.deserializeB58(pub, TestNet3Params.get())).collect(Collectors.toList());
 
     Address address = SubzeroUtils.deriveP2SHP2WSH(TestNet3Params.get(), 2, addresses, path);
-    assertThat(address.toBase58()).isEqualTo("2MuAdStu2xZtRSyA5B6wRtj7SmaLjDyfm1H");
+    assertThat(address.toString()).isEqualTo("2MuAdStu2xZtRSyA5B6wRtj7SmaLjDyfm1H");
   }
 
   @Test public void derivePublicKey() {

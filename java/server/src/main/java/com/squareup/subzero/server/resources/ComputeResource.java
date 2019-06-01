@@ -48,6 +48,6 @@ public class ComputeResource {
         .setIsChange(change)
         .setIndex(index)
         .build();
-    return coldWallet.address(p).toBase58();
+    return coldWallet.address(p).toString();
   }
 }

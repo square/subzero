@@ -24,6 +24,7 @@ import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.SignatureDecodeException;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.core.VarInt;
@@ -134,10 +135,21 @@ public class SubzeroUtils {
     // Iterate over pubkeys, and find signatures valid for them.
     // We should expect exactly two verifications to succeed
     for(ECKey pubkey: pubkeys) {
-      if(pubkey.verify(hash, sig1.getDer().toByteArray())) {
-        sortedSigs.add(sig1.getDer().toByteArray());
-      } else if(pubkey.verify(hash, sig2.getDer().toByteArray())) {
-        sortedSigs.add(sig2.getDer().toByteArray());
+      try {
+        if(pubkey.verify(hash, sig1.getDer().toByteArray())) {
+          sortedSigs.add(sig1.getDer().toByteArray());
+        }
+      } catch (SignatureDecodeException e) {
+        // keep going, we'll throw a RuntimeException later if we don't find the right number of
+        // signatures
+      }
+      try {
+        if(pubkey.verify(hash, sig2.getDer().toByteArray())) {
+          sortedSigs.add(sig2.getDer().toByteArray());
+        }
+      } catch (SignatureDecodeException e) {
+        // keep going, we'll throw a RuntimeException later if we don't find the right number of
+        // signatures
       }
     }
 
@@ -158,7 +170,7 @@ public class SubzeroUtils {
 
   protected static void hashUint64LE(long val, MessageDigest digest) {
     byte[] buf = new byte[8];
-    Utils.uint64ToByteArrayLE(val, buf, 0);
+    Utils.int64ToByteArrayLE(val, buf, 0);
     digest.update(buf);
   }
 

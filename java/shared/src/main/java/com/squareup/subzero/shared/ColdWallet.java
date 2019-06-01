@@ -228,7 +228,7 @@ public class ColdWallet {
         switch (output.getDestination()) {
           case GATEWAY:
             DeterministicKey to = derivePublicKey(gateway, output.getPath());
-            address = new Address(params, to.getPubKeyHash());
+            address = Address.fromKey(params, to, Script.ScriptType.P2PKH);
             break;
           case CHANGE:
             address = SubzeroUtils.deriveP2SHP2WSH(params, Constants.MULTISIG_THRESHOLD,
