@@ -107,8 +107,7 @@ public class SubzeroUtils {
   // This validates that the two signatures are valid for two different pubkeys, and returns
   // them in the same order that the pubkeys are sorted into.
   // The hash is the value the signatures are over.
-  protected static List<byte[]> validateAndSort(List<ECKey> pubkeys, byte[] hash, Signature sig1,
-      Signature sig2) {
+  protected static List<byte[]> validateAndSort(List<ECKey> pubkeys, byte[] hash, List<Signature> signatures) {
     // This needs to be the same sort that ScriptBuilder.createRedeemScript does.
     pubkeys.sort(ECKey.PUBKEY_COMPARATOR);
     List<byte[]> sortedSigs = new ArrayList<>();
@@ -116,46 +115,36 @@ public class SubzeroUtils {
     // If this check fails, we've probably got invalid signatures that would fail below, or when
     // broadcast.  However, this lets us distinguish between invalid signatures and signatures over
     // the wrong data.  Useful primarily for debugging when making changes to either piece of code.
-    if(sig1.hasHash()) {
-      if(!Arrays.equals(sig1.getHash().toByteArray(), hash)) {
-        throw new RuntimeException(format(
-            "Our calculated hash does not match the HSM provided sig1: %s != %s",
-            Hex.toHexString(sig1.getHash().toByteArray()), Hex.toHexString(hash)));
-      }
-    }
-
-    if(sig2.hasHash()) {
-      if(!Arrays.equals(sig2.getHash().toByteArray(), hash)) {
-        throw new RuntimeException(format(
-            "Our calculated hash does not match the HSM provided sig2: %s != %s",
-            Hex.toHexString(sig2.getHash().toByteArray()), Hex.toHexString(hash)));
+    for (Signature sig : signatures) {
+      if (sig.hasHash()) {
+        if (!Arrays.equals(sig.getHash().toByteArray(), hash)) {
+          throw new RuntimeException(format(
+              "Our calculated hash does not match the HSM provided sig: %s != %s",
+              Hex.toHexString(sig.getHash().toByteArray()), Hex.toHexString(hash)));
+        }
       }
     }
 
     // Iterate over pubkeys, and find signatures valid for them.
     // We should expect exactly two verifications to succeed
     for(ECKey pubkey: pubkeys) {
-      try {
-        if(pubkey.verify(hash, sig1.getDer().toByteArray())) {
-          sortedSigs.add(sig1.getDer().toByteArray());
+      for (Signature sig : signatures) {
+        try {
+          if (pubkey.verify(hash, sig.getDer().toByteArray())) {
+            sortedSigs.add(sig.getDer().toByteArray());
+          }
+        } catch (SignatureDecodeException e) {
+          // keep going, we'll throw a RuntimeException later if we don't find the right number of
+          // signatures
         }
-      } catch (SignatureDecodeException e) {
-        // keep going, we'll throw a RuntimeException later if we don't find the right number of
-        // signatures
-      }
-      try {
-        if(pubkey.verify(hash, sig2.getDer().toByteArray())) {
-          sortedSigs.add(sig2.getDer().toByteArray());
-        }
-      } catch (SignatureDecodeException e) {
-        // keep going, we'll throw a RuntimeException later if we don't find the right number of
-        // signatures
       }
     }
 
-    // Possible cases: Two of the same signature, or invalid signatures.
-    if(sortedSigs.size() != 2) {
-      throw new RuntimeException(format("Failed validating signatures. Expected 2, got %d", sortedSigs.size()));
+    if(sortedSigs.size() != Constants.MULTISIG_THRESHOLD) {
+      // If we end up here with less signatures than expected, it implies we either received two
+      // or more of the same signature or one of the signatures is invalid.
+      throw new RuntimeException(format("Failed validating signatures. Expected %d, got %d",
+          Constants.MULTISIG_THRESHOLD, sortedSigs.size()));
     }
 
     return sortedSigs;
