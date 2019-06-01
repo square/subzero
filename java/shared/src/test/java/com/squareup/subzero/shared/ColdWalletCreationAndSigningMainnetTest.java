@@ -120,7 +120,7 @@ public class ColdWalletCreationAndSigningMainnetTest {
     String gateway = "xpub68Jb6w8Rt39nCkDgMaaSiTCCEyZTx6vjeFJHfKgvxz4JkePneCfRpe82vECwHxfWkAdUysRxa4d59RbC8RqVFDKYB5hWQ8ebUecbS5qwHN7";
 
     ColdWallet coldWallet = new ColdWallet(MainNetParams.get(), walletId, addresses, gateway);
-    String coldWalletAddress = coldWallet.address(path).toBase58();
+    String coldWalletAddress = coldWallet.address(path).toString();
     assertThat(coldWalletAddress).isEqualTo("38j52zh1XCpjWEgAgEQXaEdfwHV1gSBSQY");
 
     // You can see the transaction which funds this address here:
