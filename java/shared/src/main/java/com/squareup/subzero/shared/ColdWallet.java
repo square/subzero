@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -148,11 +149,10 @@ public class ColdWallet {
       if (signatures.size() != Constants.MULTISIG_THRESHOLD) {
         throw new RuntimeException(format("Expected %d signatures", Constants.MULTISIG_THRESHOLD));
       }
-      if (signatures.get(0).size() != inputs.size()) {
-        throw new RuntimeException("Expected signature and input counts to be equal");
-      }
-      if (signatures.get(0).size() != signatures.get(1).size()) {
-        throw new RuntimeException("Expected same number of signatures from both signers");
+      for (List<Signature> sig : signatures) {
+        if (sig.size() != inputs.size()) {
+          throw new RuntimeException("Expected signature and input counts to be equal");
+        }
       }
 
       // Segwit serialization format:
@@ -251,7 +251,7 @@ public class ColdWallet {
 
       // 6. witness
       // Each txin is associated with a witness field.
-      for (int i=0; i< witnesses.size(); i++) {
+      for (int i=0; i<witnesses.size(); i++) {
         Pair<List<ECKey>, Script> witness = witnesses.get(i);
         byte[] witnessProgram = witness.getRight().getProgram();
         TxInput input = inputs.get(i);
@@ -259,32 +259,31 @@ public class ColdWallet {
         byte[] hash = SubzeroUtils.bip0143hash(prevoutsDoubleSha, sequenceDoubleSha, outputsDoubleSha, input,
             witnessProgram, sequence, lock_time);
 
-        // Each witness field starts with a compactSize integer to indicate the number of stack items
-        // for the corresponding txin
-        // Always 4 for 2-signature multisig scripts: 2 signatures, script, and extra 0 for CHECKMULTISIG bug
-        out.write(4);
+        // Each witness field starts with a compactSize integer to indicate the number of stack
+        // items for the corresponding txin. The stack is as following:
+        // extra 0 for CHECKMULTISIG bug, MULTISIG_THRESHOLD signatures, script
+        out.write(Constants.MULTISIG_THRESHOLD + 2);
 
-        // Each witness stack item starts with a compactSize integer to indicate the number of bytes of the item.
-
-        // Stack item 1.
-        // I think this is the CHECKMULTISIG bug empty stack item
+        // CHECKMULTISIG bug empty stack item.
         out.write(0);
+
+        List<Signature> filteredSignatures = new LinkedList<>();
+        for (List<Signature> sig : signatures) {
+          filteredSignatures.add(sig.get(i));
+        }
 
         // We need the signatures sorted in the same order as the public keys.
         // This function validates the signatures and sorts them.
-        List<byte[]> sortedSigs = SubzeroUtils.validateAndSort(witness.getLeft(), hash, signatures.get(0).get(i),
-            signatures.get(1).get(i));
+        List<byte[]> sortedSigs = SubzeroUtils.validateAndSort(witness.getLeft(), hash, filteredSignatures);
 
-        // Write two signatures out.  It's length + 1 because of the extra byte for the signature type
-        // Stack item 2 & 3
+        // Write signatures out. It's length + 1 because of the extra byte for the signature type.
         for (byte[] sig : sortedSigs) {
           out.write(new VarInt(sig.length + 1).encode());
           out.write(sig);
           out.write(Transaction.SigHash.ALL.value);
         }
 
-        // And finally the script
-        // Stack item 4.
+        // And finally the script.
         out.write(new VarInt(witnessProgram.length).encode());
         out.write(witnessProgram);
       }
