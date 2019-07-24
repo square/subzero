@@ -42,6 +42,7 @@ input[type=text] {
 
 .response canvas {
   border: 1px solid #678;
+  cursor: none;
 }
 
 .response div {
