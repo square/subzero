@@ -50,7 +50,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java-util</artifactId>
-            <version>3.6.0</version>
+            <version>3.9.1</version>
         </dependency>
       <dependency>
         <groupId>com.squareup.subzero</groupId>
