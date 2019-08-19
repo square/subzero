@@ -21,7 +21,7 @@ the caveat that the code is currently only useful if you have the exact same har
 code more modular over time, as long as the broader community shows interest to implement support for additional
 hardware vendors.
 
-See also [Open Sourcing Subzero (blog post)](https://medium.com/square-corner-blog/open-sourcing-subzero-ee9e3e071827)
+See also [Open Sourcing Subzero (blog post)](https://developer.squareup.com/blog/open-sourcing-subzero)
 
 # Documentation
 
