@@ -44,8 +44,8 @@ import static java.lang.String.format;
  * nCipher specific logic. Handles loading the Security World, OCS, various keys, etc.
  *
  * In theory, we could derive an interface from this class and support different HSM models/vendors.
- * In practice, it might be easier to maintain different forks, as each HSM will have its own way
- * of doing things.
+ * In practice, it might be easier to maintain different forks, as each HSM will have its own way of
+ * doing things.
  */
 public class NCipher {
   private static final String DATA_SIGNING_KEY_NAME = "subzerodatasigner";
@@ -68,8 +68,23 @@ public class NCipher {
     if (!securityWorld.isInitialised()) {
       throw new IllegalStateException("nCipher not initialized");
     }
-    if (!securityWorld.getModule(1).isUsable()) {
-      String state = NFKM_ModuleState.toString(securityWorld.getModule(1).getData().state);
+
+    Module[] modules = securityWorld.getModules();
+    Module module;
+    switch (modules.length) {
+      case 0:
+        throw new IllegalStateException("No nCipher modules found");
+      case 1:
+        // Expected case: exactly 1 module
+        module = modules[0];
+        break;
+      default:
+        throw new IllegalStateException(
+            format("More than 1 nCipher found: found %d", modules.length));
+    }
+
+    if (!module.isUsable()) {
+      String state = NFKM_ModuleState.toString(module.getData().state);
       throw new IllegalStateException(format("nCipher not usable: %s", state));
     }
   }
@@ -113,7 +128,8 @@ public class NCipher {
     ocsCardSet = cardSets[0];
     // TODO: we could give the OCS a name, e.g. subzero-{dev, staging, prod}-ocs and then check
     // the name here.
-    NCipherLoadOCS loadOCS = new NCipherLoadOCS(defaultPassword, screens, NCipherChangePasswordOCS.PLACEHOLDER_PASSWORD);
+    NCipherLoadOCS loadOCS =
+        new NCipherLoadOCS(defaultPassword, screens, NCipherChangePasswordOCS.PLACEHOLDER_PASSWORD);
 
     // TODO: should ocsCardSet.load get called after renderLoading?
     ocsCardSet.load(slot, loadOCS);
@@ -130,7 +146,8 @@ public class NCipher {
         }
         screens.promptPasswordChangeFailed();
       }
-      securityWorld.changePP(slot, new NCipherChangePasswordOCS(NCipherChangePasswordOCS.PLACEHOLDER_PASSWORD, newPassword));
+      securityWorld.changePP(slot,
+          new NCipherChangePasswordOCS(NCipherChangePasswordOCS.PLACEHOLDER_PASSWORD, newPassword));
     }
     screens.renderLoading();
 
@@ -183,7 +200,8 @@ public class NCipher {
     return ticket;
   }
 
-  public void loadSoftcard(String softcardName, String password, String pubKeyEncryptionKeyName) throws NFException {
+  public void loadSoftcard(String softcardName, String password, String pubKeyEncryptionKeyName)
+      throws NFException {
     // Load the softcard and pubkey encryption key.
     softcard = getSoftcardByNameOrId(softcardName);
     softcard.load(module, new NCipherLoadSoftcard(password));
@@ -196,7 +214,7 @@ public class NCipher {
 
   public byte[] getPubKeyEncryptionKeyTicket()
       throws NFException {
-    M_Ticket pubKeyEncryptionKeyTicket = getTicket( pubKeyEncryptionKey.load(softcard, module));
+    M_Ticket pubKeyEncryptionKeyTicket = getTicket(pubKeyEncryptionKey.load(softcard, module));
 
     byte[] ticket = MarshallContext.marshall(pubKeyEncryptionKeyTicket);
     System.out.println(format("pubKeyEncryptionKeyTicket: %s", Hex.toHexString(ticket)));
@@ -207,7 +225,7 @@ public class NCipher {
       ClientException, CommandTooBig, MarshallTypeError, ConnectionClosed {
     M_Cmd_Args_GetTicket args = new M_Cmd_Args_GetTicket(0, k, M_TicketDestination.Any, null);
     M_Reply rep = securityWorld.getConnection().transact(new M_Command(M_Cmd.GetTicket, 0, args));
-    return ((M_Cmd_Reply_GetTicket)(rep.reply)).ticket;
+    return ((M_Cmd_Reply_GetTicket) (rep.reply)).ticket;
   }
 
   private SoftCard getSoftcardByNameOrId(String softcard) throws NFException {
