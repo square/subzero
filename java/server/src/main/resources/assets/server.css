@@ -55,3 +55,8 @@ input[type=text] {
   padding: 1px;
   border-radius: 2px;
 }
+
+.error {
+  color: red;
+  font-size: 8pt;
+}
