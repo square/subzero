@@ -24,45 +24,37 @@ public class PrettyPrintResource {
 
   @Path("/request")
   @GET
-  public String request(@QueryParam("raw") String raw) {
-    try {
-      byte[] rawBytes = base64().decode(raw);
-      Service.CommandRequest command = Service.CommandRequest.parseFrom(rawBytes);
-      String json = JsonFormat.printer().print(command);
-      if (command.hasInitWallet()) {
-        return "init wallet request: " + json;
-      }
-      if (command.hasFinalizeWallet()) {
-        return "finalize wallet request: " + json;
-      }
-      if (command.hasSignTx()) {
-        return "sign tx request: " + json;
-      }
-      return json;
-    } catch (InvalidProtocolBufferException | IllegalArgumentException e) {
-      return e.getMessage();
+  public String request(@QueryParam("raw") String raw) throws InvalidProtocolBufferException {
+    byte[] rawBytes = base64().decode(raw);
+    Service.CommandRequest command = Service.CommandRequest.parseFrom(rawBytes);
+    String json = JsonFormat.printer().print(command);
+    if (command.hasInitWallet()) {
+      return "init wallet request: " + json;
     }
+    if (command.hasFinalizeWallet()) {
+      return "finalize wallet request: " + json;
+    }
+    if (command.hasSignTx()) {
+      return "sign tx request: " + json;
+    }
+    return json;
   }
 
   @Path("/response")
   @GET
-  public String response(@QueryParam("raw") String raw) {
-    try {
-      byte[] rawBytes = base64().decode(raw);
-      Service.CommandResponse command = Service.CommandResponse.parseFrom(rawBytes);
-      String json = JsonFormat.printer().print(command);
-      if (command.hasInitWallet()) {
-        return "init wallet response: " + json;
-      }
-      if (command.hasFinalizeWallet()) {
-        return "finalize wallet response: " + json;
-      }
-      if (command.hasSignTx()) {
-        return "sign tx response: " + json;
-      }
-      return json;
-    } catch (InvalidProtocolBufferException | IllegalArgumentException e) {
-      return e.getMessage();
+  public String response(@QueryParam("raw") String raw) throws InvalidProtocolBufferException {
+    byte[] rawBytes = base64().decode(raw);
+    Service.CommandResponse command = Service.CommandResponse.parseFrom(rawBytes);
+    String json = JsonFormat.printer().print(command);
+    if (command.hasInitWallet()) {
+      return "init wallet response: " + json;
     }
+    if (command.hasFinalizeWallet()) {
+      return "finalize wallet response: " + json;
+    }
+    if (command.hasSignTx()) {
+      return "sign tx response: " + json;
+    }
+    return json;
   }
 }

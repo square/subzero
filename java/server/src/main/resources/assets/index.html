@@ -22,6 +22,7 @@
   <p>Display the contents of a request or response. Useful for debugging purpose.</p>
   <p>raw: <textarea id="pretty_print_raw"></textarea></p>
   <p><button onClick="pretty_print_request()">decode request</button> <button onClick="pretty_print_response()">decode response</button></p>
+  <div id="pretty_print_error" class="error" style="display: none"></div>
   <div id="pretty_print_response" class="response" style="display: none">
     <p>json: <textarea disabled="true" id="pretty_print_json"></textarea></p>
   </div>
@@ -47,6 +48,7 @@
   <div id="init_responses">
   </div>
   <p><button onClick="finalize_wallet_request()">generate QR code</button></p>
+  <div id="finalize_wallet_error" class="error" style="display: none"></div>
   <div id="finalize_wallet_response" class="response" style="display: none">
     <canvas id="finalize_wallet_response_qr" width="400"></canvas>
     <div id="finalize_wallet_response_data"></div>
@@ -58,6 +60,7 @@
   <div id="finalize_response">
   </div>
   <p><button onClick="reveal_xpubs()">reveal xpubs</button></p>
+  <div id="reveal_xpubs_error" class="error" style="display: none"></div>
   <div id="reveal_xpubs_response" class="response" style="display: none">
     <p>xpubs: <textarea disabled="true" id="reveal_xpubs_response_data"></textarea></p>
   </div>
@@ -69,6 +72,7 @@
   <p>change: <input type="checkbox" id="derive_address_change"></p>
   <p>index: <input type="text" id="derive_address_index" size="10"> (BIP-32)</p>
   <p><button onClick="derive_address()">derive address</button></p>
+  <div id="derive_address_error" class="error" style="display: none"></div>
   <div id="derive_address_response" class="response" style="display: none">
     <p>address: <input type="text" size="70" disabled="true" id="derive_address_response_data"/></p>
   </div>
@@ -88,6 +92,7 @@
   <p><button class="small" style="margin-left: 2em;" onClick="addOutput(false)">add more outputs</button></p>
 
   <p><button onClick="sign_tx_request()">generate QR code</button></p>
+  <div id="sign_tx_error" class="error" style="display: none"></div>
   <div id="sign_tx_response" class="response" style="display: none">
     <canvas id="sign_tx_response_qr" width="400"></canvas>
     <div id="sign_tx_response_data"></div>
@@ -103,6 +108,7 @@
   <p>Gateway xpub: <textarea id="gateway"></textarea></p>
   <div id="merge_responses"></div>
   <p><button onClick="show_final_transaction()">show final transaction</button></p>
+  <div id="show_final_transaction_error" class="error" style="display: none"></div>
   <div id="show_final_transaction_response" class="response" style="display: none">
     <p>transaction: <textarea disabled="true" id="show_final_transaction_response_data"></textarea></p>
   </div>

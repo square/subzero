@@ -341,13 +341,12 @@ public class SubzeroUtils {
     for (NetworkParameters network : Networks.get()) {
       try {
         deserializeB58(base58address, network);
-        params = network;
-        break;
+        return network;
       } catch (IllegalArgumentException e) {
         continue;
       }
     }
-    return params;
+    throw new IllegalArgumentException(format("Failed to infer network parameters from %s", base58address));
   }
 
   public static List<String> finalizeResponsesToAddresses(List<String> finalizeResponses)

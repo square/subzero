@@ -6,19 +6,35 @@
 // using a real framework...
 
 function pretty_print_request() {
-  $('#pretty_print_response').slideDown();
+  $('#pretty_print_error').hide();
+  $('#pretty_print_response').hide();
   $.ajax("/pretty-print/request", {
     data: {"raw": pretty_print_raw.value}
   })
-  .done(result => pretty_print_json.value = result);
+  .fail((jqXhr, status) => {
+    $('#pretty_print_error').text(status + ": " + jqXhr.responseText);
+    $('#pretty_print_error').slideDown();
+  })
+  .done(result => {
+    pretty_print_json.value = result;
+    $('#pretty_print_response').slideDown();
+  });
 }
 
 function pretty_print_response() {
-  $('#pretty_print_response').slideDown();
+  $('#pretty_print_error').hide();
+  $('#pretty_print_response').hide();
   $.ajax("/pretty-print/response", {
     data: {"raw": pretty_print_raw.value}
   })
-  .done(result => pretty_print_json.value = result);
+  .fail((jqXhr, status) => {
+    $('#pretty_print_error').text(status + ": " + jqXhr.responseText);
+    $('#pretty_print_error').slideDown();
+  })
+  .done(result => {
+    pretty_print_json.value = result;
+    $('#pretty_print_response').slideDown();
+  });
 }
 
 function init_wallet_request() {
@@ -45,7 +61,8 @@ function init_wallet_request() {
 }
 
 function finalize_wallet_request() {
-  $('#finalize_wallet_response').slideDown();
+  $('#finalize_wallet_error').hide();
+  $('#finalize_wallet_response').hide();
 
   var data = {"wallet": wallet.value|0, "encPubKeys": []};
   for (var i=1; i<=N.innerText; i++) {
@@ -53,6 +70,10 @@ function finalize_wallet_request() {
   }
 
   $.ajax("/generate-qr-code/finalize-wallet-request", {traditional: true, data: data})
+  .fail((jqXhr, status) => {
+    $('#finalize_wallet_error').text(status + ": " + jqXhr.responseText);
+    $('#finalize_wallet_error').slideDown();
+  })
   .done(result => {
     finalize_wallet_response_data.innerText = result.data;
     var r = Math.floor(finalize_wallet_response_qr.width / result.size);
@@ -68,11 +89,13 @@ function finalize_wallet_request() {
         }
       }
     }
+    $('#finalize_wallet_response').slideDown();
   });
 }
 
 function reveal_xpubs() {
-  $('#reveal_xpubs_response').slideDown();
+  $('#reveal_xpubs_error').hide();
+  $('#reveal_xpubs_response').hide();
 
   var data = {"finalizeResponses": []};
   for (var i=1; i<=N.innerText; i++) {
@@ -80,13 +103,19 @@ function reveal_xpubs() {
   }
 
   $.ajax("/compute/xpubs", {traditional: true, data: data})
+  .fail((jqXhr, status) => {
+    $('#reveal_xpubs_error').text(status + ": " + jqXhr.responseText);
+    $('#reveal_xpubs_error').slideDown();
+  })
   .done(results => {
     reveal_xpubs_response_data.value = results.join("\n");
+    $('#reveal_xpubs_response').slideDown();
   });
 }
 
 function derive_address() {
-  $('#derive_address_response').slideDown();
+  $('#derive_address_error').hide();
+  $('#derive_address_response').hide();
 
   var data = {"finalizeResponses": []};
   for (var i=1; i<=N.innerText; i++) {
@@ -96,13 +125,19 @@ function derive_address() {
   data.index = $('#derive_address_index').val();
 
   $.ajax("/compute/address", {traditional: true, data: data})
+  .fail((jqXhr, status) => {
+    $('#derive_address_error').text(status + ": " + jqXhr.responseText);
+    $('#derive_address_error').slideDown();
+  })
   .done(results => {
     derive_address_response_data.value = results;
+    $('#derive_address_response').slideDown();
   });
 }
 
 function sign_tx_request() {
-  $('#sign_tx_response').slideDown();
+  $('#sign_tx_error').hide();
+  $('#sign_tx_response').hide();
 
   var data = {
     "wallet": wallet.value|0,
@@ -113,6 +148,10 @@ function sign_tx_request() {
     rate: exchange_rate.value
   };
   $.ajax("/generate-qr-code/sign-tx-request", {type: "POST", contentType: "application/json", processData: false, data: JSON.stringify(data)})
+  .fail((jqXhr, status) => {
+    $('#sign_tx_error').text(status + ": " + jqXhr.responseText);
+    $('#sign_tx_error').slideDown();
+  })
   .done(result => {
     sign_tx_response_data.innerText = result.data;
     var r = Math.floor(sign_tx_response_qr.width / result.size);
@@ -128,11 +167,13 @@ function sign_tx_request() {
         }
       }
     }
+    $('#sign_tx_response').slideDown();
   });
 }
 
 function show_final_transaction() {
-  $('#show_final_transaction_response').slideDown();
+  $('#show_final_transaction_error').hide();
+  $('#show_final_transaction_response').hide();
   var data = {
     signTxRequest: initial_sign_tx_request.value,
     finalizeResponses: [],
@@ -146,8 +187,13 @@ function show_final_transaction() {
     data.signTxResponses.push($('#sign_tx_response_' + i).val());
   }
   $.ajax("/show-final-transaction", {traditional: true, data: data})
+  .fail((jqXhr, status) => {
+    $('#show_final_transaction_error').text(status + ": " + jqXhr.responseText);
+    $('#show_final_transaction_error').slideDown();
+  })
   .done(results => {
     show_final_transaction_response_data.value = results;
+    $('#show_final_transaction_response').slideDown();
   });
 }
 
