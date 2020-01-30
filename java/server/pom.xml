@@ -37,11 +37,6 @@
             <artifactId>dropwizard-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.dropwizard</groupId>
-            <artifactId>dropwizard-views-mustache</artifactId>
-            <version>${dropwizard.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.squareup.subzero</groupId>
             <artifactId>proto</artifactId>
             <version>1.0.0-SNAPSHOT</version>
