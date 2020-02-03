@@ -22,6 +22,9 @@ and [CLion](https://www.jetbrains.com/clion/) for the C core.
     # install Maven
     brew install maven
 
+    # note: if Mac OS X gives you a warning about unverified developers, you can go to the
+    # Security & Privacy settings and allow the action to take place.
+
     # install cmake
     brew install cmake
 
