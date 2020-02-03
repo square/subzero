@@ -1,6 +1,6 @@
 # live-usb-creator
 
-This project generates a LiveUSB image with CentOS 7.5.1804 and nCipher drivers/support tools for use in machines with
+This project generates a LiveUSB image with CentOS 7.7.1908 and nCipher drivers/support tools for use in machines with
 HSMs.
 
 ## Building image
@@ -10,18 +10,19 @@ Three dependencies need to be fetched out-of-band.
 Set the following files in place in the same directory as the `Vagrantfile`.
 
 * CodeSafe-linux64-dev-12.20.51.iso (1.9GB): supplied by the HSM vendor.
-* CentOS-7-x86_64-Everything-1804.iso (8.8GB): `curl -O http://mirror.seas.harvard.edu/centos/7.5.1804/isos/x86_64/CentOS-7-x86_64-Everything-1804.iso` (or download with the
-included `CentOS-7-x86_64-Everything-1804.torrent`)
-* kernel-devel-3.10.0-862.2.3.el7.x86_64.rpm (16MB): `curl -O http://mirror.centos.org/centos/7.5.1804/updates/x86_64/Packages/kernel-devel-3.10.0-862.2.3.el7.x86_64.rpm`
+* CentOS-7-x86_64-Everything-1908.iso (10G): `curl -O http://mirror.seas.harvard.edu/centos/7.7.1908/isos/x86_64/CentOS-7-x86_64-Everything-1908.iso`
+* kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm (17MB): `curl -O http://archive.kernel.org/centos-vault/centos/7.6.1810/updates/x86_64/Packages/kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm`
 
 Verify the following SHA256 sums:
 
 ```
-$ shasum -a 256 CodeSafe-linux64-dev-12.20.51.iso CentOS-7-x86_64-Everything-1804.iso kernel-devel-3.10.0-862.2.3.el7.x86_64.rpm
+$ shasum -a 256 CodeSafe-linux64-dev-12.20.51.iso CentOS-7-x86_64-Everything-1908.iso kernel-devel-3.10.0-862.2.3.el7.x86_64.rpm
 bdd82fb64e269565c0f718b7b81b4d75dcbd66eaa9ae357f32b62cf87af7ab71  CodeSafe-linux64-dev-12.20.51.iso
-99723c8b87dcec21df8aed23de1eb810346d42cfd2a3fafafe70a68296053417  CentOS-7-x86_64-Everything-1804.iso
-ac64e0995558acf3874b2ccbdce8f3b8aae2b6d494256c4bf1ae093aec0f1c18  kernel-devel-3.10.0-862.2.3.el7.x86_64.rpm
+bd5e6ca18386e8a8e0b5a9e906297b5610095e375e4d02342f07f32022b13acf  CentOS-7-x86_64-Everything-1908.iso
+a27c718efb2acec969b20023ea517d06317b838714cb359e4a80e8995ac289fc  kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm
 ```
+
+The CentOS's GPG signature can also be verified to confirm the image has been signed by the CentOS team.
 
 This workflow uses the tool [Vagrant](https://www.vagrantup.com/) to orchestrate the creation and provisioning of a VirtualBox VM from a CentOS-provided base VM.
 
@@ -36,8 +37,8 @@ brew cask install vagrant
 vagrant plugin install vagrant-vbguest
 # remove the existing centos/7 image, if one exists
 vagrant box remove -f centos/7
-# install centos 7 vagrant box version 1804.02 (checksum via https://cloud.centos.org/centos/7/vagrant/x86_64/images/sha256sum.txt.asc)
-vagrant box add --checksum-type sha256 --checksum 83f86355d8d1ea3001e377f67cc4a9ff15d827bea83a1878df1bcfd0a0dcab0f --provider virtualbox --box-version 1804.02 centos/7
+# install centos 7 vagrant box version 1905.1 (checksum via https://cloud.centos.org/centos/7/vagrant/x86_64/images/sha256sum.txt.asc)
+vagrant box add --checksum-type sha256 --checksum de768cf0180d712a6eac1944bd78870c060999a8b6617f8f9af98ddbb9f2d271 --provider virtualbox --box-version 1905.1 centos/7
 # boot up a virtualbox VM to run the install in
 vagrant up
 # enter the VM

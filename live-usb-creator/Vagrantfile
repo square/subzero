@@ -4,19 +4,19 @@
 VAGRANT_ROOT = File.dirname(__FILE__)
 # TODO: consider using a buildlog ISO: https://buildlogs.centos.org/rolling/7/isos/x86_64/?C=M;O=D
 # could that give us an aligned VM image release and Everything ISO release?
-CENTOS_EVERYTHING_ISO_NAME = "CentOS-7-x86_64-Everything-1804.iso"
+CENTOS_EVERYTHING_ISO_NAME = "CentOS-7-x86_64-Everything-1908.iso"
 
 # this kernel release value is specific to the config.vm.box_version set below.
-# when changing config.vm.box_version, run `uname -r` to find the kernel release
+# when changing config.vm.box_version, run `cat /etc/centos-release` and `uname -r` to find the kernel release
 # (and, of course, then download the RPM with kernel headers for that release;
-# we need to localinstall this RPM (a) because the CentOS 1804 everything ISO has kernel
-# headers that do not exactly match the VM’s 1804.02 release and (b) because for the
+# we need to localinstall this RPM (a) because the CentOS 1908 everything ISO has kernel
+# headers that do not exactly match the VM’s 1905.1 release and (b) because for the
 # VBoxGuestAdditions to install successfully, kernel headers version has to match exactly)
-KERNEL_RELEASE = "3.10.0-862.2.3.el7.x86_64"
+KERNEL_RELEASE = "3.10.0-957.12.2.el7.x86_64"
 
 Vagrant.configure("2") do |config|
   config.vm.box = "centos/7"
-  config.vm.box_version = "1804.02"
+  config.vm.box_version = "1905.1"
   config.vm.box_check_update = false
 
   config.vm.provision "shell", path: "bootstrap.sh"
@@ -55,8 +55,8 @@ Vagrant.configure("2") do |config|
         kernel_devel_guest_tmp_path = File.join("/tmp", kernel_devel_rpm_name)
         communicate.upload(kernel_devel_host_source_path, kernel_devel_guest_tmp_path)
 
-        # the VM release (1804.02) is actually slightly newer than the Everything ISO release (1804), so we have to install
-        # the kernel-devel package from an RPM specifically associated with our kernel release
+        # the VM release (1905.1) is actually slightly out of date compared to the Everything ISO release (1908), so we
+        # have to install the kernel-devel package from an RPM specifically associated with our kernel release
         communicate.sudo('mkdir /media/CentOS && ' \
                          'mount -r /dev/sr0 /media/CentOS && ' \
                          'yum-config-manager --disable \* && ' \
