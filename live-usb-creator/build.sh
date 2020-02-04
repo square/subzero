@@ -23,7 +23,7 @@ sudo cp /vagrant/patches/usr/share/lorax/live/efi.tmpl /usr/share/lorax/live/efi
 # livemedia-creator refuses to run if results_dir exists
 sudo rm -rf /tmp/build
 
-sudo livemedia-creator --make-iso --ks=/tmp/rhel7-livemedia.with_additional_packages.ks --resultdir="/tmp/build" --no-virt --project="CentOS" --releasever="7.4.1804" --volid="CentOS 7 (1804) + nCipher x86_64"
+sudo livemedia-creator --make-iso --ks=/tmp/rhel7-livemedia.with_additional_packages.ks --resultdir="/tmp/build" --no-virt --project="CentOS" --releasever="7.7.1908" --volid="CentOS 7 (1908) + nCipher x86_64"
 
 ###############################################################################
 # Copy ISO back to host
