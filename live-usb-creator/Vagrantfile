@@ -25,6 +25,7 @@ Vagrant.configure("2") do |config|
     # Do not display the VirtualBox GUI when booting the machine
     vb.gui = false
     vb.cpus = 4
+    vb.memory = 2048
 
     vb.customize ["storageattach", :id,
       "--storagectl", "IDE",
