@@ -170,7 +170,7 @@ total 48
 
 # Perform a code signing ceremony
 [bin]$ cd ~/subzero/core/build/
-[build]$ /opt/nfast/bin/tct2 --sign-and-pack --key=subzerocodesigner --is-machine --machine-type=PowerPCELF --infile=~/subzero/core/build/subzero --outfile ~/subzero/core/build/subzero-signed.sar
+[build]$ /opt/nfast/bin/tct2 --sign-and-pack --key=subzerocodesigner --is-machine --machine-type=PowerPCELF --infile ~/subzero/core/build/subzero --outfile ~/subzero/core/build/subzero-signed.sar
 No module specified, using 1
 Signing machine as `PowerPCELF'.
 
@@ -189,7 +189,7 @@ F dummy
 Written 'subzero.cpio': 1 files, 0 directories, 0 errors
 
 
-[build]$ /opt/nfast/bin/tct2 --sign-and-pack --key=subzerodatasigner --machine-key-ident=subzerocodesigner --infile=subzero.cpio --outfile subzero-userdata-signed.sar
+[build]$ /opt/nfast/bin/tct2 --sign-and-pack --key=subzerodatasigner --machine-key-ident=subzerocodesigner --infile subzero.cpio --outfile subzero-userdata-signed.sar
 No module specified, using 1
 
 Loading `subzero-signing-ocs':
