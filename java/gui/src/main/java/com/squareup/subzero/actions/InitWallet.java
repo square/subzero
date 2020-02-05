@@ -51,7 +51,7 @@ public class InitWallet {
       // TODO(alok): this hangs if the nCipher is not properly configured. In dev, this happens
       // when I fail to open my ssh tunnels. Perhaps we need a loading screen here?
       nCipher = new NCipher();
-      nCipher.loadOcs(subzero.ocsPassword, subzero.getScreens());
+      nCipher.loadOcs(subzero.config.dataSignerKey, subzero.ocsPassword, subzero.getScreens());
 
       wallet.setOcsId(nCipher.getOcsId());
       wallet.setOcsCardsFile(ByteString.copyFrom(nCipher.getOcsCardsFile()));

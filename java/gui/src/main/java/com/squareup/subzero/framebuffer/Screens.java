@@ -126,6 +126,20 @@ public class Screens {
   }
 
   /**
+   * Prompt to insert an Administrator Card.  Returns once the card is inserted.
+   *
+   * @param message Message to display to the user
+   */
+  public void promptForAdministratorCard(String message) throws IOException {
+    framebuffer.draw((Graphics2D graphics) ->
+        baseScreenLayout(graphics,"Insert Administrator Card", message, Color.white)
+    );
+
+    // TODO: Wait on the Administrator Card instead
+    framebuffer.pressEnter();
+  }
+
+  /**
    * Prompt to remove an Operator Card.  Returns once the card is removed.
    *
    * @param message Message to display to the user
@@ -149,6 +163,13 @@ public class Screens {
 
     return framebuffer.prompt(32, 250, true);
   }
+
+  public String promptAcsPassword(String message) throws IOException {
+    framebuffer.draw((Graphics2D g) -> baseScreenLayout(g,"Administrator Card Password", message, Color.white));
+
+    return framebuffer.prompt(32, 250, true);
+  }
+
 
   public void warnPasswordChange(String newPassword) throws IOException {
     String message = "Updating your Operator Card password.\n" +

@@ -6,15 +6,18 @@ import com.google.protobuf.TextFormat;
 import com.squareup.subzero.framebuffer.Framebuffer;
 import com.squareup.subzero.framebuffer.Screens;
 import com.squareup.subzero.ncipher.NCipher;
-import com.squareup.subzero.shared.SubzeroUtils;
 import com.squareup.subzero.proto.service.Service.CommandRequest;
 import com.squareup.subzero.proto.service.Service.CommandResponse;
+import com.squareup.subzero.shared.SubzeroUtils;
 
 import static com.google.common.io.BaseEncoding.base64;
 
 public class SubzeroGui {
   @Parameter(names = "--help", help = true)
   private boolean help = false;
+
+  @Parameter(names = "--init-nvram")
+  private boolean initNvram = false;
 
   @Parameter(names = "--debug") public String debug = null;
 
@@ -26,7 +29,8 @@ public class SubzeroGui {
   // If missing or incorrect, will prompt for a password on stdin.
   @Parameter(names = "--ocs-password") public String ocsPassword;
 
-  // By default, subzero listens on this port, which is allocated in Registry
+  // By default, subzero listens on this port. This port was picked randomly. We don't have to care
+  // about port conflicts since we also build the Linux image.
   @Parameter(names = "--port") public int port = 32366;
 
   // Almost always you want to talk to subzero on localhost
@@ -95,7 +99,12 @@ public class SubzeroGui {
 
     try {
       if (nCipher) {
-        new NCipher().healthCheck();
+        NCipher nCipher = new NCipher();
+        nCipher.healthCheck();
+
+        if (initNvram) {
+          nCipher.initNvram(config.dataSignerKey, screens);
+        }
       }
 
       while (true) {

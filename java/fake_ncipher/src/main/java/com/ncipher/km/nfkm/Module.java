@@ -15,4 +15,8 @@ public class Module {
   public NFKM_ModuleInfo getData() {
     throw new RuntimeException("fake nCipher");
   }
+
+  public Slot[] getSlots() {
+    throw new RuntimeException("fake nCipher");
+  }
 }

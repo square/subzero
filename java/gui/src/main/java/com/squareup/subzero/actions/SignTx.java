@@ -89,7 +89,7 @@ public class SignTx {
     NCipher nCipher = null;
     if (subzero.nCipher) {
       nCipher = new NCipher();
-      nCipher.loadOcs(subzero.ocsPassword, subzero.getScreens());
+      nCipher.loadOcs(subzero.config.dataSignerKey, subzero.ocsPassword, subzero.getScreens());
 
       // TODO: the wallet contains a backup of the OCS files. We could drop them if they are
       // missing. It might make wallet recovery easier?

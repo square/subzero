@@ -7,8 +7,4 @@ public class KeyGenerator {
   public Key generateUnrecordedKey(M_KeyGenParams params, Module m, CardSet cardset, Key seeinteg, Boolean recovery) throws NFException {
     throw new RuntimeException("fake nCipher");
   }
-
-  public Key generateUnrecordedKey(M_KeyGenParams params, Module m, SoftCard softcard, Key seeinteg, Boolean recovery) throws NFException {
-    throw new RuntimeException("fake nCipher");
-  }
 }

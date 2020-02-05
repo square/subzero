@@ -21,6 +21,7 @@ public class SubzeroConfig {
   public String softcardPassword;    // either "<password>" or "!!<path>"
   public String pubKeyEncryptionKey; // hex
   public String teamName;            // either "<name>" or "!!<path>"
+  public String dataSignerKey;       // should be "subzerodatasigner", unless a different name was given to the key.
 
   /**
    * SubzeroGui does not use ServiceContainer, so we implement our own config loading.

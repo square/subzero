@@ -170,7 +170,7 @@ total 48
 
 # Perform a code signing ceremony
 [bin]$ cd ~/subzero/core/build/
-[build]$ /opt/nfast/bin/tct2 --sign-and-pack --key=subzerocodesigner --is-machine --machine-type=PowerPCELF --infile=~/subzero/core/build/subzero --outfile ~/subzero/core/build/subzero-signed.sar
+[build]$ /opt/nfast/bin/tct2 --sign-and-pack --key=subzerocodesigner --is-machine --machine-type=PowerPCELF --infile ~/subzero/core/build/subzero --outfile ~/subzero/core/build/subzero-signed.sar
 No module specified, using 1
 Signing machine as `PowerPCELF'.
 
@@ -189,7 +189,7 @@ F dummy
 Written 'subzero.cpio': 1 files, 0 directories, 0 errors
 
 
-[build]$ /opt/nfast/bin/tct2 --sign-and-pack --key=subzerodatasigner --machine-key-ident=subzerocodesigner --infile=subzero.cpio --outfile subzero-userdata-signed.sar
+[build]$ /opt/nfast/bin/tct2 --sign-and-pack --key=subzerodatasigner --machine-key-ident=subzerocodesigner --infile subzero.cpio --outfile subzero-userdata-signed.sar
 No module specified, using 1
 
 Loading `subzero-signing-ocs':
@@ -287,20 +287,6 @@ Module 1 slot 0: blank card
 Card erasure complete.
 
 
-# Initialize the NVRAM
-[bin]$ ./nvram-sw -a
-
-Load Admin Card (for KNV):
-Module 1 slot 0: empty
-Module 1 slot 0: Admin Card #1
-Module 1 slot 0:- passphrase supplied - reading card
-Card reading complete.
-
-
-# Set the initial version
-[bin]$ printf "%-99s %s" "8414-100" | tr ' ' '\0' | ./nvram-sw --write
-
-
 # Create a softcard for pubKeyEncryptionKey
 [bin]$ ./ppmk --new subzero
 Enter new pass phrase:
@@ -313,5 +299,6 @@ New softcard created: HKLTU aa6bfaa5f222407b10fea9b30b68129d6fb7a3e4
 
 
 # The HSM is now setup for performing wallet operations.
-# Note: you will have to update the Java yaml file and burn a DVD with the two .sar files.
+# Note: you will have to update the Java yaml file and burn a DVD with the two .sar files. Then run the Java GUI with
+# --init-nvram the first time to initialize the nvram (will prompt for the ACS).
 ```
