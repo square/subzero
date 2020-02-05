@@ -329,7 +329,7 @@ EOF
 rm /tmp/1_post_install_chroot
 %end
 
-%packages
+%packages --excludedocs
 # Packages needed by anaconda, but not directly required.
 # Includes all of the grub2 and shim packages needed, except
 # for the grub2-efi-*-cdboot package
