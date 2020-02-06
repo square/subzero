@@ -56,7 +56,7 @@ public class FinalizeWallet {
       byte[] ticket = nCipher.getMasterSeedEncryptionKeyTicket();
       internalRequest.setMasterSeedEncryptionKeyTicket(ByteString.copyFrom(ticket));
 
-      nCipher.loadSoftcard(subzero.config.softcard, subzero.config.getSoftcardPassword(), subzero.config.pubKeyEncryptionKey);
+      nCipher.loadSoftcard(subzero.config.softcard, subzero.config.softcardPassword, subzero.config.pubKeyEncryptionKey);
       ticket = nCipher.getPubKeyEncryptionKeyTicket();
       internalRequest.setPubKeyEncryptionKeyTicket(ByteString.copyFrom(ticket));
     }

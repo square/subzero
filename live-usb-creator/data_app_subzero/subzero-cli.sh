@@ -10,4 +10,4 @@ stty raw
 tput civis
 
 # Actually execute the jar and arguments
-exec java -jar /data/app/subzero/subzero-cli.jar --ncipher > /hd/subzero-cli.stdout 2> /hd/subzero-cli.stderr
+exec java -jar /data/app/subzero/subzero-cli.jar --ncipher --config /hd/config.yaml > /hd/subzero-cli.stdout 2> /hd/subzero-cli.stderr

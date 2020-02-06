@@ -1,12 +1,12 @@
 package com.squareup.subzero;
 
+import com.google.common.base.Strings;
+import com.ncipher.nfast.NFException;
 import com.squareup.subzero.ncipher.NCipher;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
 import org.yaml.snakeyaml.Yaml;
 
 import static java.lang.String.format;
@@ -23,67 +23,24 @@ public class SubzeroConfig {
   public String teamName;            // either "<name>" or "!!<path>"
   public String dataSignerKey;       // should be "subzerodatasigner", unless a different name was given to the key.
 
-  /**
-   * SubzeroGui does not use ServiceContainer, so we implement our own config loading.
-   */
-  public static SubzeroConfig load(boolean nCipher) throws IOException {
-    // load subzero.yaml
-    EnvironmentsMap environmentsMap = loadEnvMap();
-
-    // Get HSM's security world. Default to dev.
-    EnvironmentsMap.Environments env = null;
+  public static SubzeroConfig load(boolean nCipher, String configFile)
+      throws IOException, NFException {
     if (nCipher) {
       String securityWorld = new NCipher().getSecurityWorld();
-      System.out.println(format("Looking up env with %s", securityWorld));
-      env = environmentsMap.environments.get(securityWorld);
+      System.out.println(format("Security world: %s", securityWorld));
     } else {
-      System.out.println("skipping nCipher check");
+      System.out.println("skipping nCipher");
     }
-    if (env == null) {
-      env = EnvironmentsMap.Environments.development;
-    }
-    System.out.printf("Env: %s\n", env.name());
 
     // Load the right config file
-    ClassLoader classLoader = SubzeroGui.class.getClassLoader();
-    URL resource = classLoader.getResource(format("subzero-%s.yaml", env.name()));
-    return new Yaml().loadAs(resource.openStream(), SubzeroConfig.class);
-  }
-
-  protected static EnvironmentsMap loadEnvMap() throws IOException {
-    ClassLoader classLoader = SubzeroGui.class.getClassLoader();
-    URL resource = classLoader.getResource("subzero.yaml");
-    return new Yaml().loadAs(resource.openStream(), EnvironmentsMap.class);
-  }
-
-  private String getStringOrLoadFile(String parameter) throws IOException {
-    if (parameter.startsWith(FILE_PREFIX)) {
-      List<String> fileContent =
-          Files.readAllLines(Paths.get(parameter.substring(FILE_PREFIX.length())));
-      if (fileContent.size() > 0) {
-        return fileContent.get(0);
-      }
+    InputStream file;
+    if (Strings.isNullOrEmpty(configFile)) {
+      ClassLoader classLoader = SubzeroGui.class.getClassLoader();
+      URL resource = classLoader.getResource("sample.yaml");
+      file = resource.openStream();
+    } else {
+      file = new FileInputStream(configFile);
     }
-    return parameter;
-  }
-
-  public String getSoftcardPassword() throws IOException {
-    return getStringOrLoadFile(softcardPassword);
-  }
-
-  public String getTeamName() throws IOException {
-    return getStringOrLoadFile(teamName);
-  }
-
-  public String getFramebufferSize() throws IOException {
-    return getStringOrLoadFile(framebufferSize);
-  }
-
-  public static class EnvironmentsMap {
-    public Map<String, Environments> environments;
-
-    enum Environments {
-      development
-    }
+    return new Yaml().loadAs(file, SubzeroConfig.class);
   }
 }

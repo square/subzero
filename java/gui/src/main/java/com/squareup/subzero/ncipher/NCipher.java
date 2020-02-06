@@ -47,7 +47,6 @@ import com.ncipher.nfast.marshall.M_TicketDestination;
 import com.ncipher.nfast.marshall.M_UseLimit;
 import com.ncipher.nfast.marshall.MarshallContext;
 import com.ncipher.provider.km.nCipherKM;
-import com.ncipher.provider.nCRuntimeException;
 import com.squareup.subzero.framebuffer.Screens;
 import com.squareup.subzero.shared.Constants;
 import java.io.ByteArrayOutputStream;
@@ -112,14 +111,10 @@ public class NCipher {
     }
   }
 
-  public String getSecurityWorld() {
+  public String getSecurityWorld() throws NFException {
     // nCipher quirk: getData() returns null, unless getModules() was previously called.
-    try {
-      securityWorld.getModules();
-      return Hex.toHexString(securityWorld.getData().hknso.value);
-    } catch (nCRuntimeException | NFException e) {
-      return "";
-    }
+    securityWorld.getModules();
+    return Hex.toHexString(securityWorld.getData().hknso.value);
   }
 
   public String getOcsId() {

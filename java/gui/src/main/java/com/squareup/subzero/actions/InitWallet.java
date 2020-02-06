@@ -62,7 +62,7 @@ public class InitWallet {
 
       internalRequest.setMasterSeedEncryptionKeyTicket(ByteString.copyFrom(nCipher.getMasterSeedEncryptionKeyTicket()));
 
-      nCipher.loadSoftcard(subzero.config.softcard, subzero.config.getSoftcardPassword(), subzero.config.pubKeyEncryptionKey);
+      nCipher.loadSoftcard(subzero.config.softcard, subzero.config.softcardPassword, subzero.config.pubKeyEncryptionKey);
 
       internalRequest.setPubKeyEncryptionKeyTicket(ByteString.copyFrom(nCipher.getPubKeyEncryptionKeyTicket()));
     }

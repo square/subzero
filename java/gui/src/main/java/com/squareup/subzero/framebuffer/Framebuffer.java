@@ -110,7 +110,7 @@ public class Framebuffer {
   }
 
   private void readFramebufferSize() throws IOException {
-    String metadata = config.getFramebufferSize();
+    String metadata = config.framebufferSize;
     String[] sizes = metadata.split(",", 2);
     if (sizes.length == 2) {
       width = Integer.valueOf(sizes[0]);

@@ -4,8 +4,8 @@
 framebuffer: "/tmp/framebuffer"
 framebufferSize: "1024,768"
 window: true
-softcard: ""
-softcardPassword: ""
-pubKeyEncryptionKey: ""
+softcard: "bd70e630a8a019f3c47273880a74f78633d9bb21"
+softcardPassword: "toto"
+pubKeyEncryptionKey: "pubkeyenckey"
 teamName: "Developer"
 dataSignerKey: "subzerodatasigner"
