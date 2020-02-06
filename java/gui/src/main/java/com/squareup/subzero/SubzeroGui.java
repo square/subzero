@@ -16,6 +16,9 @@ public class SubzeroGui {
   @Parameter(names = "--help", help = true)
   private boolean help = false;
 
+  @Parameter(names = "--config")
+  private String configFile;
+
   @Parameter(names = "--init-nvram")
   private boolean initNvram = false;
 
@@ -65,7 +68,7 @@ public class SubzeroGui {
     System.out.println("This program draws to a framebuffer. If you are only seeing this output,");
     System.out.println("then something has gone wrong. Please report this error.");
 
-    subzero.config = SubzeroConfig.load(subzero.nCipher);
+    subzero.config = SubzeroConfig.load(subzero.nCipher, subzero.configFile);
 
     if (subzero.uiTest) {
       subzero.uiTest();
@@ -95,7 +98,7 @@ public class SubzeroGui {
   }
 
   private void interactive() throws Exception {
-    screens = new Screens(new Framebuffer(config), config.getTeamName());
+    screens = new Screens(new Framebuffer(config), config.teamName);
 
     try {
       if (nCipher) {
@@ -135,7 +138,7 @@ public class SubzeroGui {
    * worry about any system state, run Subzero, etc.
    */
   private void uiTest() throws Exception {
-    screens = new Screens(new Framebuffer(config), config.getTeamName());
+    screens = new Screens(new Framebuffer(config), config.teamName);
 
     try {
       while (true) {
