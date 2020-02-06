@@ -295,7 +295,7 @@ New softcard created: HKLTU aa6bfaa5f222407b10fea9b30b68129d6fb7a3e4
 
 
 # Create pubKeyEncryptionKey
-[bin]$ ./generatekey simple type=AES protect=softcard softcard=subzero recovery=yes size=256 ident=pubkeyenckey plainname= seeintegname=subzerodatasigner nvram=no
+[bin]$ ./generatekey --no-verify simple type=AES protect=softcard softcard=subzero recovery=yes size=256 ident=pubkeyenckey plainname= seeintegname=subzerodatasigner nvram=no
 
 
 # The HSM is now setup for performing wallet operations.
