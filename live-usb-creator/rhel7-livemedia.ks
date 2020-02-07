@@ -335,6 +335,7 @@ rm /tmp/1_post_install_chroot
 # for the grub2-efi-*-cdboot package
 @anaconda-tools --optional
 @core
+-iwl*firmware
 anaconda
 isomd5sum
 kernel
