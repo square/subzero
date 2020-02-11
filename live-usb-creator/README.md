@@ -9,15 +9,15 @@ Three dependencies need to be fetched out-of-band.
 
 Set the following files in place in the same directory as the `Vagrantfile`.
 
-* CodeSafe-linux64-dev-12.20.51.iso (1.9GB): supplied by the HSM vendor.
+* CodeSafe-linux64-dev-12.20.51.iso (2.6GB): supplied by the HSM vendor.
 * CentOS-7-x86_64-Everything-1908.iso (10G): `curl -O http://mirror.seas.harvard.edu/centos/7.7.1908/isos/x86_64/CentOS-7-x86_64-Everything-1908.iso`
 * kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm (17MB): `curl -O http://archive.kernel.org/centos-vault/centos/7.6.1810/updates/x86_64/Packages/kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm`
 
 Verify the following SHA256 sums:
 
 ```
-$ shasum -a 256 CodeSafe-linux64-dev-12.20.51.iso CentOS-7-x86_64-Everything-1908.iso kernel-devel-3.10.0-862.2.3.el7.x86_64.rpm
-bdd82fb64e269565c0f718b7b81b4d75dcbd66eaa9ae357f32b62cf87af7ab71  CodeSafe-linux64-dev-12.20.51.iso
+$ shasum -a 256 CodeSafe-linux64-dev-12.50.2.iso CentOS-7-x86_64-Everything-1908.iso kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm
+23ca2c5fc2476887926409bc69f19b772c99191b1e0cce1a3bace8d1e4488528  CodeSafe-linux64-dev-12.50.2.iso
 bd5e6ca18386e8a8e0b5a9e906297b5610095e375e4d02342f07f32022b13acf  CentOS-7-x86_64-Everything-1908.iso
 a27c718efb2acec969b20023ea517d06317b838714cb359e4a80e8995ac289fc  kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm
 ```
