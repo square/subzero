@@ -2,7 +2,7 @@ package com.squareup.subzero.shared;
 
 public class Constants {
   public static final int MAGIC = 0x20de; // must be kept in sync with core/include/config.h
-  public static final int VERSION = 207; // must be kept in sync with core/include/config.h
+  public static final int VERSION = 208; // must be kept in sync with core/include/config.h
   public static final int TEMP_DEFAULT_WALLET_ID = 9999;
 
   public static final int MULTISIG_PARTICIPANTS = 4;
