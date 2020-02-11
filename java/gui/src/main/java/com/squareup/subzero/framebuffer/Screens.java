@@ -80,7 +80,7 @@ public class Screens {
       baseScreenLayout(graphics,"Approve", instructions, Color.white);
     });
 
-    int offset = 300;
+    int offset = 320;
     while(true) {
       String input = framebuffer.prompt(18, offset, false);
 
@@ -271,3 +271,4 @@ public class Screens {
     framebuffer.pressEnter();
   }
 }
+
