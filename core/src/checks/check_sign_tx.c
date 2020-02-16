@@ -23,7 +23,6 @@
 #include "squareup/subzero/internal.pb.h"
 
 // Return a constructed request for test
-// See test-transaction.txt for info on the data used here
 static int construct_request(InternalCommandRequest_SignTxRequest *tx) {
 
   const char *mnemonic1 =

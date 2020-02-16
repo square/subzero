@@ -9,7 +9,7 @@ Three dependencies need to be fetched out-of-band.
 
 Set the following files in place in the same directory as the `Vagrantfile`.
 
-* CodeSafe-linux64-dev-12.20.51.iso (2.6GB): supplied by the HSM vendor.
+* CodeSafe-linux64-dev-12.50.2.iso (2.6GB): supplied by the HSM vendor.
 * CentOS-7-x86_64-Everything-1908.iso (10G): `curl -O http://mirror.seas.harvard.edu/centos/7.7.1908/isos/x86_64/CentOS-7-x86_64-Everything-1908.iso`
 * kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm (17MB): `curl -O http://archive.kernel.org/centos-vault/centos/7.6.1810/updates/x86_64/Packages/kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm`
 
