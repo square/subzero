@@ -366,6 +366,7 @@ function loadState() {
     var input = state.inputs[i];
     var el = addInput(true);
     el.find('.prev_hash').val(input.prev_hash);
+    el.find('.prev_index').val(input.prev_index);
     el.find('.amount').val(input.amount);
     el.find('.change').prop('checked', input.change);
     el.find('.index').val(input.index);
