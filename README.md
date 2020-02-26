@@ -1,3 +1,7 @@
+[![Build Status](https://api.travis-ci.com/square/subzero.svg?branch=master)](https://travis-ci.com/square/subzero)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/square/subzero/blob/master/LICENSE)
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=square/subzero)](https://dependabot.com)
+
 <img src="logo.png" width="100">
 
 # HSM Cold Storage
@@ -43,4 +47,3 @@ See also [Open Sourcing Subzero (blog post)](https://developer.squareup.com/blog
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
