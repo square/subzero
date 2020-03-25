@@ -12,24 +12,36 @@ We recommend picking physical locations which are unlikely to be simultaneously 
 
 ## Hardware Security Module (HSM)
 
-We leverage "Thales nCipher Solo XC low" HSMs. We picked this HSM for the following reasons:
+We leverage nCipher Security's **nShield Solo XC General Purpose** HSMs ([product page](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo)). We recommend picking the
+XC Base model, but the software works with any of the XC models (XC Base, XC Mid, or XC High). Our latest build uses
+the vendor supplied CodeSafe-linux64-dev-12.50.2.iso and firmware 12.50.11.
+
+We picked this HSM for the following reasons:
 
 - FIPS certified.
 - Ability to run custom, signed code.
 
-Our HSM's form factor is PCIe, but a network-attached setup might also be feasible.
+Our HSM's form factor is PCIe. The same hardware is available as an external USB device (nShield Edge) or a
+network-attached device (nShield Connect). These different form factors _should_ function in an identical way.
 
-A smart card reader (supplied with the HSM) and smart cards are required for various administrative, as well as
-operational, tasks.
+A smart card reader (supplied with the HSM) and smart cards are required for various administrative tasks, as well as
+operational tasks.
 
-Running custom software on this HSM requires a CodeSafe license. The ECC license is not required.
+The vendor sells licenses to enable various functionalities. The CodeSafe license is required to run the Subzero Core
+component inside the HSM. The ECC license is *not* required (we leverage Trezor's cryptographic library).
+
+Note: while the device is marketed as nShield, all the vendor provided software is called nCipher. We therefore refer
+to our nShield devices as nCiphers.
+
+The code is currently tightly coupled to the nShield. We are open to contributions enabling support for alternative
+vendors.
 
 ## DVD reader
 
 The code which runs on the servers is distributed using DVDs. We picked DVDs for the following reasons:
 
 - Immutable (mostly).
-- Easy path for upgrading multiple remote locations.
+- Makes upgrading remote locations easier.
 
 ## QR-code scanner
 
