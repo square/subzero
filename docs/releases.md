@@ -1,6 +1,6 @@
 # Past and future releases
 Square's security engineering team maintains Subzero. Our recommendation is to use the _master_ branch, which we
-keep in a stable state. If you would like the piece of mind of using a version of Subzero which corresponds to
+keep in a stable state. If you would like the peace of mind of using a version of Subzero which corresponds to
 Square's internal release, you can refer to the table below.
 
 Each internal release upgrades dependencies as well as fixes issues. Given the project's offline nature, each release
