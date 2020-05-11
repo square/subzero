@@ -16,6 +16,7 @@ nav:
       - Address derivation: address_derivation.md
       - Signing ceremony: signing_ceremony.md
       - Merging signatures: merging_signatures.md
+    - Past and future releases: releases.md
     - Audit: audit.md
     - Bug Bounty: bug_bounty.md
     - Contributors: contributors.md
