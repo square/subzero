@@ -10,6 +10,7 @@ Three dependencies need to be fetched out-of-band.
 Set the following files in place in the same directory as the `Vagrantfile`.
 
 * CodeSafe-linux64-dev-12.50.2.iso (2.6GB): supplied by the HSM vendor.
+* Codesafe_Lin64-12.63.0.iso (281M): supplied by the HSM vendor.
 * CentOS-7-x86_64-Everything-1908.iso (10G): `curl -O https://vault.centos.org/7.7.1908/isos/x86_64/CentOS-7-x86_64-Everything-1908.iso`
 * kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm (17MB): `curl -L -O http://archive.kernel.org/centos-vault/centos/7.6.1810/updates/x86_64/Packages/kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm`
 * protoc-3.14.0-linux-x86_64.zip (1.6MB): `curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protoc-3.14.0-linux-x86_64.zip`
@@ -19,10 +20,11 @@ Set the following files in place in the same directory as the `Vagrantfile`.
 Verify the following SHA256 sums:
 
 ```bash
-$ shasum -a 256 CodeSafe-linux64-dev-12.50.2.iso CentOS-7-x86_64-Everything-1908.iso \
+$ shasum -a 256 CodeSafe-linux64-dev-12.50.2.iso Codesafe_Lin64-12.63.0.iso CentOS-7-x86_64-Everything-1908.iso \
 kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm protoc-3.14.0-linux-x86_64.zip \
 six-1.15.0-py2.py3-none-any.whl protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl
 23ca2c5fc2476887926409bc69f19b772c99191b1e0cce1a3bace8d1e4488528  CodeSafe-linux64-dev-12.50.2.iso
+df928054888f466c263ef1d7de37877bdcf27c632b34c6934b6eee4e8697a6de  Codesafe_Lin64-12.63.0.iso
 bd5e6ca18386e8a8e0b5a9e906297b5610095e375e4d02342f07f32022b13acf  CentOS-7-x86_64-Everything-1908.iso
 a27c718efb2acec969b20023ea517d06317b838714cb359e4a80e8995ac289fc  kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm
 a2900100ef9cda17d9c0bbf6a3c3592e809f9842f2d9f0d50e3fba7f3fc864f0  protoc-3.14.0-linux-x86_64.zip
