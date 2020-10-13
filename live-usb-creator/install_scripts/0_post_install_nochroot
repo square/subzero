@@ -11,42 +11,38 @@
 mkdir /tmp/nfast_install
 pushd /tmp/nfast_install
 
-# Hardware Support (mandatory)
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/hwsp/agg.tar
+# CipherTools Developer
+tar -xzf /media/SecWorld/linux/amd64/ctd.tar.gz
 
 # Core Tools (recommended)
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/ctls/agg.tar
+tar -xzf /media/SecWorld/linux/amd64/ctls.tar.gz
 
-# Java Support (including KeySafe)
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/javasp/agg.tar
+# nCore API Documentation
+tar -xzf /media/SecWorld/linux/amd64/devref.tar.gz
 
-# nCipherKM JCA/JCE provider classes
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/jcecsp/user.tar
+# Hardware Support (mandatory)
+tar -xzf /media/SecWorld/linux/amd64/hwsp.tar.gz
 
-# nCipher PKCS #11 library
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/pkcs11/user.tar
+# Java Support (including nCipherKM JCA/JCE provider, KeySafe)
+tar -xzf /media/SecWorld/linux/amd64/javasp.tar.gz
 
-# CHIL (Cryptographic Hardware Interface Library),
-# apparently required for "generatekey" utility
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/hwcrhk/user.tar
+# Java dev libs for nCore API
+tar -xzf /media/SecWorld/linux/amd64/jd.tar.gz
 
-# Remote Administration Service
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/dsserv/user.tar
+# nShield SNMP service and tools
+tar -xzf /media/SecWorld/linux/amd64/ncsnmp.tar.gz
 
-# Remote Administration Client Tools
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/ratls/agg.tar
+# Remote Administration Service (before 12.60 this package was known as dsserv)
+tar -xzf /media/SecWorld/linux/amd64/raserv.tar.gz
 
-# nCore CodeSafe API Documentation (not in SecWorld; CodeSafe only)
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/csdref/agg.tar
+# Redistributable GNU C shared libs
+tar -xzf /media/SecWorld/linux/amd64/redist.tar.gz
 
-# nCore API Documentation (not in SecWorld; CodeSafe only)
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/devref/agg.tar
+# CodeSafe Developer; example programs, and SDK for CodeSafe
+tar -xzf /media/CodeSafe/linux/amd64/csd.tar.gz
 
-# CodeSafe Developer (not in SecWorld; CodeSafe only)
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/csd/agg.tar
-
-# Prebuilt powerpcm-gcc for Codesafe/C (not in SecWorld; CodeSafe only)
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/gccsrc/ppcdev.tar
+# Documentation for CodeSafe
+tar -xzf /media/CodeSafe/linux/amd64/csdref.tar.gz
 
 pushd opt
 mv nfast /mnt/sysimage/opt/
