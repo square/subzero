@@ -40,7 +40,7 @@ public class Screens {
    *  types of screen being displayed (prompt for input, action, QR scan, etc).
    *
    */
-  private void baseScreenLayout(Graphics2D graphics, String title, String instructions, Color background) {
+  private void baseScreenLayout(Graphics2D graphics, String title, String instructions, Color background, Boolean redactStdout) {
     // Clear with background color:
     graphics.setBackground(background);
     graphics.clearRect(0, 0, framebuffer.getWidth(), framebuffer.getHeight());
@@ -60,9 +60,13 @@ public class Screens {
     FontMetrics metrics = Framebuffer.setFont(22, graphics);
     for(String line: instructions.split("\n")) {
       offset += metrics.getHeight();
-      System.out.println(line);
+      System.out.println(redactStdout ? "*****" : line);
       graphics.drawString(line, margin, offset);
     }
+  }
+
+  private void baseScreenLayout(Graphics2D graphics, String title, String instructions, Color background) {
+    baseScreenLayout(graphics, title, instructions, background, false);
   }
 
   public void renderLoading() throws IOException {
@@ -176,7 +180,7 @@ public class Screens {
         "Please record the following password. You will never see this password again. Hit <enter> to continue.\n\n" +
         newPassword;
 
-    framebuffer.draw((Graphics2D g) -> baseScreenLayout(g,"Operator Card Password", message, Color.white));
+    framebuffer.draw((Graphics2D g) -> baseScreenLayout(g,"Operator Card Password", message, Color.white, true));
     framebuffer.pressEnter();
   }
 
