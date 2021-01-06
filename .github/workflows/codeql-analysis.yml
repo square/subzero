@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['cpp', 'java', 'python', 'javascript', 'go']
+        language: ['cpp', 'java']
         python-version: [3.9]
 
     steps:
