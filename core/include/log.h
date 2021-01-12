@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 // Part 2/2 of magic to drop the full path from __FILE__
-#define __FILENAME__ (__FILE__ + SOURCE_PATH_SIZE)
+#define __FILENAME__ (&__FILE__[SOURCE_PATH_SIZE])
 
 #ifdef BTC_TESTNET
   // Print DEBUG to stdout in green
