@@ -12,7 +12,7 @@ Set the following files in place in the same directory as the `Vagrantfile`.
 * SecWorld_Lin64-12.60.11.iso (316M): supplied by the HSM vendor
 * Codesafe_Lin64-12.63.0.iso (281M): supplied by the HSM vendor.
 * CentOS-7-x86_64-Everything-1908.iso (10G): `curl -O https://vault.centos.org/7.7.1908/isos/x86_64/CentOS-7-x86_64-Everything-1908.iso`
-* kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm (17MB): `curl -O http://archive.kernel.org/centos-vault/centos/7.6.1810/updates/x86_64/Packages/kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm`
+* kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm (17MB): `curl -L -O http://archive.kernel.org/centos-vault/centos/7.6.1810/updates/x86_64/Packages/kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm`
 
 Verify the following SHA256 sums:
 
