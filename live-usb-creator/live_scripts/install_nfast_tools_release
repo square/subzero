@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ###############################################################################
-# Install NCipher
+# Install NCipher for release image
 ###############################################################################
 
 # note that we have to do this after livemedia boot, because the install script behaves differently based on whether
@@ -23,13 +23,14 @@ popd
 /opt/nfast/bin/nopclearfail --clear --all
 
 mkdir -p /hd
+# /dev/sda1 is the harddrive used for persistent storage
 mount /dev/sda1 /hd
 
 # Setup symlinks for /opt/nfast/kmdata/local and /data/app/subzero/wallets
 mkdir -p /opt/nfast/kmdata/
-rm -rf /opt/nfast/kmdata/local/
-ln -s /hd/local /opt/nfast/kmdata/local
-ln -s /hd/wallets /data/app/subzero/wallets
+rm -rf /opt/nfast/kmdata/local
+ln -sf /hd/local /opt/nfast/kmdata/local
+ln -sf /hd/wallets /data/app/subzero/wallets
 
 nohup /opt/nfast/bin/see-stdioesock-serv --machine /data/app/subzero/subzero-signed.sar --userdata-sar /data/app/subzero/subzero-userdata-signed.sar > /hd/subzero-signed.stdout 2> /hd/subzero-signed.stderr &
 
