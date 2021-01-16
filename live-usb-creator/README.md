@@ -71,11 +71,11 @@ Build the image in a CentOS VM guest as follows:
 
 ## Writing image to USB drive
 
-1. Identify device path to disk (such as `/dev/disk3`) with `diskutil list external physical`
-2. Unmount all volumes on that disk with `diskutil unmountDisk /dev/disk3`
+1. Identify device path to disk (such as `/dev/disk3`) with `diskutil list external physical`. We will call it `/dev/diskN` in the rest of the document.
+2. Unmount all volumes on that disk with `diskutil unmountDisk /dev/diskN`
 3. Identify the “raw” device path by replacing `disk` with `rdisk` in the device path. (E.g. `/dev/disk3` becomes `/dev/rdisk3`.) This speeds up writes by 3–4× in very informal testing.
-3. Write ISO to that “raw” device path with `sudo dd bs=1m if=boot.iso of=/dev/rdisk3`. Remember that on MacOS you can check in on progress by sending SIGINFO with Ctrl+T. (Takes about 3 minutes in one test.)
-4. Eject the disk with `diskutil eject /dev/disk3`
+3. Write ISO to that “raw” device path with `sudo dd bs=1m if=boot.iso of=/dev/rdiskN`. Remember that on MacOS you can check in on progress by sending SIGINFO with Ctrl+T. (Takes about 3 minutes in one test.)
+4. Eject the disk with `diskutil eject /dev/diskN`
 5. Remember to hold F12 during startup to get a boot menu. You’ll then select something like `UEFI: SanDisk`.
 
 ## Build process
@@ -111,29 +111,38 @@ VM related stuff:
 
     A release image is to be used by cold storage operators who do not need
     to have access to an interactive shell. For a release image to boot into
-    a root shell successfully, an SCSI/ATA hard drive needs to be available,
-    with a partition '/dev/sda1' used as persistent storage for the cold
+    a root shell successfully,
+    * An SCSI/ATA hard drive needs to be available, with a partition
+    '/dev/sda1' used as persistent storage for the cold
     wallet. The partition can be formatted in ext3 or vfat for example. The
     device node `/dev/sda1` is required to give the operators a seamless
-    experience when booting up the system. A few other files, including the
-    HSM world and encrypted secrets, and compiled subzero code (in .jar and
-    signed .sar), are not checked in to the project repository, and need to
-    be added to their appropriate locations before building a release image
-    that will work out of the box.
+    experience when booting up the system.
+    * A provisioned HSM needs to be operational on the machine.
+    * A few other files, including the HSM world and encrypted secrets, and
+    the compiled subzero code (in .jar and signed .sar), are not checked in
+    to the project repository, and need to be added to the appropriate
+    locations in the subzero repository's `live-usb-creator` directory before
+    building a release image that will work out of the box. Specifically,
 
-    * `data_app_subzero/` should contain `subzero-cli.jar`,
-    `subzero-signed.sar`, `subzero-userdata-signed`.
-    * `/dev/sda1` when mounted to `/hd`, should have the HSM and wallets files contained in `/hd/local` and `/hd/wallets`, respectively.
+      * `data_app_subzero/` should contain `subzero-cli.jar`,
+      `subzero-signed.sar`, `subzero-userdata-signed`.
+      * `/dev/sda1` when mounted to `/hd`, should have the HSM and wallets
+      files contained in `/hd/local` and `/hd/wallets`, respectively.
 
   * Development build: `build.sh dev`.
 
     A development image is to be used by subzero developers for HSM and cold
     wallet development. A developer can boot into an interactive root shell
     without performing the above mentioned steps. The HSM software is
-    automatically installed in the development image, but a developer needs
-    to manually set up persistent storage for the cold wallet, put .jar and
-    .sar files to appropriate filesystem locations, and execute them
-    accordingly, for development and testing.
+    automatically installed in the development image to allow a subzero
+    developer to set up a customizable testing environment with a minimal
+    hardware requirement. A developer can manually provision the HSM, set up
+    persistent storage for the cold wallet and HSM files, execute the .jar
+    and .sar files for development and testing.
+
+  Note that right now an interactive shell for the `liveuser` user is
+  available for a debugging purpose, in both the `dev` and `release` images.
+  The default booting behavior is different between these two image flavors.
 
 Install related stuff:
 
