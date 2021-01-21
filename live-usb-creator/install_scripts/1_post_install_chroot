@@ -40,5 +40,6 @@ systemctl disable kdump.service
 ###############################################################################
 # Subzero specific stuff
 ###############################################################################
-
-echo 'exec /data/app/subzero/subzero-cli.sh' >> /root/.bash_profile
+if [ -f "/usr/local/bin/.isotype_rel" ]; then
+  echo 'exec /data/app/subzero/subzero-cli.sh' >> /root/.bash_profile
+fi

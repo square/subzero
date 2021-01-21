@@ -1,0 +1,22 @@
+#!/bin/bash
+
+###############################################################################
+# Install NCipher for development image
+###############################################################################
+
+# note that we have to do this after livemedia boot, because the install script behaves differently based on whether
+# a PCI NShield is plugged in, and we don’t want our ISO build to depend on having a PCI Nshield plugged in
+
+pushd /opt/nfast/driver
+./configure
+make install
+popd
+
+pushd /opt/nfast/sbin
+./install
+popd
+
+/opt/nfast/bin/config-serverstartup --enable-tcp --enable-privileged-tcp
+# restart the hardserver for the changes to take effect
+/opt/nfast/sbin/init.d-ncipher restart
+
