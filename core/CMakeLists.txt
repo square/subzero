@@ -90,6 +90,7 @@ if ($ENV{TARGET} MATCHES "nCipher")
 else ()
   set(extra_SRC
       "src/dev/additional_checks.c"
+      "src/dev/aes_gcm.c"
       "src/dev/no_rollback.c"
       "src/dev/execute_command_hooks.c"
       "src/dev/init.c"

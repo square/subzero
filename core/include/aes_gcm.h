@@ -1,5 +1,14 @@
 #pragma once
 
+// M_KeyID is typedef'ed in codesafe header. If STDMARSHALTYPES_H is not
+// defined, we are in dev target
+#ifndef STDMARSHALTYPES_H
+typedef enum {KEYID_MASTER_SEED_ENCRYPTION_KEY = 0,
+              KEYID_PUBKEY_ENCRYPTION_KEY = 1} M_KeyID;
+// Key encryption key declaration
+extern uint8_t KEK[2][16];
+#endif
+
 #include <squareup/subzero/internal.pb.h>
 
 Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
