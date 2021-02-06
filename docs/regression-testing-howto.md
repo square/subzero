@@ -51,17 +51,17 @@ Put the follow content in `/data/app/subzero/wallets/subzero-1492.wallet`
    ./java/server/target/server-1.0.0-SNAPSHOT.jar server
    ```
 
-3. Run python script `txsign_testcase_generator.py` to generate an [expect
-script](https://core.tcl-lang.org/expect/index) that will later be used to
-generate test vector files.
+3. Run python script `txsign_testcase_expect_scrypt_gen.py` to generate an
+[expect script](https://core.tcl-lang.org/expect/index) that will later be
+used to generate test vector files.
 
    ```bash
    # under subzero repository directory root
-   python3 ./utils/txsign_testcase_generator.py > /tmp/subzero_expect.sh
+   python3 ./utils/txsign_testcase_expect_script_gen.py > /tmp/subzero_expect.sh
    chmod +x /tmp/subzero_expect.sh
    ```
 
-   Under the hood in `txsign_testcase_generator.py`:
+   Under the hood in `txsign_testcase_expect_script_gen.py`:
 
    - Generate 255 (17x5x3) test vectors in JSON based on a fixed RNG seed
    (1492), as well as the number of inputs (MAX 17), the number of outputs
@@ -94,7 +94,7 @@ expect script log, and generate test vector files in `/tmp/out_dir`
    ```bash
    # under subzero repository directory root
    mkdir -p /tmp/out_dir
-   python3 utils/expectlog2testcase.py -i ./expect_subzero.log -o /tmp/out_dir
+   python3 utils/txsign_testcase_from_expect_log.py -i ./expect_subzero.log -o /tmp/out_dir
    # test vector files should now show up
    ls -l /tmp/out_dir
    ```
@@ -115,9 +115,13 @@ the development server's "Pretty print" utility.
 
 - How to create new test vectors. There are multiple ways
 
-  - Rotate the RNG seed in `txsign_testcase_generator.py` to generate another set of 255 test vectors
-  - Hack up `txsign_testcase_generator.py` to add new test vector generation logic
-  - Hand craft test transactions in JSON, and convert them into test vectors following a procedure similar how `txsign_testcase_generator.py` does it, as described in the previous section
+  - Rotate the RNG seed in `txsign_testcase_expect_script_gen.py` to
+  generate another set of 255 test vectors
+  - Hack up `txsign_testcase_expect_script_gen.py` to add new test vector
+  generation logic
+  - Hand craft test transactions in JSON, and convert them into test vectors
+  following a procedure similar how `txsign_testcase_expect_script_gen.py`
+  does it, as described in the previous section
 
 - How to make test vectors available for subzero GUI
 

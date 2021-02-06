@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.IllegalFormatException;
 import java.util.List;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static com.google.common.io.BaseEncoding.base64;
 
@@ -136,9 +137,6 @@ public class SubzeroGui {
 
         CommandRequest commandRequest = CommandRequest.parseFrom(proto);
 
-        System.out.println("print out commandRequest:");
-        System.out.println(commandRequest.toString());
-
         CommandResponse response =
             CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port),
                 commandRequest);
@@ -215,14 +213,14 @@ public class SubzeroGui {
     // TODO: implement HSM test
     if (nCipher) {
       System.out.println("Transaction signing regression test not yet implemented for nCipher");
-      return;
+      throw new NotImplementedException();
     }
 
     // Passed and failed test cases, for valid and invalid test vectors.
     // For a valid test vector, test passes (ok) if and only if subzero response matches
-    // expected response.
+    // expected response. This is for happy path testing.
     // For an invalid test vector, test passes (ok) if and only if subzero response does not
-    // match expected response.
+    // match expected response. This is for sad path testing.
     int ok_valid = 0;
     int fail_valid = 0;
     int ok_invalid = 0;
