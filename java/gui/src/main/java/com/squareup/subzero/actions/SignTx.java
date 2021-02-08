@@ -61,20 +61,27 @@ public class SignTx {
             signTxRequest.getLocalCurrency()));
       }
 
-      if(!subzero.getScreens().approveAction(s.toString())) {
+      if(subzero.getScreens() != null && !subzero.getScreens().approveAction(s.toString())) {
         throw new RuntimeException("User did not approve signing operation");
       }
     }
 
-    // Load wallet file
+    // Load wallet
     WalletLoader walletLoader = new WalletLoader();
-    Wallet wallet = walletLoader.load(request.getWalletId());
+    Wallet wallet;
 
-    // Check that the wallet file has enc_pub_keys
-    if (wallet.getEncryptedPubKeysCount() == 0) {
-      throw new IllegalStateException("wallet not finalized.");
+    if (subzero.signtxTest) {
+      // Load hardcode wallet
+      wallet = walletLoader.loadTestWallet(subzero.nCipher);
+    } else {
+      // Load wallet file
+      wallet = walletLoader.load(request.getWalletId());
+
+      // Check that the wallet file has enc_pub_keys
+      if (wallet.getEncryptedPubKeysCount() == 0) {
+        throw new IllegalStateException("wallet not finalized.");
+      }
     }
-
     // Build request
     InternalCommandRequest.SignTxRequest.Builder signTx =
         InternalCommandRequest.SignTxRequest.newBuilder();

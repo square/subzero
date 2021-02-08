@@ -1,12 +1,14 @@
 package com.squareup.subzero.wallet;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 import com.squareup.subzero.proto.wallet.WalletProto.Wallet;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 
@@ -75,6 +77,19 @@ public class WalletLoader {
     return wallet.build();
   }
 
+  /**
+   * Load hardcoded wallet for regression transaction signing testing
+   * @param isNcipher
+   * @return
+   * @throws InvalidProtocolBufferException
+   */
+  public Wallet loadTestWallet(Boolean isNcipher) throws InvalidProtocolBufferException {
+    String s = new String(isNcipher ? TestWallets.ncipherTestWallet: TestWallets.devTestWallet);
+    Wallet.Builder wallet = Wallet.newBuilder();
+    JsonFormat.parser().merge(s, wallet);
+
+    return wallet.build();
+  }
   /**
    * Path to folder which contains the wallet files.
    */

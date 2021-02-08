@@ -9,6 +9,15 @@ import com.squareup.subzero.ncipher.NCipher;
 import com.squareup.subzero.proto.service.Service.CommandRequest;
 import com.squareup.subzero.proto.service.Service.CommandResponse;
 import com.squareup.subzero.shared.SubzeroUtils;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.IllegalFormatException;
+import java.util.List;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static com.google.common.io.BaseEncoding.base64;
 
@@ -39,12 +48,15 @@ public class SubzeroGui {
   // Almost always you want to talk to subzero on localhost
   @Parameter(names = "--hostname") public String hostname = "localhost";
 
+  // Blackbox signTx Test
+  @Parameter(names = "--signtx-test") public Boolean signtxTest = false;
+
   public SubzeroConfig config;
   private Screens screens;
 
   /**
-   * We pass the cli object into functions which can use it to draw screens.
-   * If null, you're running in debug mode and screens should probably use text instead.
+   * We pass the cli object into functions which can use it to draw screens. If null, you're running
+   * in debug mode and screens should probably use text instead.
    *
    * @return a screens object to interact with the user
    */
@@ -65,13 +77,21 @@ public class SubzeroGui {
       return;
     }
 
-    System.out.println("This program draws to a framebuffer. If you are only seeing this output,");
-    System.out.println("then something has gone wrong. Please report this error.");
+    if (subzero.signtxTest) {
+      System.out.println(
+          "Transaction signing regression test. Please make sure subzero core is up and running.");
+    } else {
+      System.out.println(
+          "This program draws to a framebuffer. If you are only seeing this output,");
+      System.out.println("then something has gone wrong. Please report this error.");
+    }
 
     subzero.config = SubzeroConfig.load(subzero.nCipher, subzero.configFile);
 
     if (subzero.uiTest) {
       subzero.uiTest();
+    } else if (subzero.signtxTest) {
+      subzero.signTxTest();
     } else if (subzero.debug != null) {
       subzero.debugMode();
     } else {
@@ -118,7 +138,8 @@ public class SubzeroGui {
         CommandRequest commandRequest = CommandRequest.parseFrom(proto);
 
         CommandResponse response =
-            CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port), commandRequest);
+            CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port),
+                commandRequest);
         System.out.println(response.toString());
 
         String encoded = base64().encode(response.toByteArray());
@@ -134,8 +155,8 @@ public class SubzeroGui {
   }
 
   /**
-   * This goes through the various screens, so you can test changes to them without needing to
-   * worry about any system state, run Subzero, etc.
+   * This goes through the various screens, so you can test changes to them without needing to worry
+   * about any system state, run Subzero, etc.
    */
   private void uiTest() throws Exception {
     screens = new Screens(new Framebuffer(config), config.teamName);
@@ -178,6 +199,111 @@ public class SubzeroGui {
       }
     } catch (Exception e) {
       screens.exception(e);
+    }
+  }
+
+  private static class IllegalTxSignTestFileFormatException extends Exception {
+    public IllegalTxSignTestFileFormatException(String msg) {
+      super(msg);
+    }
+  }
+
+  private void signTxTest() throws Exception {
+
+    // TODO: implement HSM test
+    if (nCipher) {
+      System.out.println("Transaction signing regression test not yet implemented for nCipher");
+      throw new NotImplementedException();
+    }
+
+    // Passed and failed test cases, for valid and invalid test vectors.
+    // For a valid test vector, test passes (ok) if and only if subzero response matches
+    // expected response. This is for happy path testing.
+    // For an invalid test vector, test passes (ok) if and only if subzero response does not
+    // match expected response. This is for sad path testing.
+    int ok_valid = 0;
+    int fail_valid = 0;
+    int ok_invalid = 0;
+    int fail_invalid = 0;
+
+    // Read request & expected response from src/main/resources/txsign-testvectors/.
+    // The request and expected response are pre-generated, based64-encoded proto buffers
+    FileResourceUtils util = new FileResourceUtils();
+    List<Path> txsignRegressionTestsPath = util.getPathsFromResourcesJAR("txsign-testvectors");
+    for (Path path : txsignRegressionTestsPath) {
+      String filePathInJAR = path.toString();
+      if (filePathInJAR.startsWith("/")) {
+        filePathInJAR = filePathInJAR.substring(1, filePathInJAR.length());
+      }
+
+      try {
+        InputStreamReader inStreamReader =
+            new InputStreamReader(util.getFileFromResourceAsStream(filePathInJAR),
+                StandardCharsets.UTF_8);
+        BufferedReader reader = new BufferedReader(inStreamReader);
+
+        // Get input from file
+        String request = reader.readLine();
+        if (request == null || !request.startsWith("request:")) {
+          throw new IllegalTxSignTestFileFormatException(
+              path.toString() + ": malformed file, request not found");
+        }
+
+        // Get expected output from file
+        String expectedResponse = reader.readLine();
+        if (expectedResponse == null || !expectedResponse.startsWith("response:")) {
+          throw new IllegalTxSignTestFileFormatException(
+              filePathInJAR + ": malformed file, response not found");
+        }
+        request = request.substring("request:".length(), request.length());
+        expectedResponse =
+            expectedResponse.substring("response:".length(), expectedResponse.length());
+
+        byte[] proto = base64().decode(request);
+
+        CommandRequest commandRequest = CommandRequest.parseFrom(proto);
+
+        CommandResponse response =
+            CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port),
+                commandRequest);
+
+        String encoded = base64().encode(response.toByteArray());
+
+        if (encoded.equals(expectedResponse)) {
+          if (path.getFileName().toString().startsWith("valid-")) {
+            System.out.println("testcase " + filePathInJAR + " : OK");
+            ok_valid++;
+          } else if (path.getFileName().toString().startsWith("invalid-")) {
+            System.out.println("testcase " + filePathInJAR + " : FAIL");
+            fail_invalid++;
+          }
+        } else {
+          if (path.getFileName().toString().startsWith("valid-")) {
+            System.out.println("testcase " + filePathInJAR + " : FAIL");
+            fail_valid++;
+          } else if (path.getFileName().toString().startsWith("invalid-")) {
+            System.out.println("testcase " + filePathInJAR + " : OK");
+            ok_invalid++;
+          }
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+    System.out.println("-------------------------------------------");
+    System.out.printf("positive (valid) test cases: %d, passed %d, failed %d%n",
+        (ok_valid + fail_valid), ok_valid, fail_valid);
+    System.out.printf("negative (invalid) test cases: %d, passed %d, failed %d%n",
+        (ok_invalid + fail_invalid), ok_invalid, fail_invalid);
+    System.out.printf("test cases total: %d, passed %d, failed %d%n",
+        (ok_valid + ok_invalid + fail_valid + fail_invalid), (ok_valid + ok_invalid),
+        (fail_valid + fail_invalid));
+    System.out.println("-------------------------------------------");
+    if (fail_valid + fail_invalid == 0) {
+      System.out.println("ALL TESTS PASSED");
+    } else {
+      System.out.println("SOME TESTS FAILED");
     }
   }
 }
