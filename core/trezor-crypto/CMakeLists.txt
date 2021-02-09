@@ -28,6 +28,7 @@ target_include_directories(TrezorCrypto PUBLIC chacha20poly1305)
 target_include_directories(TrezorCrypto PUBLIC ed25519-donna)
 
 target_compile_options(TrezorCrypto PRIVATE "-std=c99")
+add_definitions(-Wno-cast-qual -Wno-incompatible-pointer-types -Wno-missing-prototypes)
 
 if(MSVC)
   set_source_files_properties(${SOURCES} PROPERTIES LANGUAGE CXX)
