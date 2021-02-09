@@ -15,7 +15,7 @@ This software is provided 'as is' with no explicit or implied warranties
 in respect of its operation, including, but not limited to, correctness
 and fitness for purpose.
 ---------------------------------------------------------------------------
-Issue Date: 02/09/2018
+Issue Date: 02/08/2018
 
  This file contains the definitions required to use AES in C. See aesopt.h
  for optimisation details.
@@ -25,19 +25,23 @@ Issue Date: 02/09/2018
 #define _AES_H
 
 #include <stdlib.h>
+#include <stdint.h>
 
-/*  This include is used to find 8 & 32 bit unsigned integer types   */
-#include "brg_types.h"
+#define VOID_RETURN         void
+#define INT_RETURN          int
+#define ALIGN_OFFSET(x,n)   (((intptr_t)(x)) & ((n) - 1))
+#define ALIGN_FLOOR(x,n)    ((uint8_t*)(x) - ( ((intptr_t)(x)) & ((n) - 1)))
+#define ALIGN_CEIL(x,n)     ((uint8_t*)(x) + (-((intptr_t)(x)) & ((n) - 1)))
 
 #if defined(__cplusplus)
 extern "C"
 {
 #endif
 
-#define AES_128     /* if a fast 128 bit key scheduler is needed     */
-#define AES_192     /* if a fast 192 bit key scheduler is needed     */
+// #define AES_128     /* if a fast 128 bit key scheduler is needed     */
+// #define AES_192     /* if a fast 192 bit key scheduler is needed     */
 #define AES_256     /* if a fast 256 bit key scheduler is needed     */
-#define AES_VAR     /* if variable key size scheduler is needed      */
+// #define AES_VAR     /* if variable key size scheduler is needed      */
 #if 1
 #  define AES_MODES /* if support is needed for modes in the C code  */
 #endif              /* (these will use AES_NI if it is present)      */
@@ -79,13 +83,6 @@ typedef union
     uint8_t b[4];
 } aes_inf;
 
-/* Macros for detecting whether a given context was initialized for  */
-/* use with encryption or decryption code. These should only be used */
-/* by e.g. language bindings which lose type information when the    */
-/* context pointer is passed to the calling language's runtime.      */
-#define IS_ENCRYPTION_CTX(cx) (((cx)->inf.b[2] & (uint8_t)0x01) == 1)
-#define IS_DECRYPTION_CTX(cx) (((cx)->inf.b[2] & (uint8_t)0x01) == 0)
-
 #ifdef _MSC_VER
 #  pragma warning( disable : 4324 )
 #endif
@@ -101,10 +98,12 @@ typedef union
 typedef struct ALIGNED_(16)
 {   uint32_t ks[KS_LENGTH];
     aes_inf inf;
-} aes_crypt_ctx;
+} aes_encrypt_ctx;
 
-typedef aes_crypt_ctx aes_encrypt_ctx;
-typedef aes_crypt_ctx aes_decrypt_ctx;
+typedef struct ALIGNED_(16)
+{   uint32_t ks[KS_LENGTH];
+    aes_inf inf;
+} aes_decrypt_ctx;
 
 #ifdef _MSC_VER
 #  pragma warning( default : 4324 )
@@ -216,59 +215,8 @@ typedef void cbuf_inc(unsigned char *cbuf);
 AES_RETURN aes_ctr_crypt(const unsigned char *ibuf, unsigned char *obuf,
             int len, unsigned char *cbuf, cbuf_inc ctr_inc, aes_encrypt_ctx cx[1]);
 
-#endif
+void aes_ctr_cbuf_inc(unsigned char *cbuf);
 
-#if 0 && defined( ADD_AESNI_MODE_CALLS )
-#  define USE_AES_CONTEXT
-#endif
-
-#ifdef ADD_AESNI_MODE_CALLS
-#  ifdef USE_AES_CONTEXT
-
-AES_RETURN aes_CBC_encrypt(const unsigned char *in,
-    unsigned char *out,
-    unsigned char ivec[16],
-    unsigned long length,
-    const aes_encrypt_ctx cx[1]);
-
-AES_RETURN aes_CBC_decrypt(const unsigned char *in,
-    unsigned char *out,
-    unsigned char ivec[16],
-    unsigned long length,
-    const aes_decrypt_ctx cx[1]);
-
-AES_RETURN AES_CTR_encrypt(const unsigned char *in,
-    unsigned char *out,
-    const unsigned char ivec[8],
-    const unsigned char nonce[4],
-    unsigned long length,
-    const aes_encrypt_ctx cx[1]);
-
-#  else
-
-void aes_CBC_encrypt(const unsigned char *in,
-    unsigned char *out,
-    unsigned char ivec[16],
-    unsigned long length,
-    unsigned char *key,
-    int number_of_rounds);
-
-void aes_CBC_decrypt(const unsigned char *in,
-    unsigned char *out,
-    unsigned char ivec[16],
-    unsigned long length,
-    unsigned char *key,
-    int number_of_rounds);
-
-void aes_CTR_encrypt(const unsigned char *in,
-    unsigned char *out,
-    const unsigned char ivec[8],
-    const unsigned char nonce[4],
-    unsigned long length,
-    const unsigned char *key,
-    int number_of_rounds);
-
-#  endif
 #endif
 
 #if defined(__cplusplus)

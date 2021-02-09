@@ -10,7 +10,6 @@ set(SOURCES
     groestl.c
     hasher.c
     aes/aescrypt.c aes/aeskey.c aes/aestab.c aes/aes_modes.c
-    aes/gcm.c aes/gf128mul.c
     ed25519-donna/curve25519-donna-32bit.c ed25519-donna/curve25519-donna-helpers.c ed25519-donna/modm-donna-32bit.c
     ed25519-donna/ed25519-donna-basepoint-table.c ed25519-donna/ed25519-donna-32bit-tables.c ed25519-donna/ed25519-donna-impl-base.c
     ed25519-donna/ed25519.c ed25519-donna/curve25519-donna-scalarmult-base.c ed25519-donna/ed25519-sha3.c ed25519-donna/ed25519-keccak.c
@@ -29,7 +28,6 @@ target_include_directories(TrezorCrypto PUBLIC chacha20poly1305)
 target_include_directories(TrezorCrypto PUBLIC ed25519-donna)
 
 target_compile_options(TrezorCrypto PRIVATE "-std=c99")
-add_definitions(-Wno-cast-qual -Wno-incompatible-pointer-types -Wno-missing-prototypes)
 
 if(MSVC)
   set_source_files_properties(${SOURCES} PROPERTIES LANGUAGE CXX)

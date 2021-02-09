@@ -95,7 +95,9 @@ Issue Date: 20/12/2007
 
 /*  PLATFORM SPECIFIC INCLUDES */
 
-#include "brg_endian.h"
+#define IS_BIG_ENDIAN 4321
+#define IS_LITTLE_ENDIAN 1234
+#define PLATFORM_BYTE_ORDER IS_LITTLE_ENDIAN
 
 /*  CONFIGURATION - THE USE OF DEFINES
 
@@ -185,7 +187,7 @@ Issue Date: 20/12/2007
     if it is detected (both present and enabled).
 
 	AESNI uses a decryption key schedule with the first decryption
-	round key at the high end of the key schedule with the following
+	round key at the high end of the key scedule with the following
 	round keys at lower positions in memory.  So AES_REV_DKS must NOT
 	be defined when AESNI will be used.  Although it is unlikely that
 	assembler code will be used with an AESNI build, if it is then
@@ -194,12 +196,8 @@ Issue Date: 20/12/2007
 	code files must match that here if they are used). 
 */
 
-#if defined( INTEL_AES_POSSIBLE )
-#  if 1 && !defined( USE_INTEL_AES_IF_PRESENT )
-#    define USE_INTEL_AES_IF_PRESENT
-#  endif
-#elif defined( USE_INTEL_AES_IF_PRESENT )
-#  error: AES_NI is not available on this platform
+#if 0 && defined( INTEL_AES_POSSIBLE ) && !defined( USE_INTEL_AES_IF_PRESENT )
+#  define USE_INTEL_AES_IF_PRESENT
 #endif
 
 /*  Define this option if support for the VIA ACE is required. This uses
@@ -219,7 +217,7 @@ Issue Date: 20/12/2007
 	AES_REV_DKS must be set for assembler code used with a VIA ACE build
 */
 
-#if 1 && defined( VIA_ACE_POSSIBLE ) && !defined( USE_VIA_ACE_IF_PRESENT )
+#if 0 && defined( VIA_ACE_POSSIBLE ) && !defined( USE_VIA_ACE_IF_PRESENT )
 #  define USE_VIA_ACE_IF_PRESENT
 #endif
 
@@ -289,7 +287,7 @@ Issue Date: 20/12/2007
 
 /*  5. LOOP UNROLLING
 
-    The code for encryption and decryption cycles through a number of rounds
+    The code for encryption and decrytpion cycles through a number of rounds
     that can be implemented either in a loop or by expanding the code into a
     long sequence of instructions, the latter producing a larger program but
     one that will often be much faster. The latter is called loop unrolling.
@@ -334,9 +332,9 @@ Issue Date: 20/12/2007
 /*  7. INTERNAL STATE VARIABLE FORMAT
 
     The internal state of Rijndael is stored in a number of local 32-bit
-    word variables which can be defined either as an array or as individual
+    word varaibles which can be defined either as an array or as individual
     names variables. Include this section if you want to store these local
-    variables in arrays. Otherwise individual local variables will be used.
+    varaibles in arrays. Otherwise individual local variables will be used.
 */
 #if 1
 #  define ARRAYS
@@ -365,10 +363,10 @@ Issue Date: 20/12/2007
 
 /*  10. TABLE ALIGNMENT
 
-    On some systems speed will be improved by aligning the AES large lookup
+    On some sytsems speed will be improved by aligning the AES large lookup
     tables on particular boundaries. This define should be set to a power of
     two giving the desired alignment. It can be left undefined if alignment
-    is not needed.  This option is specific to the Microsoft VC++ compiler -
+    is not needed.  This option is specific to the Microsft VC++ compiler -
     it seems to sometimes cause trouble for the VC++ version 6 compiler.
 */
 
@@ -393,7 +391,7 @@ Issue Date: 20/12/2007
     up using tables.  The basic tables are each 256 32-bit words, with either
     one or four tables being required for each round function depending on
     how much speed is required. The encryption and decryption round functions
-    are different and the last encryption and decryption round functions are
+    are different and the last encryption and decrytpion round functions are
     different again making four different round functions in all.
 
     This means that:
@@ -492,7 +490,7 @@ Issue Date: 20/12/2007
    a column number c to the way the state array variable is to be held.
    The first define below maps the state into an array x[c] whereas the
    second form maps the state into a number of individual variables x0,
-   x1, etc.  Another form could map individual state columns to machine
+   x1, etc.  Another form could map individual state colums to machine
    register names.
 */
 
