@@ -5,7 +5,9 @@
 #include "gcm.h"
 #include "rand.h"
 
-// Temp buffer for backing up content, etc
+// Temp buffer for backing up content, etc.
+// Because subzero CORE is supposed to be single-threaded, we use a global
+// buffer here.
 uint8_t aes_gcm_buffer[1000];
 
 /**
@@ -20,6 +22,12 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t * plaintext, size_t plaintext_len,
                        uint8_t *ciphertext, size_t ciphertext_len,
                        size_t *bytes_written)
 {
+  // NULL pointer checks. Note that plaintext can be NULL.
+  if (!ciphertext || !bytes_written) {
+    ERROR("%s: ciphertext and bytes_written must not be NULL", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+
   uint8_t iv[12] = {0};
   uint8_t tag[16] = {0};
   gcm_ctx ctx[1] = {0};
@@ -47,8 +55,10 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t * plaintext, size_t plaintext_len,
   // Generate a random IV
   random_buffer(iv, sizeof(iv));
 
-  // Encrypt plaintext
-  memcpy(aes_gcm_buffer, plaintext, plaintext_len);
+  // Encrypt plaintext. plaintext can be NULL, in which case we don't memcpy it
+  if (plaintext) {
+    memcpy(aes_gcm_buffer, plaintext, plaintext_len);
+  }
 
   if (RETURN_GOOD != gcm_encrypt_message(iv, sizeof(iv),
                                          NULL, 0, // empty header
@@ -83,11 +93,19 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext, size_t cipherte
                        uint8_t *plaintext, size_t plaintext_len,
                        size_t *bytes_written)
 {
+  // NULL pointer checks. Note that plaintext can be NULL.
+  if (!ciphertext || !bytes_written) {
+    ERROR("%s: ciphertext and bytes_written must not be NULL", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+
   uint8_t iv[12] = {0};
   uint8_t tag[16] = {0};
   gcm_ctx ctx[1] = {0};
 
-  memzero(plaintext, plaintext_len);
+  if (plaintext) {
+    memzero(plaintext, plaintext_len);
+  }
 
   if (ciphertext_len < sizeof(iv) + sizeof(tag))
   {
@@ -136,7 +154,9 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext, size_t cipherte
     return Result_UNKNOWN_INTERNAL_FAILURE;
   }
 
-  memcpy(plaintext, aes_gcm_buffer, expected_plaintext_len);
+  if (plaintext) {
+    memcpy(plaintext, aes_gcm_buffer, expected_plaintext_len);
+  }
   *bytes_written = expected_plaintext_len;
   memzero(aes_gcm_buffer, sizeof(aes_gcm_buffer));
   memzero(iv, sizeof(iv));
