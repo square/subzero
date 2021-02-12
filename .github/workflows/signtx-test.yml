@@ -15,6 +15,9 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -euxo pipefail {0}
 
     strategy:
       fail-fast: false
