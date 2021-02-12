@@ -10,17 +10,20 @@ public final class TestWallets {
   // Test wallet 1492, share 1
   protected static final String devTestWallet =
       "{\"currency\":\"TEST_NET\",\"encrypted_master_seed\":{\"encrypted_master_seed\":" +
-          "\"pvG4sZJ5bbAdbFzfDmwJ3Ebh8EKju7VNTGOvp0EPPOmPURQfH3KDkkdpkGMDD0AJzybVQ9C4pA" +
-          "ze1HWLtQk7yQ==\"},\"encrypted_pub_keys\":[{\"encrypted_pub_key\":\"3trfyO6S/" +
-          "JOexdnE79rCnN7L65ndzczPnen4mP/w//jFztDgkpv658vm583hwdDo3s6dmN7/7vqe7sSezZney" +
-          "Jv47p/c5PrmyeycwN/B5uftzMDLnsubwJPEz+/b693dzc+SmNzky8Lyn8OZwfD5\"},{\"encryp" +
-          "ted_pub_key\":\"3trfyO6S2eTZ5p3c5M3a7J3inMXZm+346JLinp+Sx8n7wvjPxfLo6d3i3ODY" +
-          "xJzg4Of56+zv4v7ywf+f0tzFmPLs2cjY8P/aw+vT2NDcmJnCxfvD2sCdm5zzn+zk+s7w++La5sDH" +
-          "057B2tzLzt6e\"},{\"encrypted_pub_key\":\"3trfyO6T4emS08ji7eDJwNjC6NjL/f/kksf" +
-          "J+8XO/eyYw9Dmx/DZzemd7v/pzNL56MDk4P7dwtPa2Nv985P4m/r6+82bxMzN3ebc4pz73Nn42/v" +
-          "tw5zSn/+Z6O/DnpLs+pPM4cCc/fjgzsvn/djF\"},{\"encrypted_pub_key\":\"3trfyO6Swu" +
-          "fA8/CYyf7/x+7c4eTY4MDp+cDk/8fDwN7828vEnc3s+834w/36ntrr7e3dkvzTw+HB3NvH096ZnJ" +
-          "/++ZvL8sLh0Jz6x+bm2d6S5NvT6/Ke3MXm8ML4zcjc+/zZk/ve8pjCxZPnmNzM\"}]}";
+          "\"ioBg3WF2BntMnGaebOtI+HDcTHVkaMonIplOcp+6i83P9Cjb6r7+5T9KDrlN8Np9MyIm6vh74M" +
+          "348X7oJMkCG6cY5endbgf/sofKn5OcpOw86+rtI8fCAyLNddM=\"},\"encrypted_pub_keys\"" +
+          ":[{\"encrypted_pub_key\":\"OytXbV6n2L0l50yLa5fXe0z8N84MU1Ci3jQyOy87Id1zMJCG3" +
+          "3Wqg5rVv6KJED8fmjg8s0rsMJaiCe9o47OHrFg9SH37SxIa4IGVU3WEjuFVTOAxFbOJkY0gE2XlS" +
+          "zGUtO+MGzvcayS4JSqDdsRHN2pKBvJDDi92oxMMpi0C8uuu9vUiIYa9IA8f5g==\"},{\"encryp" +
+          "ted_pub_key\":\"YxgmbmaiwGON1uHpO1U51f9BcZAruJn436kjCZZxQBXqbcxJcd2L0k7HNDhG" +
+          "K7Q7g+bbqKnhEoS+Cqjz4FqSv+yGmfzLqwvy9g/XIu44B37VSXLh5bsyBl1hh8sljNVIwbYWRWjh" +
+          "iCGE57g0P2o2Uj63cBE9wRpwKUa6RTlRWb2Mmw3GnL+xn9n0Bw==\"},{\"encrypted_pub_key" +
+          "\":\"i36ne27C7pv1psRF7iF3FtA9D+DYzL9dGLNG2al96iZYOhXW3fWxB1WmgapH4Qjwp32cNos" +
+          "GJ5xIqPGcOebe/lUYfJy9nAJktqNb+9m9cIXRAEBR2Aem07Y3iVBPXwbrsEGrwaIlghXSU35d8s3" +
+          "nGgmJHpb/+ILUK+XipCW6f6laVM8jC39lq8od5Q==\"},{\"encrypted_pub_key\":\"s/1O2n" +
+          "YnApJd+MlcGpLARYL7pudrwDSrF/xLc6Lj5WgaKquFlJFFlTblYtOSyA8O7jiz253gvzFmK1oVmr" +
+          "2hqw7rW0kAliBzpQ/sbiZnQYHnGVw5582vRTmixQmJD7EtlOXsuY3zcniZZjJm6oMRMxO0QGQVme" +
+          "wgW3jyfnB8ed5Nh3jCTs/eMwWWNQ==\"}]}";
 
   // TODO: Implement test wallet for nChipher testing
   protected static final String ncipherTestWallet = "TO BE IMPLEMENTED";
