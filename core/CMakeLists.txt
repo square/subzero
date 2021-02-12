@@ -16,6 +16,7 @@ if ($ENV{TARGET} MATCHES "nCipher")
 endif ()
 
 add_subdirectory(trezor-crypto)
+add_subdirectory(external-crypto)
 add_subdirectory(proto)
 
 include_directories(include nanopb trezor-crypto "${CMAKE_BINARY_DIR}/proto")
@@ -97,6 +98,18 @@ else ()
       "src/dev/protection.c"
   )
   list(APPEND main_SRC ${extra_SRC})
+
+  # We need to build a small static libary to avoid conflicting headers
+  add_library(aes_gcm_dev STATIC "src/dev/aes_gcm.c")
+  target_include_directories(aes_gcm_dev PUBLIC
+      "include"
+      "external-crypto/modes"
+      "external-crypto/aes"
+      "nanopb"
+      "${CMAKE_BINARY_DIR}/proto"
+  )
+  target_link_libraries(aes_gcm_dev SubzeroProtos)
+
 endif ()
 
 if ($ENV{TARGET} MATCHES "fuzz")
@@ -106,4 +119,9 @@ else ()
 endif ()
 
 add_executable(subzero ${main_SRC})
-target_link_libraries(subzero TrezorCrypto SubzeroProtos)
+
+if ($ENV{TARGET} MATCHES "nCipher")
+  target_link_libraries(subzero TrezorCrypto SubzeroProtos)
+else()
+  target_link_libraries(subzero TrezorCrypto SubzeroProtos aes_gcm_dev GladmanGCM)
+endif ()
