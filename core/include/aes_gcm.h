@@ -7,8 +7,8 @@
 #ifndef STDMARSHALTYPES_H
 typedef enum {KEYID_MASTER_SEED_ENCRYPTION_KEY = 0,
               KEYID_PUBKEY_ENCRYPTION_KEY = 1} M_KeyID;
-// Key encryption key declaration (AES-256-GCM)
-extern uint8_t KEK[2][32];
+// Key encryption key declaration
+extern uint8_t KEK[2][16];
 #endif
 
 
