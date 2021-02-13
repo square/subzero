@@ -210,12 +210,6 @@ public class SubzeroGui {
 
   private void signTxTest() throws Exception {
 
-    // TODO: implement HSM test
-    if (nCipher) {
-      System.out.println("Transaction signing regression test not yet implemented for nCipher");
-      throw new NotImplementedException();
-    }
-
     // Passed and failed test cases, for valid and invalid test vectors.
     // For a valid test vector, test passes (ok) if and only if subzero response matches
     // expected response. This is for happy path testing.
@@ -227,7 +221,8 @@ public class SubzeroGui {
     int fail_invalid = 0;
 
     // Read request & expected response from src/main/resources/txsign-testvectors/.
-    // The request and expected response are pre-generated, based64-encoded proto buffers
+    // The request and expected response are pre-generated, based64-encoded proto buffers.
+    // These test vectors are the same for TARGET=dev and TARGET=nCipher subzero core build types
     FileResourceUtils util = new FileResourceUtils();
     List<Path> txsignRegressionTestsPath = util.getPathsFromResourcesJAR("txsign-testvectors");
     for (Path path : txsignRegressionTestsPath) {

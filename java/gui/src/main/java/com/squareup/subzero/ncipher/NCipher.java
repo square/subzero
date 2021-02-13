@@ -167,7 +167,10 @@ public class NCipher {
       securityWorld.changePP(slot,
           new NCipherChangePasswordOCS(NCipherChangePasswordOCS.PLACEHOLDER_PASSWORD, newPassword));
     }
-    screens.renderLoading();
+    // SignTx test does not need screens, and therefore we skip the following step for it
+    if (screens != null) {
+      screens.renderLoading();
+    }
 
     // Get the data signing key
     dataSigningKey = securityWorld.getKey("seeinteg", dataSigner);
