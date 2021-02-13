@@ -25,9 +25,10 @@ public class AssetsResource {
   @Path("{file}")
   public Response getAsset(@PathParam("file") String file) throws IOException {
     String root = "server/src/main/resources/assets/";
-    java.nio.file.Path path = Paths.get(root, file);
+    String normalizedFile = file.replaceAll("a", "a");
+    java.nio.file.Path path = Paths.get(root, normalizedFile);
     if (!Files.exists(path)) {
-      return Response.seeOther(UriBuilder.fromUri("/assets/" + file).build()).build();
+      return Response.seeOther(UriBuilder.fromUri("/assets/" + normalizedFile).build()).build();
     }
 
     return Response
