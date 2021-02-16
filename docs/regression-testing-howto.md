@@ -32,7 +32,7 @@ documentation](https://subzero.readthedocs.io/en/master/running_without_hsm/).
 Put the follow content in `/data/app/subzero/wallets/subzero-1492.wallet`
 
    ```text
-   {"currency":"TEST_NET","encrypted_master_seed":{"encrypted_master_seed":"pvG4sZJ5bbAdbFzfDmwJ3Ebh8EKju7VNTGOvp0EPPOmPURQfH3KDkkdpkGMDD0AJzybVQ9C4pAze1HWLtQk7yQ=="},"encrypted_pub_keys":[{"encrypted_pub_key":"3trfyO6S/JOexdnE79rCnN7L65ndzczPnen4mP/w//jFztDgkpv658vm583hwdDo3s6dmN7/7vqe7sSezZneyJv47p/c5PrmyeycwN/B5uftzMDLnsubwJPEz+/b693dzc+SmNzky8Lyn8OZwfD5"},{"encrypted_pub_key":"3trfyO6S2eTZ5p3c5M3a7J3inMXZm+346JLinp+Sx8n7wvjPxfLo6d3i3ODYxJzg4Of56+zv4v7ywf+f0tzFmPLs2cjY8P/aw+vT2NDcmJnCxfvD2sCdm5zzn+zk+s7w++La5sDH057B2tzLzt6e"},{"encrypted_pub_key":"3trfyO6T4emS08ji7eDJwNjC6NjL/f/kksfJ+8XO/eyYw9Dmx/DZzemd7v/pzNL56MDk4P7dwtPa2Nv985P4m/r6+82bxMzN3ebc4pz73Nn42/vtw5zSn/+Z6O/DnpLs+pPM4cCc/fjgzsvn/djF"},{"encrypted_pub_key":"3trfyO6SwufA8/CYyf7/x+7c4eTY4MDp+cDk/8fDwN7828vEnc3s+834w/36ntrr7e3dkvzTw+HB3NvH096ZnJ/++ZvL8sLh0Jz6x+bm2d6S5NvT6/Ke3MXm8ML4zcjc+/zZk/ve8pjCxZPnmNzM"}]}
+   {"currency":"TEST_NET","encrypted_master_seed":{"encrypted_master_seed":"ioBg3WF2BntMnGae6PyWbp1VG4r446PUYVZnt1BzOOVQzHy3XeaqmBXS6tMbE9fsB0sR+Vi9xPgJcayN2uJsJNjEw7S77h9oUUpu0zWrYvl6iRAI4fcezOxbRcc="},"encrypted_pub_keys":[{"encrypted_pub_key":"OytXbV6n2L0l50yLegnaP6ea9jRDfFM0I6J/tJQzvnc2+E2Bleqvh4ZaIoTd7Nm6j9XRag1WYni/K0uoek/0rLnLNGZbrrQLNt5lkfTTcMZ72mEKTRkvRWbJwd8H+p86GLqSqgvofDSE5E5EkgYGhIGSkFy8dLpXK4jpYxAQGrIQ2tNeXKKw2nNPOQ=="},{"encrypted_pub_key":"YxgmbmaiwGON1uHpp6cp7sWxMNNJYbX4tqtEJwbOYqfKWW9k56V/uguQrliIwaG2X7ca6VJ01YQiiMdJciQzb3w182R/HsGiYYdMuHP0PNjVk9ScYby38ofTUfjW8ihUFFjM6FSs7WzZAFCuQ04bNNATuGfdXQK8pgoCHKWKTJ2c3alaZvIauwzkfQ=="},{"encrypted_pub_key":"i36ne27C7pv1psRFttz3oNBVZVwgh/t6sQO3DUDfb6Edw3GvDAea3oPQ3Fm5No3JBWp5/SARPva29lPdi4X4mz+qde2nPYMvIJtW0ndAUGU2kw9dhzVY/FZ8XGnIH33otuKE2i+HxOYwxk6+EqS1WEoWEqRe2LO8h1DTg9GsYzzTyjSj2OKIOGc02A=="},{"encrypted_pub_key":"s/1O2nYnApJd+Mlc10rvGsMghE8AmhfIBXDBW52GBrjML07IVF3pZsgPKt4mLpsf2aUcHYn4P276jrdN1rCCxlkz1haxZawNOD0RUdocg5/h6GjaeOqJVxI6hgD3xqJRT+8e2OjVLwJWSmwbX2ckeKz+u76bFNxiCP2g+UCT94s8amrAeQTLXwF9lg=="}]}
    ```
 
 2. Start subzero core and the development server as normal
@@ -103,7 +103,7 @@ Here is the content of a sample test vector (`cat /tmp/out_dir/valid-0000`).
 
 ```text
 request:ENQLKlMKMgogxDWtt0dgwAmN4ISc0MOWwGTTmUUiiIo4nckDVeaiA/QQABjVutiZprYJIgQQABgGEhAIh6nDxsznCBACGgQQABgDGAAiACkAAAAAAAAAAA==
-response:GmwKagpGMEQCIBtPd9qU3aqwuekXry8hD2SzE+UipWrLNcGdyDVrRSYSAiBYTfqq+KLMdXWogsYfvvjMmxPmPjtXTMHaye5T06/mqxIgbLKqotdv2jUjkhIKN0Bj+GLyDJH8A3pqPQ8NyQ5eFBo=
+response:GmwKagpGMEQCIH9/UgdzasFtbHSjV8JXNmUtlqWCb4RbfVehzQlJ1yoNAiBFIvAVeuXCEDCubBygIz1xWrfY0f+o3gV7QAUH44wqkRIggyGhJCTpuwc9nmvbRzbdsOGZ5NDOzJTTjJCDJgn7/os=
 ```
 
 The request and response in the above example can be displayed in JSON using
