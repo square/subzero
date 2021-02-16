@@ -116,7 +116,7 @@ public class SignTx {
 
     if (subzero.nCipher) {
       nCipher.unloadOcs();
-      if (Strings.isNullOrEmpty(subzero.debug)) {
+      if (!subzero.signtxTest && Strings.isNullOrEmpty(subzero.debug)) {
         subzero.getScreens().removeOperatorCard("Please remove Operator Card and return it to the safe. Then hit <enter>.");
       }
     }
