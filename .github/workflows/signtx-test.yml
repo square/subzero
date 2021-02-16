@@ -46,18 +46,18 @@ jobs:
       run: |
         cd /tmp
         sudo apt-get update
-        sudo apt-get install autoconf automake libtool curl make g++ unzip -y
-        git clone https://github.com/google/protobuf.git
-        cd protobuf
-        git submodule update --init --recursive
-        ./autogen.sh
-        ./configure
-        make
-        sudo make install
-        sudo ldconfig
+        sudo apt-get install libtool curl make g++ unzip -y
+        curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/$PROTOC_ZIP
+        sudo unzip -o $PROTOC_ZIP -d /usr/local bin/protoc
+        sudo unzip -o $PROTOC_ZIP -d /usr/local 'include/*'
+        sudo chmod 755 /usr/local/bin/protoc
+        sudo chmod -R 755 /usr/local/include
+        # For debugging
         protoc --version
         python -m pip install --upgrade pip
         python -m pip install protobuf
+      env:
+        PROTOC_ZIP: protoc-3.14.0-linux-x86_64.zip
 
     # Build Java targets
     - name: Build Java
