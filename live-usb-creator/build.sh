@@ -15,10 +15,12 @@ sudo cp /vagrant/patches/usr/share/lorax/live/efi.tmpl /usr/share/lorax/live/efi
 rm -rf /vagrant/live_scripts/.isotype_rel /vagrant/live_scripts/.isotype_dev
 if [ "$1" = "dev" ]; then
   BUILD_TYPE="Dev"
+  RHEL_KS=rhel7-livemedia-dev.ks
   cp /vagrant/live_scripts/install_nfast_tools_dev /vagrant/live_scripts/install_nfast_tools
   touch /vagrant/live_scripts/.isotype_dev
 elif [ "$1" = "release" ] || [ "$#" -eq 0 ]; then
   BUILD_TYPE="Rel"
+  RHEL_KS=rhel7-livemedia.ks
   cp /vagrant/live_scripts/install_nfast_tools_release /vagrant/live_scripts/install_nfast_tools
   touch /vagrant/live_scripts/.isotype_rel
 else
@@ -33,7 +35,7 @@ fi
 # livemedia-creator refuses to run if results_dir exists
 sudo rm -rf /tmp/build
 
-sudo livemedia-creator --logfile=/vagrant/livemedia-creator.log --make-iso --ks=/vagrant/rhel7-livemedia.ks --resultdir="/tmp/build" --no-virt --project="CentOS" --releasever="7.7.1908" --volid="CentOS 7 (1908) + nCipher ($BUILD_TYPE)"
+sudo livemedia-creator --logfile=/vagrant/livemedia-creator.log --make-iso --ks="/vagrant/${RHEL_KS}" --resultdir="/tmp/build" --no-virt --project="CentOS" --releasever="7.7.1908" --volid="CentOS 7 (1908) + nCipher ($BUILD_TYPE)"
 
 ###############################################################################
 # Copy ISO back to host

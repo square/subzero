@@ -12,14 +12,16 @@ Set the following files in place in the same directory as the `Vagrantfile`.
 * CodeSafe-linux64-dev-12.50.2.iso (2.6GB): supplied by the HSM vendor.
 * CentOS-7-x86_64-Everything-1908.iso (10G): `curl -O https://vault.centos.org/7.7.1908/isos/x86_64/CentOS-7-x86_64-Everything-1908.iso`
 * kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm (17MB): `curl -L -O http://archive.kernel.org/centos-vault/centos/7.6.1810/updates/x86_64/Packages/kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm`
+* protoc-3.14.0-linux-x86_64.zip (1.6MB): `curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protoc-3.14.0-linux-x86_64.zip`
 
 Verify the following SHA256 sums:
 
 ```bash
-$ shasum -a 256 CodeSafe-linux64-dev-12.50.2.iso CentOS-7-x86_64-Everything-1908.iso kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm
+$ shasum -a 256 CodeSafe-linux64-dev-12.50.2.iso CentOS-7-x86_64-Everything-1908.iso kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm protoc-3.14.0-linux-x86_64.zip
 23ca2c5fc2476887926409bc69f19b772c99191b1e0cce1a3bace8d1e4488528  CodeSafe-linux64-dev-12.50.2.iso
 bd5e6ca18386e8a8e0b5a9e906297b5610095e375e4d02342f07f32022b13acf  CentOS-7-x86_64-Everything-1908.iso
 a27c718efb2acec969b20023ea517d06317b838714cb359e4a80e8995ac289fc  kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm
+a2900100ef9cda17d9c0bbf6a3c3592e809f9842f2d9f0d50e3fba7f3fc864f0  protoc-3.14.0-linux-x86_64.zip
 ```
 
 The CentOS's GPG signature can also be verified to confirm the image has been signed by the CentOS team.
