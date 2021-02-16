@@ -1,0 +1,6 @@
+# Ignore vendored code from linguist
+# Cf. https://github.com/github/linguist#overrides
+core/external-crypto/**/* linguist-vendored
+core/trezor-crypto/**/* linguist-vendored
+core/external-crypto/CMakeLists.txt -linguist-vendored
+core/trezor-crypto/CMakeLists.txt -linguist-vendored
