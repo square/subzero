@@ -30,7 +30,12 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t * plaintext, size_t plaintext_len,
 
   uint8_t iv[12] = {0};
   uint8_t tag[16] = {0};
-  gcm_ctx ctx[1] = {0};
+  // In theory, we don't need the following array to be static to zero
+  // initialize it. We could have done "gcm_ctx ctx[1] = {0}" according to the
+  // C standard. Unfortunately, a gcc version (4.8.5) that we would like to
+  // support has a bug (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119),
+  // and this is to work around it.
+  static gcm_ctx ctx[1];
 
   memzero(ciphertext, ciphertext_len);
 
@@ -101,7 +106,8 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext, size_t cipherte
 
   uint8_t iv[12] = {0};
   uint8_t tag[16] = {0};
-  gcm_ctx ctx[1] = {0};
+  // Declare static to work around a bug in gcc 4.8.5
+  static gcm_ctx ctx[1];
 
   if (plaintext) {
     memzero(plaintext, plaintext_len);
