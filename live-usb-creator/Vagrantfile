@@ -62,7 +62,7 @@ Vagrant.configure("2") do |config|
                          'yum-config-manager --disable \* && ' \
                          "yum-config-manager --enable c7-media --setopt='c7-media.baseurl=file:///media/CentOS/' && " \
                          "rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 &&" \
-                         "yum swap -y -- install perl gcc binutils make perl bzip2 lorax anaconda patch grub2-efi-x64-modules" \
+                         "yum swap -y -- install perl gcc binutils make bzip2 lorax anaconda patch grub2-efi-x64-modules" \
                                     " -- localinstall #{kernel_devel_guest_tmp_path}", opts, &block)
         super
       end

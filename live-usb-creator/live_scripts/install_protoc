@@ -1,0 +1,9 @@
+#!/bin/bash
+
+###############################################################################
+# Install protobuf compiler image
+###############################################################################
+
+unzip -o /data/app/subzero/protoc-3.14.0-linux-x86_64.zip -d /usr bin/protoc
+unzip -o /data/app/subzero/protoc-3.14.0-linux-x86_64.zip -d /usr "include/*"
+rm -rf /data/app/subzero/protoc-3.14.0-linux-x86_64.zip
