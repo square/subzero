@@ -30,6 +30,7 @@ ADD nanopb /subzero/nanopb
 ADD proto /subzero/proto
 ADD src /subzero/src
 ADD trezor-crypto /subzero/trezor-crypto
+ADD external-crypto /subzero/external-crypto
 
 WORKDIR /subzero
 
