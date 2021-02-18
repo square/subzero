@@ -13,15 +13,21 @@ Set the following files in place in the same directory as the `Vagrantfile`.
 * CentOS-7-x86_64-Everything-1908.iso (10G): `curl -O https://vault.centos.org/7.7.1908/isos/x86_64/CentOS-7-x86_64-Everything-1908.iso`
 * kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm (17MB): `curl -L -O http://archive.kernel.org/centos-vault/centos/7.6.1810/updates/x86_64/Packages/kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm`
 * protoc-3.14.0-linux-x86_64.zip (1.6MB): `curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protoc-3.14.0-linux-x86_64.zip`
+* six-1.15.0-py2.py3-none-any.whl (11.0kB): `curl -L -O https://files.pythonhosted.org/packages/ee/ff/48bde5c0f013094d729fe4b0316ba2a24774b3ff1c52d924a8a4cb04078a/six-1.15.0-py2.py3-none-any.whl`
+* protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl (1MB): `curl -O -L https://files.pythonhosted.org/packages/fe/fd/247ef25f5ec5f9acecfbc98ca3c6aaf66716cf52509aca9a93583d410493/protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl`
 
 Verify the following SHA256 sums:
 
 ```bash
-$ shasum -a 256 CodeSafe-linux64-dev-12.50.2.iso CentOS-7-x86_64-Everything-1908.iso kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm protoc-3.14.0-linux-x86_64.zip
+$ shasum -a 256 CodeSafe-linux64-dev-12.50.2.iso CentOS-7-x86_64-Everything-1908.iso \
+kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm protoc-3.14.0-linux-x86_64.zip \
+six-1.15.0-py2.py3-none-any.whl protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl
 23ca2c5fc2476887926409bc69f19b772c99191b1e0cce1a3bace8d1e4488528  CodeSafe-linux64-dev-12.50.2.iso
 bd5e6ca18386e8a8e0b5a9e906297b5610095e375e4d02342f07f32022b13acf  CentOS-7-x86_64-Everything-1908.iso
 a27c718efb2acec969b20023ea517d06317b838714cb359e4a80e8995ac289fc  kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm
 a2900100ef9cda17d9c0bbf6a3c3592e809f9842f2d9f0d50e3fba7f3fc864f0  protoc-3.14.0-linux-x86_64.zip
+8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced  six-1.15.0-py2.py3-none-any.whl
+ecc33531a213eee22ad60e0e2aaea6c8ba0021f0cce35dbf0ab03dee6e2a23a1  protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl
 ```
 
 The CentOS's GPG signature can also be verified to confirm the image has been signed by the CentOS team.

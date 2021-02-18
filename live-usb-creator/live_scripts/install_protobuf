@@ -1,9 +1,12 @@
 #!/bin/bash
 
 ###############################################################################
-# Install protobuf compiler image
+# Install protobuf compiler to image
 ###############################################################################
 
 unzip -o /data/app/subzero/protoc-3.14.0-linux-x86_64.zip -d /usr bin/protoc
 unzip -o /data/app/subzero/protoc-3.14.0-linux-x86_64.zip -d /usr "include/*"
 rm -rf /data/app/subzero/protoc-3.14.0-linux-x86_64.zip
+
+python3 -m pip install /data/app/subzero/six-1.15.0-py2.py3-none-any.whl /data/app/subzero/protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl
+rm -rf /data/app/subzero/*.whl
