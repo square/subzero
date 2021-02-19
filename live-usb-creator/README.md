@@ -141,12 +141,13 @@ VM related stuff:
 
     A development image is to be used by subzero developers for HSM and cold
     wallet development. A developer can boot into an interactive root shell
-    without performing the above mentioned steps. The HSM software is
-    automatically installed in the development image to allow a subzero
-    developer to set up a customizable testing environment with a minimal
-    hardware requirement. A developer can manually provision the HSM, set up
-    persistent storage for the cold wallet and HSM files, execute the .jar
-    and .sar files for development and testing.
+    without performing the above mentioned steps. The subzero development
+    toolchain including HSM software is automatically installed in the
+    development image to allow a subzero developer to set up a customizable
+    development and testing environment with a minimal hardware requirement.
+    A developer can manually provision the HSM, set up persistent storage
+    for the cold wallet and HSM files, execute the .jar and .sar files for
+    development and testing.
 
   Note that right now an interactive shell for the `liveuser` user is
   available for a debugging purpose, in both the `dev` and `release` images.
@@ -170,7 +171,8 @@ Pretty bootloader related stuff:
 Live system related stuff:
 
 * `live_scripts/`: All the files in this directory (except README.md) will be copied into `/usr/local/bin/` on the live system image, putting them in-$PATH. Useful for utility scripts that should be available on the live system.
-* `live_scripts/install_nfast_tools_{dev|release}`: Depending on image type (development or release), this script is copied into `live_scripts/install_nfast_tools` at build time. The script `live_scripts/install_nfast_tools` is run at startup (via /usr/local/bin/startup and /etc/rc.d/init.d/livesys), and builds the nfast kernel module in /opt/nfast/driver and runs the /opt/nfast/sbin/install script. This has to be done from the live system because the install script behaves differently when no PCI card is attached to the system. The contents of this file block entering an interactive shell, thanks to `nfast_block_shell` and a bash profile addition.
+* `live_scripts/install_protobuf`: This script is invoked and only invoked for the development image type at startup (via /usr/local/bin/startup and /etc/rc.d/init.d/livesys).
+* `live_scripts/install_nfast_tools_{dev|release}`: Depending on image type (development or release), the script `live_scripts/install_nfast_tools_dev` or `live_scripts/install_nfast_tools_release` is run at startup (via /usr/local/bin/startup and /etc/rc.d/init.d/livesys), and builds the nfast kernel module in /opt/nfast/driver and runs the /opt/nfast/sbin/install script. This has to be done from the live system because the install script behaves differently when no PCI card is attached to the system. The contents of this file block entering an interactive shell, thanks to `nfast_block_shell` and a bash profile addition.
 * `live_scripts/startup`: This script is run at startup (via /etc/rc.d/init.d/livesys). The contents of this file DO NOT block entering an interactive shell (they run async).
 * `live_scripts/nfast_block_shell`: Blocks until the existence of the path /.nfast-configured, which is intended to be touched after NFast Tools have been installed with `install_nfast_tools`.
 

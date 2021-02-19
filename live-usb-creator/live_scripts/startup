@@ -3,11 +3,14 @@
 # /etc/rc.d/init.d/livesys calls out to this script (/usr/local/bin/startup), meaning it’s run on startup.
 # Note that it does NOT block a TTY/login/bash/etc., hence the nfast_block_shell utility script.
 
-/usr/local/bin/install_protobuf
-
-/usr/local/bin/install_nfast_tools
-
-ln -Tsf /bin/python3 /bin/python
+# Install protobuf only for dev ISO
+if [ -f "/usr/local/bin/.isotype_dev" ]; then
+  /usr/local/bin/install_protobuf
+  ln -Tsf /bin/python3 /bin/python
+  /usr/local/bin/install_nfast_tools_dev
+else
+  /usr/local/bin/install_nfast_tools_release
+fi
 
 # now that NFast Tools have been installed, we touch /.nfast-configured, thus unblocking the nfast_block_shell utility script
 touch /.nfast-configured
