@@ -16,12 +16,10 @@ rm -rf /vagrant/live_scripts/.isotype_rel /vagrant/live_scripts/.isotype_dev
 if [ "$1" = "dev" ]; then
   BUILD_TYPE="Dev"
   RHEL_KS=rhel7-livemedia-dev.ks
-  cp /vagrant/live_scripts/install_nfast_tools_dev /vagrant/live_scripts/install_nfast_tools
   touch /vagrant/live_scripts/.isotype_dev
 elif [ "$1" = "release" ] || [ "$#" -eq 0 ]; then
   BUILD_TYPE="Rel"
   RHEL_KS=rhel7-livemedia.ks
-  cp /vagrant/live_scripts/install_nfast_tools_release /vagrant/live_scripts/install_nfast_tools
   touch /vagrant/live_scripts/.isotype_rel
 else
   echo "Error occurred. Usage: $0 [release|dev]." >&2
