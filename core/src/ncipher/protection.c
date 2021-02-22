@@ -152,8 +152,8 @@ Result expose_wallet(EncryptedMasterSeed *encrypted_master_seed,
     return Result_EXPOSE_WALLET_UNEXPECTED_MASTER_SEED_LEN_FAILURE;
   }
 
-  printf("master_seed: ");
-  for (unsigned int i = 0; i < r; i++) {
+  DEBUG_("master_seed: ");
+  for (unsigned int i = 0; i < master_seed_len; i++) {
     DEBUG_("%02x", master_seed[i]);
   }
   DEBUG_("\n");
