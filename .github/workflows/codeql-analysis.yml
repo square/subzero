@@ -45,21 +45,7 @@ jobs:
 
     - if: ${{ matrix.language == 'cpp' }}
       name: Install dependencies
-      run: |
-        cd /tmp
-        sudo apt-get update
-        sudo apt-get install libtool curl make g++ unzip -y
-        curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/$PROTOC_ZIP
-        sudo unzip -o $PROTOC_ZIP -d /usr/local bin/protoc
-        sudo unzip -o $PROTOC_ZIP -d /usr/local 'include/*'
-        sudo chmod 755 /usr/local/bin/protoc
-        sudo chmod -R 755 /usr/local/include
-        # For debugging
-        protoc --version
-        python -m pip install --upgrade pip
-        python -m pip install protobuf
-      env:
-        PROTOC_ZIP: protoc-3.14.0-linux-x86_64.zip
+      run: scripts/ubuntu_install_protobuf.sh
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
@@ -79,12 +65,7 @@ jobs:
     # Use custom build process for C/C++
     - if: ${{ matrix.language == 'cpp' }}
       name: Build Subzero Core (C/C++)
-      run: |
-        cd ${{ github.workspace }}
-        mkdir -p core/build
-        cd core/build
-        TARGET=dev CURRENCY=btc-testnet cmake ../
-        make
+      run: scripts/build_core.sh
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
