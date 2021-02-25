@@ -7,6 +7,7 @@
 #include "log.h"
 #include "protection.h"
 #include "rpc.h"
+#include "strlcpy.h"
 
 Result
 handle_finalize_wallet(InternalCommandRequest_FinalizeWalletRequest *in,
@@ -87,7 +88,11 @@ handle_finalize_wallet(InternalCommandRequest_FinalizeWalletRequest *in,
 
   static_assert(sizeof(out->pub_key.bytes) == XPUB_SIZE,
                 "misconfigured pub_key max size");
-  strcpy((char *)out->pub_key.bytes, pub_keys[i]);
+  if (subzero_strlcpy((char *)out->pub_key.bytes, pub_keys[i],
+    sizeof(out->pub_key.bytes)) >= sizeof(out->pub_key.bytes)) {
+      ERROR("pub_key %d is too long", i);
+      return Result_UNKNOWN_INTERNAL_FAILURE;
+    }
   out->pub_key.size = (pb_size_t)strlen(pub_keys[i]);
 
   // TODO: figure out pub_keys_hash story
