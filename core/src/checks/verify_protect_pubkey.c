@@ -2,13 +2,14 @@
 #include "config.h"
 #include "log.h"
 #include "protection.h"
+#include "strlcpy.h"
 
 int verify_protect_pubkey(void) {
   EncryptedPubKey temp = EncryptedPubKey_init_default;
   char buffer1[XPUB_SIZE] =
       "xpub661MyMwAqRbcGw6rpZ6SYUfFk6Z5YX216YRXnhuB6UcdwuVe4XUKKiPg";
   char buffer2[XPUB_SIZE];
-  strcpy(buffer2, buffer1);
+  subzero_strlcpy(buffer2, buffer1, sizeof(buffer2));
 
   char buffer3[XPUB_SIZE];
 

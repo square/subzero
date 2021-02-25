@@ -1,3 +1,5 @@
+#include <stdlib.h> /* strtoul */
+#include <inttypes.h>
 #include "no_rollback.h"
 #include "log.h"
 
@@ -27,8 +29,32 @@ Result no_rollback_check(const char* filename, bool allow_upgrade, uint32_t expe
     return r;
   }
 
-  uint32_t magic, version, matches;
-  matches = sscanf(buf, "%u-%u", &magic, &version);
+  unsigned long magic = 0; // 0 is not a valid magic number
+  unsigned long version = 0; // 0 is not a valid version number
+  int matches = 0;
+  char *endptr = NULL;
+
+  magic = strtoul(buf, &endptr, 10);
+  if (magic == 0) {
+    ERROR("%s: invalid magic failure", __func__);
+    return Result_NO_ROLLBACK_INVALID_FORMAT;
+  }
+  matches++;
+
+  if (endptr == NULL || *endptr != '-') {
+    ERROR("%s: invalid format failure", __func__);
+    return Result_NO_ROLLBACK_INVALID_FORMAT;
+  }
+
+  endptr++;
+  version = strtoul(endptr, NULL, 10);
+  if (version == 0 || version > UINT32_MAX) {
+    ERROR("%s: invalid version failure", __func__);
+    return Result_NO_ROLLBACK_INVALID_FORMAT;
+  }
+  matches++;
+
+  // matches should always be 2. Check anyway.
   if (matches != 2) {
     ERROR("no_rollback_check: invalid format failure");
     return Result_NO_ROLLBACK_INVALID_FORMAT;
@@ -39,7 +65,7 @@ Result no_rollback_check(const char* filename, bool allow_upgrade, uint32_t expe
   }
 
   if (allow_upgrade && (version < expected_version)) {
-    INFO("no_rollback_check: bumping version from %d to %d", version, expected_version);
+    INFO("no_rollback_check: bumping version from %"PRIu32" to %"PRIu32, (uint32_t) version, expected_version);
     r = no_rollback_write_version(filename, expected_magic, expected_version);
     if (r != Result_SUCCESS) {
       return r;
@@ -59,7 +85,7 @@ Result no_rollback_write_version(const char* filename, uint32_t magic, uint32_t 
   DEBUG("in no_rollback_write");
 
   char buf[VERSION_SIZE];
-  bzero(buf, VERSION_SIZE);
+  memset(buf, 0, VERSION_SIZE);
   snprintf(buf, sizeof(buf), "%d-%d", magic, version);
   return no_rollback_write(filename, buf);
 }
