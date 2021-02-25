@@ -29,6 +29,8 @@ while read FILE; do
       -analyzer-disable-checker=unix \
       -extra-arg -Xanalyzer -extra-arg \
       -analyzer-checker=core,deadcode,security,cplusplus,nullability \
+      -extra-arg -Xanalyzer -extra-arg \
+      -analyzer-disable-checker=security.insecureAPI.DeprecatedOrUnsafeBufferHandling \
       -extra-arg -Xanalyzer -extra-arg -analyzer-output=text \
       -p ${COMPILE_DB_DIR} \
       $(basename ${FILE}) 2>&1)
