@@ -12,8 +12,8 @@ on:
     - cron: '0 1 * * *'
 
 jobs:
-  analyze:
-    name: Analyze
+  signtx-test:
+    name: "SignTx Test"
     runs-on: ubuntu-latest
     defaults:
       run:

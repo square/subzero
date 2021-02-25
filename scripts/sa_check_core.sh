@@ -7,11 +7,11 @@ set -euxo pipefail
 
 echo "Static analysis through clang static analyzer"
 EXCLUDE_PATH_PATTERN="\/external-crypto\/\|\/trezor-crypto\/"
-SUBZERO_ROOT=$(cd "$(dirname "$0")"; pwd -P)
+SUBZERO_ROOT=$(cd "$(dirname "$0")"; pwd -P)/..
 
-${SUBZERO_ROOT}/build_core.sh
+${SUBZERO_ROOT}/scripts/build_core.sh
 
-COMPILE_DB_DIR="${SUBZERO_ROOT}/../core/build"
+COMPILE_DB_DIR="${SUBZERO_ROOT}/core/build"
 COMPILE_DB="${COMPILE_DB_DIR}/compile_commands.json"
 if [ ! -f "${COMPILE_DB}" ]; then
     exit 1

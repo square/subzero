@@ -12,7 +12,7 @@ on:
     - cron: '0 2 * * *'
 
 jobs:
-  analyze:
+  sacheck:
     name: "Clang Static Analysis"
     runs-on: ubuntu-latest
     defaults:
