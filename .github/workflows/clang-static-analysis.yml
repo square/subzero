@@ -1,0 +1,56 @@
+# Static analysis of subzero CORE via clang static analyzer
+name: "Clang Static Analysis"
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [master]
+  schedule:
+    # Daily at 2am
+    - cron: '0 2 * * *'
+
+jobs:
+  analyze:
+    name: "Clang Static Analysis"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -euxo pipefail {0}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.9]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        # We must fetch at least the immediate parents so that if this is
+        # a pull request then we can checkout the head.
+        fetch-depth: 2
+        submodules: 'recursive'
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Display Python version
+      run: |
+        python -c "import sys; print(sys.version)"
+
+    - name: Install build dependencies
+      run: scripts/ubuntu_install_protobuf.sh
+
+    - name: Install clang tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install clang-tools-10 -y
+        sudo ln -sf /usr/bin/clang-check-10 /usr/bin/clang-check
+
+    # Run static analysis
+    - name: Run clang static analysis
+      run: scripts/sa_check_core.sh

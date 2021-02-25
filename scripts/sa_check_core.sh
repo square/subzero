@@ -8,10 +8,8 @@ set -euxo pipefail
 echo "Static analysis through clang static analyzer"
 EXCLUDE_PATH_PATTERN="\/external-crypto\/\|\/trezor-crypto\/"
 SUBZERO_ROOT=$(cd "$(dirname "$0")"; pwd -P)
-cd "$(dirname $0)"/..
-mkdir -p core/build
-cd core/build
-TARGET=dev CURRENCY=btc-testnet cmake ../ -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+${SUBZERO_ROOT}/build_core.sh
 
 COMPILE_DB_DIR="${SUBZERO_ROOT}/../core/build"
 COMPILE_DB="${COMPILE_DB_DIR}/compile_commands.json"
