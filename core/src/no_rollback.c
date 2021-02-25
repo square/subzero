@@ -85,7 +85,7 @@ Result no_rollback_write_version(const char* filename, uint32_t magic, uint32_t 
   DEBUG("in no_rollback_write");
 
   char buf[VERSION_SIZE];
-  bzero(buf, VERSION_SIZE);
+  memset(buf, 0, VERSION_SIZE);
   snprintf(buf, sizeof(buf), "%d-%d", magic, version);
   return no_rollback_write(filename, buf);
 }
