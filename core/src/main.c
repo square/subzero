@@ -8,6 +8,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 #include "no_rollback.h"
 #include "checks.h"
@@ -24,8 +25,29 @@
 
 int main(int argc, char **argv) {
   int r;
+  bool checks_only = false;
+  bool listen_all_ip = false;
 
   DEBUG("in main");
+
+  // This is ugly, but it's probably not worth parsing arguments for a simple
+  // case.
+  if (argc == 2) {
+    if (strcmp(argv[1], "--checks-only") == 0) {
+      checks_only = true;
+    }
+    else if (strcmp(argv[1], "--listen-all-ip") == 0) {
+      listen_all_ip = true;
+      INFO("server to listen on all interfaces");
+    }
+    else {
+      ERROR("the only valid argument is --checks-only or --listen-all-ip");
+      return -1;
+    }
+  } else if (argc != 1) {
+    ERROR("the only valid argument is --checks-only or --listen-all-ip");
+    return -1;
+  }
 
   r = init();
   if (r < 0) {
@@ -50,15 +72,10 @@ int main(int argc, char **argv) {
   }
   INFO("self-checks passed.");
 
-  // This is ugly, but it's probably not worth parsing arguments for a single
-  // case.
-  if (argc > 1) {
-    if (strcmp(argv[1], "--checks-only") == 0) {
-      cleanup();
-      return 0;
-    }
-    ERROR("the only valid argument is --checks-only");
-    return -1;
+  // Return if checks_only
+  if (checks_only) {
+    cleanup();
+    return 0;
   }
 
   // Spin up a server to handle requests
@@ -66,7 +83,8 @@ int main(int argc, char **argv) {
   memzero(&serveraddr, sizeof(serveraddr));
   serveraddr.sin_family = AF_INET;
   serveraddr.sin_port = htons(PORT);
-  serveraddr.sin_addr.s_addr = inet_addr("0.0.0.0");
+  serveraddr.sin_addr.s_addr =
+    listen_all_ip ? htonl(INADDR_ANY) : htonl(INADDR_LOOPBACK);
 
   int server;
   server = socket(AF_INET, SOCK_STREAM, 0);
