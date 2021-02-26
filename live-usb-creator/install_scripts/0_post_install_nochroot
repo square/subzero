@@ -11,32 +11,30 @@
 mkdir /tmp/nfast_install
 pushd /tmp/nfast_install
 
-# CipherTools Developer
-tar -xzf /media/SecWorld/linux/amd64/ctd.tar.gz
+# Hardware Support (mandatory)
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/hwsp/agg.tar
 
 # Core Tools (recommended)
-tar -xzf /media/SecWorld/linux/amd64/ctls.tar.gz
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/ctls/agg.tar
 
-# nCore API Documentation
-tar -xzf /media/SecWorld/linux/amd64/devref.tar.gz
+# Java Support (including KeySafe)
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/javasp/agg.tar
 
-# Hardware Support (mandatory)
-tar -xzf /media/SecWorld/linux/amd64/hwsp.tar.gz
+# nCipherKM JCA/JCE provider classes
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/jcecsp/user.tar
 
-# Java Support (including nCipherKM JCA/JCE provider, KeySafe)
-tar -xzf /media/SecWorld/linux/amd64/javasp.tar.gz
+# nCipher PKCS #11 library
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/pkcs11/user.tar
 
-# Java dev libs for nCore API
-tar -xzf /media/SecWorld/linux/amd64/jd.tar.gz
+# CHIL (Cryptographic Hardware Interface Library),
+# apparently required for "generatekey" utility
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/hwcrhk/user.tar
 
-# nShield SNMP service and tools
-tar -xzf /media/SecWorld/linux/amd64/ncsnmp.tar.gz
+# Remote Administration Service
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/dsserv/user.tar
 
-# Remote Administration Service (before 12.60 this package was known as dsserv)
-tar -xzf /media/SecWorld/linux/amd64/raserv.tar.gz
-
-# Redistributable GNU C shared libs
-tar -xzf /media/SecWorld/linux/amd64/redist.tar.gz
+# Remote Administration Client Tools
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/ratls/agg.tar
 
 # CodeSafe Developer; example programs, and SDK for CodeSafe
 tar -xzf /media/CodeSafe/linux/amd64/csd.tar.gz
