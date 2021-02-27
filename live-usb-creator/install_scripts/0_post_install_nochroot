@@ -12,41 +12,35 @@ mkdir /tmp/nfast_install
 pushd /tmp/nfast_install
 
 # Hardware Support (mandatory)
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/hwsp/agg.tar
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/hwsp/agg.tar
 
 # Core Tools (recommended)
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/ctls/agg.tar
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/ctls/agg.tar
 
 # Java Support (including KeySafe)
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/javasp/agg.tar
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/javasp/agg.tar
 
 # nCipherKM JCA/JCE provider classes
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/jcecsp/user.tar
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/jcecsp/user.tar
 
 # nCipher PKCS #11 library
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/pkcs11/user.tar
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/pkcs11/user.tar
 
 # CHIL (Cryptographic Hardware Interface Library),
 # apparently required for "generatekey" utility
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/hwcrhk/user.tar
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/hwcrhk/user.tar
 
 # Remote Administration Service
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/dsserv/user.tar
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/dsserv/user.tar
 
 # Remote Administration Client Tools
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/ratls/agg.tar
+tar -xf /media/SecWorld/linux/libc6_11/amd64/nfast/ratls/agg.tar
 
-# nCore CodeSafe API Documentation (not in SecWorld; CodeSafe only)
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/csdref/agg.tar
+# CodeSafe Developer; example programs, and SDK for CodeSafe
+tar -xzf /media/CodeSafe/linux/amd64/csd.tar.gz
 
-# nCore API Documentation (not in SecWorld; CodeSafe only)
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/devref/agg.tar
-
-# CodeSafe Developer (not in SecWorld; CodeSafe only)
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/csd/agg.tar
-
-# Prebuilt powerpcm-gcc for Codesafe/C (not in SecWorld; CodeSafe only)
-tar -xf /media/CodeSafe/linux/libc6_11/amd64/nfast/gccsrc/ppcdev.tar
+# Documentation for CodeSafe
+tar -xzf /media/CodeSafe/linux/amd64/csdref.tar.gz
 
 pushd opt
 mv nfast /mnt/sysimage/opt/
