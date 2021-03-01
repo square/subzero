@@ -1,5 +1,5 @@
-# Subzero regression test for transaction signing
-name: "SignTx Regression Test"
+# Static analysis of subzero CORE via clang static analyzer
+name: "Clang Static Analysis"
 
 on:
   push:
@@ -8,12 +8,12 @@ on:
     # The branches below must be a subset of the branches above
     branches: [master]
   schedule:
-    # Daily at 1am
-    - cron: '0 1 * * *'
+    # Daily at 2am
+    - cron: '0 2 * * *'
 
 jobs:
-  signtx-test:
-    name: "SignTx Test"
+  sacheck:
+    name: "Clang Static Analysis"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -42,27 +42,15 @@ jobs:
       run: |
         python -c "import sys; print(sys.version)"
 
-    - name: Install dependencies
+    - name: Install build dependencies
       run: scripts/ubuntu_install_protobuf.sh
 
-    # Build Java targets
-    - name: Build Java
+    - name: Install clang tools
       run: |
-        cd ${{ github.workspace }}/java
-        mvn clean package
+        sudo apt-get update
+        sudo apt-get install clang-tools-10 -y
+        sudo ln -sf /usr/bin/clang-check-10 /usr/bin/clang-check
 
-    # Build CORE
-    - name: Build Subzero Core (C/C++)
-      run: scripts/build_core.sh
-
-    - name: Run Subzero CORE
-      run: |
-        cd ${{ github.workspace }}
-        ./core/build/subzero &
-
-    - name: Run SignTx Test
-      run: |
-        cd ${{ github.workspace }}
-        ./java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test |\
-          tee /tmp/signtx-test-1492.out
-        grep -qv "ALL TESTS PASSED" /tmp/signtx-test-1492.out || exit 1
+    # Run static analysis
+    - name: Run clang static analysis
+      run: scripts/sa_check_core.sh
