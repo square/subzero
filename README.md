@@ -1,4 +1,7 @@
-[![Build Status](https://github.com/square/subzero/workflows/CodeQL/badge.svg)](https://github.com/square/subzero/actions?query=workflow%3ACodeQL)
+[![Build Status](https://github.com/square/subzero/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/square/subzero/actions/workflows/codeql-analysis.yml)
+[![Static Analysis](https://github.com/square/subzero/actions/workflows/clang-static-analysis.yml/badge.svg)](https://github.com/square/subzero/actions/workflows/clang-static-analysis.yml)
+[![Integration Test](https://github.com/square/subzero/actions/workflows/signtx-test.yml/badge.svg)](https://github.com/square/subzero/actions/workflows/signtx-test.yml)
+
 [![Documentation Status](https://readthedocs.org/projects/subzero/badge/?version=master)](https://subzero.readthedocs.io/en/master/?badge=master)
 [![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=square/subzero)](https://dependabot.com)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/square/subzero/blob/master/LICENSE)
