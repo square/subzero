@@ -1,8 +1,12 @@
 # How to set up and do transaction signing regression (black box) testing for subzero core
 
-*Currently, we have only implemented regression testing for a subzero core
-'dev' target. Support of the nCipher target will be added later. Some ideas
-about how to do it are described in Section "Future Work" of this document.*
+*The steps described in this document work for subzero core built as
+`TARGET=dev` and `TARGET=nCipher`. In the latter case, your HSM needs to be
+configured appropriately so that the dummy master seed and public key
+encryption keys (cf.
+[core/dev/protection.c](https://github.com/square/subzero/blob/3d96ba033ad4aba2bceef20ec2dac5de4499efa7/core/src/dev/protection.c#L16-L25))
+are available in the HSM world. In the rest of the document, we will go over
+the steps for `TARGET=dev`, for presentation simplicity.*
 
 ## How to run regression tests
 
@@ -11,14 +15,14 @@ instructed in [subzero
 documentation](https://subzero.readthedocs.io/en/master/running_without_hsm/).
 2. Start subzero core in a terminal
 
-   ```bash
+   ```no-highlight
    # under subzero repository directory root
    ./core/build/subzero
    ```
 
 3. In another terminal, invoke subzero GUI with option `--signtx-test`
 
-   ```bash
+   ```no-highlight
    # under subzero repository directory root
    ./java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test
    ```
@@ -31,7 +35,7 @@ An outline of the test vector creation process is as follows.
 documentation](https://subzero.readthedocs.io/en/master/running_without_hsm/).
 Put the follow content in `/data/app/subzero/wallets/subzero-1492.wallet`
 
-   ```text
+   ```no-highlight
    {"currency":"TEST_NET","encrypted_master_seed":{"encrypted_master_seed":"ioBg3WF2BntMnGae6PyWbp1VG4r446PUYVZnt1BzOOVQzHy3XeaqmBXS6tMbE9fsB0sR+Vi9xPgJcayN2uJsJNjEw7S77h9oUUpu0zWrYvl6iRAI4fcezOxbRcc="},"encrypted_pub_keys":[{"encrypted_pub_key":"OytXbV6n2L0l50yLegnaP6ea9jRDfFM0I6J/tJQzvnc2+E2Bleqvh4ZaIoTd7Nm6j9XRag1WYni/K0uoek/0rLnLNGZbrrQLNt5lkfTTcMZ72mEKTRkvRWbJwd8H+p86GLqSqgvofDSE5E5EkgYGhIGSkFy8dLpXK4jpYxAQGrIQ2tNeXKKw2nNPOQ=="},{"encrypted_pub_key":"YxgmbmaiwGON1uHpp6cp7sWxMNNJYbX4tqtEJwbOYqfKWW9k56V/uguQrliIwaG2X7ca6VJ01YQiiMdJciQzb3w182R/HsGiYYdMuHP0PNjVk9ScYby38ofTUfjW8ihUFFjM6FSs7WzZAFCuQ04bNNATuGfdXQK8pgoCHKWKTJ2c3alaZvIauwzkfQ=="},{"encrypted_pub_key":"i36ne27C7pv1psRFttz3oNBVZVwgh/t6sQO3DUDfb6Edw3GvDAea3oPQ3Fm5No3JBWp5/SARPva29lPdi4X4mz+qde2nPYMvIJtW0ndAUGU2kw9dhzVY/FZ8XGnIH33otuKE2i+HxOYwxk6+EqS1WEoWEqRe2LO8h1DTg9GsYzzTyjSj2OKIOGc02A=="},{"encrypted_pub_key":"s/1O2nYnApJd+Mlc10rvGsMghE8AmhfIBXDBW52GBrjML07IVF3pZsgPKt4mLpsf2aUcHYn4P276jrdN1rCCxlkz1haxZawNOD0RUdocg5/h6GjaeOqJVxI6hgD3xqJRT+8e2OjVLwJWSmwbX2ckeKz+u76bFNxiCP2g+UCT94s8amrAeQTLXwF9lg=="}]}
    ```
 
@@ -39,14 +43,14 @@ Put the follow content in `/data/app/subzero/wallets/subzero-1492.wallet`
 
    In one terminal
 
-   ```bash
+   ```no-highlight
    # under subzero repository directory root
    ./core/build/subzero
    ```
 
    In another terminal
 
-   ```bash
+   ```no-highlight
    # under subzero repository directory root
    ./java/server/target/server-1.0.0-SNAPSHOT.jar server
    ```
@@ -55,7 +59,7 @@ Put the follow content in `/data/app/subzero/wallets/subzero-1492.wallet`
 [expect script](https://core.tcl-lang.org/expect/index) that will later be
 used to generate test vector files.
 
-   ```bash
+   ```no-highlight
    # under subzero repository directory root
    python3 ./utils/txsign_testcase_expect_script_gen.py > /tmp/subzero_expect.sh
    chmod +x /tmp/subzero_expect.sh
@@ -78,7 +82,7 @@ used to generate test vector files.
 4. Run the expect script generated in the last step to create a log file
 `expect_subzero.log`.
 
-   ```bash
+   ```no-highlight
    # under subzero repository directory root
    # remove existing log file, if any
    rm expect_subzero.log
@@ -91,7 +95,7 @@ used to generate test vector files.
 5. Run python script `txsign_testcase_from_expect_log.py` to parse the
 expect script log, and generate test vector files in `/tmp/out_dir`
 
-   ```bash
+   ```no-highlight
    # under subzero repository directory root
    mkdir -p /tmp/out_dir
    python3 utils/txsign_testcase_from_expect_log.py -i ./expect_subzero.log -o /tmp/out_dir
@@ -101,7 +105,7 @@ expect script log, and generate test vector files in `/tmp/out_dir`
 
 Here is the content of a sample test vector (`cat /tmp/out_dir/valid-0000`).
 
-```text
+```no-highlight
 request:ENQLKlMKMgogxDWtt0dgwAmN4ISc0MOWwGTTmUUiiIo4nckDVeaiA/QQABjVutiZprYJIgQQABgGEhAIh6nDxsznCBACGgQQABgDGAAiACkAAAAAAAAAAA==
 response:GmwKagpGMEQCIH9/UgdzasFtbHSjV8JXNmUtlqWCb4RbfVehzQlJ1yoNAiBFIvAVeuXCEDCubBygIz1xWrfY0f+o3gV7QAUH44wqkRIggyGhJCTpuwc9nmvbRzbdsOGZ5NDOzJTTjJCDJgn7/os=
 ```
@@ -142,24 +146,3 @@ generating them dynamically during the test, for the following reasons:
 one-time thing) from the GUI logic
 - It makes it possible to re-use existing subzero components (server, core)
 for test vector creation, avoiding duplication of functionality
-
-## Future work
-
-- [Preferred] Add support of regression testing for the nCipher target (in
-staging)
-  - We need to generate test vectors for the HSM target. We can use a known
-  dummy master key seed for both dev and staging testing, and use (dummy)
-  master key encryption key (which happens to be the same as the public key
-  encryption key for the nCipher target) known to the staging world.
-  - It's possible to use the same test vectors for both the dev and nCipher
-  (staging) target
-
-- [Not preferred] Use wallet generated on the fly instead of a hardcoded one
-
-  - Instead of hardcoding a wallet for the test, we can hardcode the dummy
-  master key encryption (as well as the public key encryption key) in the
-  GUI, generate the master keys, the wallets, and the associated test vectors
-  dynamically. Because the wallet handling logic is relatively simple, the
-  increased test coverage seems to be marginal with this approach. Therefore,
-  we lean toward not to go in this direction to avoid adding complexity to
-  the test design.

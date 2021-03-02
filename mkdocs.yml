@@ -8,6 +8,7 @@ nav:
     - Running the code:
       - Running the code without HSMs: running_without_hsm.md
       - Developing with a remote HSM: dev_with_remote_hsm.md
+      - Transaction signing regression test: regression-testing-howto.md
     - Initialization:
       - HSM initialization: hsm_initialization.md
       - Wallet initialization: wallet_initialization.md
