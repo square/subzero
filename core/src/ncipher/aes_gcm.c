@@ -26,6 +26,13 @@ uint8_t aes_gcm_buffer[1000];
 Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
                        uint8_t *ciphertext, size_t ciphertext_len,
                        size_t *bytes_written) {
+
+  // NULL pointer checks. Note that plaintext can be NULL.
+  if (!ciphertext || !bytes_written) {
+    ERROR("%s: ciphertext and bytes_written must not be NULL", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+
   Result r;
   memzero(ciphertext, ciphertext_len);
 
@@ -50,8 +57,12 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
   command.args.encrypt.plain.type = PlainTextType_Bytes;
   command.args.encrypt.given_iv = NULL;
 
-  memcpy(aes_gcm_buffer, plaintext, plaintext_len);
-  memzero(plaintext, plaintext_len);
+  // Encrypt plaintext. plaintext can be NULL, in which case we don't
+  // memcpy/memzero it
+  if (plaintext) {
+    memcpy(aes_gcm_buffer, plaintext, plaintext_len);
+    memzero(plaintext, plaintext_len);
+  }
   command.args.encrypt.plain.data.bytes.data.len = plaintext_len;
   command.args.encrypt.plain.data.bytes.data.ptr = aes_gcm_buffer;
 
@@ -95,7 +106,16 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
 Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext,
                        size_t ciphertext_len, uint8_t *plaintext,
                        size_t plaintext_len, size_t *bytes_written) {
-  memzero(plaintext, plaintext_len);
+  // NULL pointer checks. Note that plaintext can be NULL.
+  if (!ciphertext || !bytes_written) {
+    ERROR("%s: ciphertext and bytes_written must not be NULL", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+
+  // plaintext can be NULL, in which case we don't memzero it
+  if (plaintext) {
+    memzero(plaintext, plaintext_len);
+  }
 
   size_t expected_plaintext_len = ciphertext_len - 12 - 16;
   if (plaintext_len < expected_plaintext_len) {
@@ -142,9 +162,11 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext,
     return Result_AES_GCM_DECRYPT_UNEXPECTED_PLAINTEXT_LEN_FAILURE;
   }
 
-  // success!
-  memcpy(plaintext, reply.reply.decrypt.plain.data.bytes.data.ptr,
-         expected_plaintext_len);
+  // success! Note that plaintext can be NULL
+  if (plaintext) {
+    memcpy(plaintext, reply.reply.decrypt.plain.data.bytes.data.ptr,
+           expected_plaintext_len);
+  }
   *bytes_written = expected_plaintext_len;
 
   NFastApp_Free_Reply(app, NULL, NULL, &reply);
