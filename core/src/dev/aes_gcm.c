@@ -51,7 +51,7 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t * plaintext, size_t plaintext_len,
       return Result_AES_GCM_ENCRYPT_PLAINTEXT_TOO_LONG_FAILURE;
   }
 
-  if (RETURN_GOOD != gcm_init_and_key(KEK[keyId], sizeof(KEK[keyId]), ctx))
+  if (RETURN_GOOD != gcm_init_and_key(KEK[keyId - 1], sizeof(KEK[keyId - 1]), ctx))
   {
       ERROR("gcm_init_and_key failed");
       return Result_UNKNOWN_INTERNAL_FAILURE;
@@ -130,7 +130,7 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext, size_t cipherte
     return Result_AES_GCM_DECRYPT_BUFFER_TOO_SMALL_FAILURE;
   }
 
-  if (RETURN_GOOD != gcm_init_and_key(KEK[keyId], sizeof(KEK[keyId]), ctx))
+  if (RETURN_GOOD != gcm_init_and_key(KEK[keyId - 1], sizeof(KEK[keyId - 1]), ctx))
   {
     ERROR("gcm_init_and_key failed");
     return Result_UNKNOWN_INTERNAL_FAILURE;
