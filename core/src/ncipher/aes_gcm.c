@@ -9,6 +9,10 @@
 #include "memzero.h"
 #include "transact.h"
 
+
+#define IV_SIZE_IN_BYTES (12)
+#define TAG_SIZE_IN_BYTES (16)
+
 extern NFast_AppHandle app;
 
 // For some unknown reason, NFastApp_Transact with -O2 requires heap allocated
@@ -22,19 +26,46 @@ uint8_t aes_gcm_buffer[1000];
  * Implementation detail:
  * Ciphertext is [IV (12 bytes), ciphertext (same length as input), TAG (16
  * bytes)].
+ *
+ * All pointer arguments of the function must not be NULL.
  */
 Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
                        uint8_t *ciphertext, size_t ciphertext_len,
                        size_t *bytes_written) {
+
+  // NULL pointer checks.
+  if (!plaintext) {
+    ERROR("%s: plaintext must not be NULL", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+
+  if (!ciphertext) {
+    ERROR("%s: ciphertext must not be NULL", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+
+  if (!bytes_written) {
+    ERROR("%s: bytes_written must not be NULL", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+
   Result r;
   memzero(ciphertext, ciphertext_len);
 
-  size_t expected_ciphertext_len = plaintext_len + 12 + 16;
+  if (plaintext_len > SIZE_MAX - IV_SIZE_IN_BYTES - TAG_SIZE_IN_BYTES) {
+    ERROR("%s: plaintext too long.", __func__);
+    memzero(plaintext, plaintext_len);
+    return Result_AES_GCM_ENCRYPT_PLAINTEXT_TOO_LONG_FAILURE;
+  }
+
+  size_t expected_ciphertext_len = plaintext_len + IV_SIZE_IN_BYTES +
+    TAG_SIZE_IN_BYTES;
   if (ciphertext_len < expected_ciphertext_len) {
     ERROR("aes_gcm_encrypt: ciphertext buffer too small.");
     memzero(plaintext, plaintext_len);
     return Result_AES_GCM_ENCRYPT_BUFFER_TOO_SMALL_FAILURE;
   }
+
   if (expected_ciphertext_len > sizeof(aes_gcm_buffer)) {
     ERROR("aes_gcm_encrypt: plaintext too long.");
     memzero(plaintext, plaintext_len);
@@ -50,8 +81,10 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
   command.args.encrypt.plain.type = PlainTextType_Bytes;
   command.args.encrypt.given_iv = NULL;
 
+  // Encrypt plaintext.
   memcpy(aes_gcm_buffer, plaintext, plaintext_len);
   memzero(plaintext, plaintext_len);
+
   command.args.encrypt.plain.data.bytes.data.len = plaintext_len;
   command.args.encrypt.plain.data.bytes.data.ptr = aes_gcm_buffer;
 
@@ -95,9 +128,37 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
 Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext,
                        size_t ciphertext_len, uint8_t *plaintext,
                        size_t plaintext_len, size_t *bytes_written) {
+  // NULL pointer checks.
+  if (!plaintext) {
+    ERROR("%s: plaintext must not be NULL", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+
+  if (!ciphertext) {
+    ERROR("%s: ciphertext must not be NULL", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+
+  if (!bytes_written) {
+    ERROR("%s: bytes_written must not be NULL", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+
   memzero(plaintext, plaintext_len);
 
-  size_t expected_plaintext_len = ciphertext_len - 12 - 16;
+  if (ciphertext_len < IV_SIZE_IN_BYTES + TAG_SIZE_IN_BYTES)
+  {
+    ERROR("%s: ciphertext buffer too small.", __func__);
+    return Result_AES_GCM_DECRYPT_BUFFER_TOO_SMALL_FAILURE;
+  }
+
+  if (ciphertext_len > sizeof(aes_gcm_buffer)) {
+    ERROR("%s: ciphertext too long.", __func__);
+    return Result_AES_GCM_DECRYPT_CIPHERTEXT_TOO_LONG_FAILURE;
+  }
+
+  size_t expected_plaintext_len = ciphertext_len - IV_SIZE_IN_BYTES -
+    TAG_SIZE_IN_BYTES;
   if (plaintext_len < expected_plaintext_len) {
     ERROR("aes_gcm_decrypt: plaintext buffer too small.");
     return Result_AES_GCM_DECRYPT_BUFFER_TOO_SMALL_FAILURE;
@@ -145,6 +206,7 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext,
   // success!
   memcpy(plaintext, reply.reply.decrypt.plain.data.bytes.data.ptr,
          expected_plaintext_len);
+
   *bytes_written = expected_plaintext_len;
 
   NFastApp_Free_Reply(app, NULL, NULL, &reply);
