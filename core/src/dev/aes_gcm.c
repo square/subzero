@@ -17,14 +17,26 @@ uint8_t aes_gcm_buffer[1000];
  * Implementation detail:
  * Ciphertext is [IV (12 bytes), ciphertext (same length as input), TAG (16
  * bytes)].
+ *
+ * All pointer arguments of the function must not be NULL.
  */
 Result aes_gcm_encrypt(M_KeyID keyId, uint8_t * plaintext, size_t plaintext_len,
                        uint8_t *ciphertext, size_t ciphertext_len,
                        size_t *bytes_written)
 {
-  // NULL pointer checks. Note that plaintext can be NULL.
-  if (!ciphertext || !bytes_written) {
-    ERROR("%s: ciphertext and bytes_written must not be NULL", __func__);
+  // NULL pointer checks.
+  if (!plaintext) {
+    ERROR("%s: plaintext must not be NULL", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+
+  if (!ciphertext) {
+    ERROR("%s: ciphertext must not be NULL", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+
+  if (!bytes_written) {
+    ERROR("%s: bytes_written must not be NULL", __func__);
     return Result_UNKNOWN_INTERNAL_FAILURE;
   }
 
@@ -38,6 +50,12 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t * plaintext, size_t plaintext_len,
   static gcm_ctx ctx[1];
 
   memzero(ciphertext, ciphertext_len);
+
+  if (plaintext_len > SIZE_MAX - sizeof(iv) - sizeof(tag)) {
+    ERROR("%s: plaintext too long.", __func__);
+    memzero(plaintext, plaintext_len);
+    return Result_AES_GCM_ENCRYPT_PLAINTEXT_TOO_LONG_FAILURE;
+  }
 
   size_t expected_ciphertext_len = plaintext_len + sizeof(iv) + sizeof(tag);
   if (ciphertext_len < expected_ciphertext_len) {
@@ -60,10 +78,8 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t * plaintext, size_t plaintext_len,
   // Generate a random IV
   random_buffer(iv, sizeof(iv));
 
-  // Encrypt plaintext. plaintext can be NULL, in which case we don't memcpy it
-  if (plaintext) {
-    memcpy(aes_gcm_buffer, plaintext, plaintext_len);
-  }
+  // Encrypt plaintext.
+  memcpy(aes_gcm_buffer, plaintext, plaintext_len);
 
   if (RETURN_GOOD != gcm_encrypt_message(iv, sizeof(iv),
                                          NULL, 0, // empty header
@@ -98,9 +114,19 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext, size_t cipherte
                        uint8_t *plaintext, size_t plaintext_len,
                        size_t *bytes_written)
 {
-  // NULL pointer checks. Note that plaintext can be NULL.
-  if (!ciphertext || !bytes_written) {
-    ERROR("%s: ciphertext and bytes_written must not be NULL", __func__);
+  // NULL pointer checks.
+  if (!plaintext) {
+    ERROR("%s: plaintext must not be NULL", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+
+  if (!ciphertext) {
+    ERROR("%s: ciphertext must not be NULL", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+
+  if (!bytes_written) {
+    ERROR("%s: bytes_written must not be NULL", __func__);
     return Result_UNKNOWN_INTERNAL_FAILURE;
   }
 
@@ -109,9 +135,7 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext, size_t cipherte
   // Declare static to work around a bug in gcc 4.8.5
   static gcm_ctx ctx[1];
 
-  if (plaintext) {
-    memzero(plaintext, plaintext_len);
-  }
+  memzero(plaintext, plaintext_len);
 
   if (ciphertext_len < sizeof(iv) + sizeof(tag))
   {
@@ -160,9 +184,8 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext, size_t cipherte
     return Result_UNKNOWN_INTERNAL_FAILURE;
   }
 
-  if (plaintext) {
-    memcpy(plaintext, aes_gcm_buffer, expected_plaintext_len);
-  }
+  memcpy(plaintext, aes_gcm_buffer, expected_plaintext_len);
+
   *bytes_written = expected_plaintext_len;
   memzero(aes_gcm_buffer, sizeof(aes_gcm_buffer));
   memzero(iv, sizeof(iv));
