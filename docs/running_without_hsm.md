@@ -79,7 +79,8 @@ See also [sample output](core_sample_output.md).
     ./subzero/java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar
 
 Your environment should look as following (from top left, going clockwise): the GUI, a web browser, and a Terminal.
-<img src="../dev_setup.png">
+
+![Environment layout](./dev_setup.png)
 
 ## Creating a wallet and signing your first transaction
 
@@ -87,20 +88,21 @@ By default, Subzero is configured to work with 2-of-4 signatures. Creating a wal
 initialization and 4 finalization steps. Broadcasting a transaction will require 2 signatures.
 
 ### Initialization
+
 On the web browser, click on "generate QR code" under Initialize a wallet. Unless if you set a wallet id, the QR code
 should be "EAAaAA==".
 
-<img src="../init_wallet_dev_server.png">
+![Init wallet: dev server](./init_wallet_dev_server.png)
 
 You can paste this code in the GUI, which will change the GUI to the approval step. note: the GUI currently does not
 support clipboard operations. You can instead use the Terminal tab to copy-paste data.
 
-<img src="../init_wallet_gui.png">
+![Init wallet: GUI](./init_wallet_gui.png)
 
 Type "yes" + [enter] to continue. A QR code is displayed, but you can also copy the data from the Terminal. You will
 want to save this response in TextEdit. In our case, the response was `CnMKcQpv3trfyO6S55vO5PLtkpjakvPNzdOb+PLe0P3O5sft4tzb55Lp2tLd5N7Fydjs4MPZ8szcn5Lkm53dyc+ewcWSweDF2snP39ub/fny2v/v7ODI8uzA0M7+/8/8meDD0M7znO3vx+ub7+aS3Z3O+sDy`. Since this response contains ciphertext, the data will be different each time.
 
-<img src="../init_wallet_gui_done.png">
+![Init wallet: GUI done](./init_wallet_gui_done.png)
 
 Before you can repeat the wallet initialization process 3 more times, you need to move the wallet file out of the way:
 
@@ -111,10 +113,11 @@ Before you can repeat the wallet initialization process 3 more times, you need t
 
 Once you are done initializing the 4 shares, you'll have 4 files in /data/app/subzero/wallets/initialized:
 
-<img src="../init_wallet_initialized.png">
+![Init wallet: 4 shares](./init_wallet_initialized.png)
 
 And 4 responses in TextEdit:
-<img src="../init_wallet_text_edit.png">
+
+![Init wallet: 4 responses](./init_wallet_text_edit.png)
 
 ### Finalization
 
@@ -131,18 +134,18 @@ fyO6T88SYxOzN0P3mwpP5ktnO8Oj97/r+3uLd0uz//5/pyPLd05KTw9/L5/Pk+ezy+dCY2sPo++SemMD
 Tp///cx9DD/ujF4uDr2vrN0O3C2N3F086S8ND42+ft2cPr0/r5
 ```
 
-<img src="../finalize_wallet_web.png">
+![Finalize wallet: dev server ](./finalize_wallet_web.png)
 
 You can now finalize each wallet file. You will have to, one-by-one, copy wallet files from /data/app/subzero/wallets/initialized
 to /data/app/subzero/wallets/ and move the result to /data/app/subzero/wallets/finalized/.
 
     mv -n initialized/subzero-0.wallet-1 subzero-0.wallet
 
-<img src="../finalize_wallet_gui.png">
+![Finalize wallet: GUI](./finalize_wallet_gui.png)
 
 Type "yes" + [enter] to continue. Again, make sure you record each response. Our response was `EnEKb3RwdWJEOE0xZE5YRzgycDhZZ2d5MVJYdHpXZExtR0h2cU04Q3B4d050b2NyRkppc1hmdjU4TjE3d2NlNGtvOGtKb3BjZXVxMVdTWHBVRUZKYlhGanpkVFVlVjNKaXpkWTZHRW1BMUVMOHc3ZFBqWA==`.
 
-<img src="../finalize_wallet_gui_done.png">
+![Finalize wallet: GUI done](./finalize_wallet_gui_done.png)
 
 Move the wallet file out of the way and finalize the remaining 3 shares.
 
@@ -150,10 +153,11 @@ Move the wallet file out of the way and finalize the remaining 3 shares.
 
 Once you are done finalizing the 4 shares, you'll have 4 files in /data/app/subzero/wallets/finalized:
 
-<img src="../finalize_wallet_finalized.png">
+![Finalize wallet: Finalized](./finalize_wallet_finalized.png)
 
 And 4 more responses in TextEdit:
-<img src="../finalize_wallet_text_edit.png">
+
+![Finalize wallet: 4 responses](./finalize_wallet_text_edit.png)
 
 ### Reveal wallet xpubs
 
@@ -161,14 +165,14 @@ Using the 4 responses from the finalization step and the web browser, you can ge
 (`xpub` prefix for mainnet and `tpub` prefix for testnet). These public keys can be used to derive addresses and send
 funds to the cold wallet.
 
-<img src="../xpubs.png">
+![xpubs](./xpubs.png)
 
 ### Derive an address and send funds
 
 Using the same 4 responses from the finalization step and the web browser, you can get addresses. Let's derive the
 first non-change address. In our case, we get `2NF3qdAFLNTvC8C7kqbccndZzqU22uFAr8Z`.
 
-<img src="../derive_wallet_address.png">
+![Derive wallet address](./derive_wallet_address.png)
 
 We can send funds to this address and then use our wallet shares to sign a transaction which moves the funds out. For testnet addresses, we can use
 a [faucet](https://coinfaucet.eu/en/btc-testnet/), which is a free service available to Bitcoin developers to get testnet coins.
@@ -183,13 +187,13 @@ and send all the funds (minus the fee) to the gateway.
 
 Using the web browser, we get the following signing request `EAAqTQovCiAbDUIgtchXulYyyEGL9KseDnkTwZzXuWfuVMZv5Wb9zRABGLTdpAQiBBAAGAASDQiU0J4EEAIaBBAAGAAYACIAKQAAAAAAAAAA`.
 
-<img src="../first_transaction.png">
+![First transaction](./first_transaction.png)
 
 We'll need to use any two wallet shares to sign this transaction.
 
     mv -n finalized/subzero-0.wallet-1 subzero-0.wallet
 
-<img src="../sign_tx_gui.png">
+![SignTx GUI](./sign_tx_gui.png)
 
 Resulting in a signing response. Repeat the process with another wallet share to get two responses (our threshold).
 
@@ -202,7 +206,7 @@ Gm0KawpHMEUCIQDBfIptUIBoz0dP0xvOvzPd4VB0FXLYmsrfk52u8d3U5wIgbiEFEK5EWmunEiC/bh6f
 
 Use the web browser to merge these signatures into a transaction.
 
-<img src="../final_transaction.png">
+![Final transaction](./final_transaction.png)
 
 Our final transaction is:
 

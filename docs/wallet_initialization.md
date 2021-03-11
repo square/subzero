@@ -27,7 +27,7 @@ Java UI -> Operator: InitWalletResponse (QR code displayed)
 Operator -> Coordinator Service: InitWalletResponse (QR code scanned)
 -->
 
-<img src="../init_wallet.png">
+![Init wallet](./init_wallet.png)
 _Above process takes place once per location_
 
 By encrypting the xpub, we prevent the operators who are participating in the multi-party ceremony from being able to
@@ -57,7 +57,7 @@ Java UI -> Operator: FinalizeWalletResponse (QR code displayed)
 Operator -> Coordinator Service: FinalizeWalletResponse (QR code scanned)
 -->
 
-<img src="../finalize_wallet.png">
+[Finalize wallet](./finalize_wallet.png)
 _Above process also takes place once per location_
 
 Once every location has finalized their wallet, the Coordinator service is able to derive addresses and watch
