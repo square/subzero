@@ -23,4 +23,4 @@ transaction is broadcasted
 end note
 -->
 
-<img src="../signing_ceremony.png">
+![Signing ceremony](./signing_ceremony.png)

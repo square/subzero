@@ -21,7 +21,7 @@ the caveat that the code is currently only useful if you have the exact same har
 code more modular over time, as long as the broader community shows interest to implement support for additional
 hardware vendors.
 
-<img src="map.svg">
+![Map](./map.svg)
 
 _A multi-party signing ceremony is needed to unlock funds._
 
