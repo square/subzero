@@ -3,11 +3,14 @@
 # /etc/rc.d/init.d/livesys calls out to this script (/usr/local/bin/startup), meaning it’s run on startup.
 # Note that it does NOT block a TTY/login/bash/etc., hence the nfast_block_shell utility script.
 
-# Install protobuf only for dev ISO
+# Install protobuf and enable sshd, only for dev ISO
 if [ -f "/usr/local/bin/.isotype_dev" ]; then
   /usr/local/bin/install_protobuf
   ln -Tsf /bin/python3 /bin/python
   /usr/local/bin/install_nfast_tools_dev
+  cp /data/app/subzero/sshd_config /etc/ssh/sshd_config
+  rm /data/app/subzero/sshd_config
+  service sshd start
 else
   /usr/local/bin/install_nfast_tools_release
 fi
