@@ -5,7 +5,7 @@
 
 #include "log.h"
 #include "memzero.h"
-#include "aes_gcm.h"
+#include "aes_gcm_dev.h"
 #include "rand.h"
 
 // Protection: developer edition.

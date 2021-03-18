@@ -1,7 +1,8 @@
 #include <stdint.h>
+#include <squareup/subzero/internal.pb.h> // For error codes
 #include "log.h"
 #include "memzero.h"
-#include "aes_gcm.h"
+#include "aes_gcm_dev.h"
 #include "gcm.h"
 #include "rand.h"
 

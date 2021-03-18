@@ -5,7 +5,7 @@
 #include <squareup/subzero/common.pb.h>
 #include <squareup/subzero/internal.pb.h>
 
-#include "aes_gcm.h"
+#include "aes_gcm_ncipher.h"
 #include "config.h"
 #include "log.h"
 

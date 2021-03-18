@@ -55,7 +55,8 @@ set(checks_SRC
 list(APPEND main_SRC ${checks_SRC})
 
 set(include_SRC
-    "include/aes_gcm.h"
+    "include/aes_gcm_dev.h"
+    "include/aes_gcm_ncipher.h"
     "include/checks.h"
     "include/config.h"
     "include/conv.h"
