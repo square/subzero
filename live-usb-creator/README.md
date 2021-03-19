@@ -135,7 +135,10 @@ VM related stuff:
     building a release image that will work out of the box. Specifically,
 
       * `data_app_subzero/` should contain `subzero-cli.jar`,
-      `subzero-signed.sar`, `subzero-userdata-signed`.
+      `subzero-signed.sar`, `subzero-userdata-signed.sar`, where
+      `subzero-cli.jar` is `gui-1.0.0-SNAPSHOT-shaded.jar` renamed, and the latter
+      two `.sar` files are the signed artifacts of `make prod` on a properly
+      configured machine with an HSM.
       * `/dev/sda1` when mounted to `/hd`, should have the HSM and wallets
       files contained in `/hd/local` and `/hd/wallets`, respectively.
 
