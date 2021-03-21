@@ -2,7 +2,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../nanopb/extra/)
 find_package(Nanopb REQUIRED)
 include_directories(${NANOPB_INCLUDE_DIRS})
 
-file(GLOB protos "squareup/subzero/*.proto")
+set(protos
+    "${CMAKE_CURRENT_LIST_DIR}/squareup/subzero/internal.proto"
+    "${CMAKE_CURRENT_LIST_DIR}/squareup/subzero/common.proto"
+)
 
 nanopb_generate_cpp(PROTO_SRCS PROTO_HDRS ${protos} RELPATH ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
