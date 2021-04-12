@@ -17,8 +17,14 @@ Result no_rollback_read(const char* filename, char buf[static VERSION_SIZE]) {
     no_rollback_write_version(filename, VERSION_MAGIC, VERSION);
     f = fopen(tmp_file, "r");
   }
-  fread(buf, 1, VERSION_SIZE, f);
+  size_t bytes_read = fread(buf, 1, VERSION_SIZE, f);
   fclose(f);
+  // Because the file is only supposed to be created by no_rollback_write,
+  // any mismatch below indicates an anomaly. Hence we let it fail.
+  if (bytes_read != VERSION_SIZE) {
+    ERROR("%s failed", __func__);
+    return Result_NO_ROLLBACK_FILE_NOT_FOUND;
+  }
   return Result_SUCCESS;
 }
 
