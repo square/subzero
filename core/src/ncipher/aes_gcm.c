@@ -3,8 +3,9 @@
 #include <stdint.h>
 #include <string.h>
 #include <strings.h>
+#include <squareup/subzero/internal.pb.h> // For error codes
 
-#include "aes_gcm.h"
+#include "aes_gcm_ncipher.h"
 #include "log.h"
 #include "memzero.h"
 #include "transact.h"

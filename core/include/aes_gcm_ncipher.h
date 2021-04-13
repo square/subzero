@@ -1,16 +1,7 @@
 #pragma once
 
-#include <squareup/subzero/internal.pb.h>
-
-// M_KeyID is typedef'ed in codesafe header. If STDMARSHALTYPES_H is not
-// defined, we are in dev target
-#ifndef STDMARSHALTYPES_H
-typedef enum {KEYID_MASTER_SEED_ENCRYPTION_KEY = 0,
-              KEYID_PUBKEY_ENCRYPTION_KEY = 1} M_KeyID;
-// Key encryption key declaration, for AES-128-GCM
-extern uint8_t KEK[2][16];
-#endif
-
+/* This header is meant for the nCipher target, and should only be included in the
+ * codesafe/ncipher implementation */
 
 Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
                        uint8_t *ciphertext, size_t ciphertext_len,

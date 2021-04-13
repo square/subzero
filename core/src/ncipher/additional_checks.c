@@ -1,8 +1,9 @@
 #include <nfastapp.h>
 #include <seelib.h>
 #include <stdint.h>
+#include <squareup/subzero/internal.pb.h> // For error codes
 
-#include "aes_gcm.h"
+#include "aes_gcm_ncipher.h"
 #include "checks.h"
 #include "log.h"
 #include "transact.h"
