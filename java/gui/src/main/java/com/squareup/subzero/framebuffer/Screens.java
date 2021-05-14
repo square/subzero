@@ -106,7 +106,7 @@ public class Screens {
    * @return the data from a scanned QR Code (or just typed in...)
    */
   public String readQRCode() throws IOException {
-    String instructions = "Please scan the printed QR-Code using the red scanner";
+    String instructions = "Please scan the QR-Code using the red scanner";
 
     framebuffer.draw((Graphics2D graphics) ->
       baseScreenLayout(graphics,"Scan QR Code", instructions, Color.white)

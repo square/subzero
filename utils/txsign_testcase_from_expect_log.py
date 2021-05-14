@@ -16,7 +16,7 @@ def process_expect_log(logfile):
   """
   requests = []
   responses = []
-  request_marker = "Please scan the printed QR-Code using the red scanner"
+  request_marker = "Please scan the QR-Code using the red scanner"
   response_marker = "Displaying QR code. Data: "
   with open(logfile, 'r') as f:
     lines = f.readlines()

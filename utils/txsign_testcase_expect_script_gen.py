@@ -134,7 +134,7 @@ def generate_expect_script(qr_requests):
   """
 
   expect_template = """
-  expect "Please scan the printed QR-Code using the red scanner"
+  expect "Please scan the QR-Code using the red scanner"
   send -- "$request\\r"
 
   expect "Type exactly \\"yes\\" + <enter> to approve or \\"no\\" + <enter> to abort."
