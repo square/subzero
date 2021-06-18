@@ -1,0 +1,70 @@
+# Binary static analysis of subzero CORE, to make sure it's built properly
+name: "Binary Static Analysis"
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [master]
+  schedule:
+    # Daily at 2:42am
+    - cron: '42 3 * * *'
+
+jobs:
+  bincheck:
+    name: "Binary Static Analysis"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -euxo pipefail {0}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.9]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        # We must fetch at least the immediate parents so that if this is
+        # a pull request then we can checkout the head.
+        fetch-depth: 2
+        submodules: 'recursive'
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Display Python version
+      run: |
+        python -c "import sys; print(sys.version)"
+
+    - name: Install build dependencies
+      run: |
+        scripts/ubuntu_install_protobuf.sh
+
+    - name: Build subzero CORE
+      run: |
+        scripts/build_core.sh
+
+    # Run binary static analysis
+    - name: Run binary static analysis
+      run: |
+        dev_testnet_expected=$(echo -e "GATEWAY TYPE: TESTNET\nAES KEY TYPE: DEV" \
+          | sha256sum | cut -f1 -d' ')
+        dev_mainnet_expected=$(echo -e "GATEWAY TYPE: MAINNET\nAES KEY TYPE: DEV" \
+          | sha256sum | cut -f1 -d' ')
+        dev_testnet=$(scripts/binary_static_analysis.sh core/build/subzero_testnet \
+          2> /dev/null | sha256sum | cut -f1 -d' ')
+        dev_mainnet=$(scripts/binary_static_analysis.sh core/build/subzero_mainnet \
+          2> /dev/null | sha256sum | cut -f1 -d' ')
+        if [[ $dev_testnet_expected != $dev_testnet ]]; then
+          exit 1
+        fi
+        if [[ $dev_mainnet_expected != $dev_mainnet ]]; then
+          exit 2
+        fi
+

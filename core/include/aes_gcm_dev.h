@@ -3,6 +3,10 @@
 /* This header is meant for the dev target, and should only be included in the
  * dev implementation */
 
+// magic string for binary static analysis
+// aes_gcm_dev:$(echo -n "aes_gcm_dev" | sha256sum | cut -c1-16)
+#define MAGIC "aes_gcm_dev:8873b8689d31cc4d"
+
 // M_KeyID typedef for the dev target
 //
 // Note that it's a re-definition of the codesafe-specific M_KeyID type. M_keyID
