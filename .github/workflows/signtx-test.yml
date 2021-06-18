@@ -58,7 +58,7 @@ jobs:
     - name: Run Subzero CORE
       run: |
         cd ${{ github.workspace }}
-        ./core/build/subzero &
+        ./core/build/subzero_testnet &
 
     - name: Run SignTx Test
       run: |
