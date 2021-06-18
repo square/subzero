@@ -1,10 +1,18 @@
 #!/usr/bin/env bash
 
 # This is a simple static analysis tool for subzero core. It checks 
-# - which gateway address is present in the subzero binary. Gateway address
-# types are: "TESTNET", "MAINNET", "UNKNOWN"
-# - which AES-GCM key type is present in the subzero binary. Key types are:
-# "DEV", "NCIPHER", "UNKNOWN"
+# - which gateway address type is present in the subzero binary.
+#   Function `print_gateway_address_type` prints one of the following values
+#   to STDOUT
+#   * "GATEWAY TYPE: TESTNET"
+#   * "GATEWAY TYPE: MAINNET"
+#   * "GATEWAY TYPE: UNKNOWN"
+# - which AES-GCM key type is present in the subzero binary.
+#   Function `print_aes_key_type` prints one of the following values to
+#   STDIN
+#   * "AES KEY TYPE: DEV"
+#   * "AES KEY TYPE: NCIPHER"
+#   * "AES KEY TYPE: UNKNOWN"
 
 set -euo pipefail
 
