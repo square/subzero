@@ -53,18 +53,4 @@ jobs:
     # Run binary static analysis
     - name: Run binary static analysis
       run: |
-        dev_testnet_expected=$(echo -e "GATEWAY TYPE: TESTNET\nAES KEY TYPE: DEV" \
-          | sha256sum | cut -f1 -d' ')
-        dev_mainnet_expected=$(echo -e "GATEWAY TYPE: MAINNET\nAES KEY TYPE: DEV" \
-          | sha256sum | cut -f1 -d' ')
-        dev_testnet=$(scripts/binary_static_analysis.sh core/build/subzero_testnet \
-          2> /dev/null | sha256sum | cut -f1 -d' ')
-        dev_mainnet=$(scripts/binary_static_analysis.sh core/build/subzero_mainnet \
-          2> /dev/null | sha256sum | cut -f1 -d' ')
-        if [[ $dev_testnet_expected != $dev_testnet ]]; then
-          exit 1
-        fi
-        if [[ $dev_mainnet_expected != $dev_mainnet ]]; then
-          exit 2
-        fi
-
+        scripts/bsa_check_core.sh core/build

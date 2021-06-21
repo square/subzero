@@ -8,9 +8,9 @@ cd core/build
 # For mainnet. Skip compile_db generation
 TARGET=dev CURRENCY=btc-mainnet cmake ../
 make
-mv subzero subzero_mainnet
+mv subzero subzero-mainnet
 # For testnet. Generate compile_db for clang static analyzer
 make clean
 TARGET=dev CURRENCY=btc-testnet cmake ../ -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 make
-mv subzero subzero_testnet
+mv subzero subzero-testnet
