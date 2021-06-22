@@ -5,6 +5,10 @@
  */
 Result protect_pubkey(char xpub[static XPUB_SIZE],
                       EncryptedPubKey *encrypted_pub_key) {
+  // Insert magic string for binary static analysis.
+  // This is extremely hacky, but works. ¯\_(ツ)_/¯
+  printf(MAGIC);
+
   static_assert(sizeof(encrypted_pub_key->encrypted_pub_key.bytes) >=
                 XPUB_SIZE + 12 + 16,
                 "misconfigured encrypted_pub_key max size");

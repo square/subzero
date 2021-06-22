@@ -1,5 +1,5 @@
-# Subzero regression test for transaction signing
-name: "SignTx Regression Test"
+# Binary static analysis of subzero CORE, to make sure it's built properly
+name: "Binary Static Analysis"
 
 on:
   push:
@@ -8,12 +8,12 @@ on:
     # The branches below must be a subset of the branches above
     branches: [master]
   schedule:
-    # Daily at 1am
-    - cron: '0 1 * * *'
+    # Daily at 2:42am
+    - cron: '42 3 * * *'
 
 jobs:
-  signtx-test:
-    name: "SignTx Test"
+  bincheck:
+    name: "Binary Static Analysis"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -42,27 +42,15 @@ jobs:
       run: |
         python -c "import sys; print(sys.version)"
 
-    - name: Install dependencies
-      run: scripts/ubuntu_install_protobuf.sh
-
-    # Build Java targets
-    - name: Build Java
+    - name: Install build dependencies
       run: |
-        cd ${{ github.workspace }}/java
-        mvn clean package
+        scripts/ubuntu_install_protobuf.sh
 
-    # Build CORE
-    - name: Build Subzero Core (C/C++)
-      run: scripts/build_core.sh
-
-    - name: Run Subzero CORE
+    - name: Build subzero CORE
       run: |
-        cd ${{ github.workspace }}
-        ./core/build/subzero-testnet &
+        scripts/build_core.sh
 
-    - name: Run SignTx Test
+    # Run binary static analysis
+    - name: Run binary static analysis
       run: |
-        cd ${{ github.workspace }}
-        ./java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test |\
-          tee /tmp/signtx-test-1492.out
-        grep -qv "ALL TESTS PASSED" /tmp/signtx-test-1492.out || exit 1
+        scripts/bsa_check_core.sh core/build
