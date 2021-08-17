@@ -24,6 +24,7 @@ We maintain the online/offline isolation by importing transaction metadata and e
 HSMs have the ability to share key material. This enables the ability to store our backups in encrypted form and
 restore a wallet at any location.
 
+
 This repo contains our design documents as well as specific technical information. We are sharing our source code, with
 the caveat that the code is currently only useful if you have the exact same hardware setup. We are willing to make the
 code more modular over time, as long as the broader community shows interest to implement support for additional
