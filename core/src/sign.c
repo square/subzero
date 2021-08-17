@@ -632,5 +632,6 @@ Result handle_sign_tx(InternalCommandRequest_SignTxRequest *request,
   }
   memzero((void *) public_key, 33);
 
+
   return r;
 }
