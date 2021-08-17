@@ -482,7 +482,9 @@ compute_output_hash(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
  * The code creates two signatures for a 2-of-4 segwit wallet. The result can't
  * be verified with Electrum but we can broadcast it on the Testnet.
  *
- * Best effort is made to zeroize all the secret values in error scenarios
+ * Confidential items have been marked.
+ * An effort has been made to zeroize them regardless of success or failure of this function.
+ *
  */
 Result handle_sign_tx(InternalCommandRequest_SignTxRequest *request,
                       InternalCommandResponse_SignTxResponse *response) {
@@ -492,7 +494,7 @@ Result handle_sign_tx(InternalCommandRequest_SignTxRequest *request,
   memzero((void *) &wallet, sizeof(HDNode));
   char CONFIDENTIAL xpub[MULTISIG_PARTS][XPUB_SIZE] = {0};
   uint8_t CONFIDENTIAL public_key[33] = {0};
-  
+
   do {
     if (!validate_fees(request)) {
       ERROR("validate_fees failed");
