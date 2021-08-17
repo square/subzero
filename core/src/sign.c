@@ -18,6 +18,7 @@
 #include "rpc.h"
 #include "script.h"
 #include "sign.h"
+#include "memzero.h"
 
 static void compute_prevout_hash(TxInput *inputs, pb_size_t inputs_count,
                                  uint8_t hash[static HASHER_DIGEST_LENGTH]) {
@@ -480,32 +481,42 @@ compute_output_hash(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
  *
  * The code creates two signatures for a 2-of-4 segwit wallet. The result can't
  * be verified with Electrum but we can broadcast it on the Testnet.
+ *
+ * Best effort is made to zeroize all the secret values in error scenarios
  */
 Result handle_sign_tx(InternalCommandRequest_SignTxRequest *request,
                       InternalCommandResponse_SignTxResponse *response) {
-
+  Result r = Result_SUCCESS;
+  uint8_t CONFIDENTIAL seed[SHA512_DIGEST_LENGTH] = {0};
+  HDNode CONFIDENTIAL wallet;
+  memzero((void *) &wallet, sizeof(HDNode));
+  char CONFIDENTIAL xpub[MULTISIG_PARTS][XPUB_SIZE] = {0};
+  uint8_t CONFIDENTIAL public_key[33] = {0};
+  do {
   if (!validate_fees(request)) {
     ERROR("validate_fees failed");
-    return Result_FEE_VALIDATION_FAILED;
+    r = Result_FEE_VALIDATION_FAILED;
+    break;
   }
 
   // Load encrypted wallet
-  uint8_t seed[SHA512_DIGEST_LENGTH];
-  Result r = expose_wallet(&request->encrypted_master_seed, seed);
+  r = expose_wallet(&request->encrypted_master_seed, seed);
   if (r != Result_SUCCESS) {
     ERROR("expose_wallet failed: (%d).", r);
-    return r;
+    break;
   }
 
   // Load enc_pub_keys
-  char xpub[MULTISIG_PARTS][XPUB_SIZE];
   for (int i = 0; i < MULTISIG_PARTS; i++) {
     r = expose_pubkey(&request->encrypted_pub_keys[i], xpub[i]);
     if (r != Result_SUCCESS) {
       ERROR("expose_pubkey failed");
-      return r;
+      break;
     }
     DEBUG("Loaded pubkey %d: %s", i, xpub[i]);
+  }
+  if (r != Result_SUCCESS){
+      break;
   }
 
   DEBUG("Gateway: %s", GATEWAY);
@@ -529,7 +540,7 @@ Result handle_sign_tx(InternalCommandRequest_SignTxRequest *request,
   r = compute_output_hash(xpub, request->outputs, request->outputs_count, outputHash);
   if (r != Result_SUCCESS) {
     ERROR("compute_output_hash failed: (%d).", r);
-    return r;
+    break;
   }
   DEBUG("outputHash");
   print_bytes(outputHash, HASHER_DIGEST_LENGTH);
@@ -544,25 +555,22 @@ Result handle_sign_tx(InternalCommandRequest_SignTxRequest *request,
                    prevoutsHash, seqHash, outputHash, hash);
     if (r != Result_SUCCESS) {
       ERROR("hash_input failed: (%d).", r);
-      return r;
+      break;
     }
-
     // Derive the private key used for this input
-    HDNode wallet;
     r = derive_private_key(seed, &request->inputs[i].path, &wallet);
     if (r != Result_SUCCESS) {
       ERROR("derive_private_key failed: (%d).", r);
-      return r;
+      break;
     }
     hdnode_fill_public_key(&wallet);
     // Validate the pubkey we're signing with is one of our public keys.
     bool found = false;
     for (int j = 0; j < MULTISIG_PARTS; j++) {
-      uint8_t public_key[33];
       r = derive_public_key(xpub[j], &request->inputs[i].path, public_key);
       if (r != Result_SUCCESS) {
         ERROR("Failed deriving public key");
-        return r;
+        break;
       }
       static_assert(sizeof(public_key) == sizeof(wallet.public_key),
                     "Pubkey size mismatch");
@@ -575,14 +583,16 @@ Result handle_sign_tx(InternalCommandRequest_SignTxRequest *request,
       ERROR("We're signing with a private key that doesn't match one of our "
             "public keys");
       print_bytes(wallet.public_key, sizeof(wallet.public_key));
-      return Result_UNKNOWN_INTERNAL_FAILURE;
+      r = Result_UNKNOWN_INTERNAL_FAILURE;
+      break;
     }
 
     // sign the hash
-    uint8_t sig[64];
+    uint8_t sig[64] = {0};
     if (hdnode_sign_digest(&wallet, hash, sig, NULL, NULL) != 0) {
       ERROR("hdnode_sign_digest failed");
-      return Result_UNKNOWN_INTERNAL_FAILURE;
+      r = Result_UNKNOWN_INTERNAL_FAILURE;
+      break;
     }
 
     // Validate the signature.  Validating after signing is important to ensure
@@ -592,7 +602,8 @@ Result handle_sign_tx(InternalCommandRequest_SignTxRequest *request,
     if (ecdsa_verify_digest(wallet.curve->params, wallet.public_key, sig,
                             hash) != 0) {
       ERROR("Verifying signature we just created failed");
-      return Result_UNKNOWN_INTERNAL_FAILURE;
+      r = Result_UNKNOWN_INTERNAL_FAILURE;
+      break;
     } else {
       DEBUG("Successfully validated with public key:");
       print_bytes(wallet.public_key, 33);
@@ -612,7 +623,19 @@ Result handle_sign_tx(InternalCommandRequest_SignTxRequest *request,
                   "Expect hash size to match proto size");
     memcpy(response->signatures[i].hash, hash, sizeof(hash));
   }
-  response->signatures_count = request->inputs_count;
+  if (r != Result_SUCCESS){
+        break;
+  }
 
-  return Result_SUCCESS;
+
+  response->signatures_count = request->inputs_count;
+  }while(0);
+
+  memzero((void *) seed, SHA512_DIGEST_LENGTH);
+  memzero((void *) &wallet, sizeof(HDNode));
+  for (int i = 0 ; i < MULTISIG_PARTS ; i++){
+      memzero((void *)xpub[i], XPUB_SIZE);
+  }
+  memzero((void *) public_key, 33);
+  return r;
 }
