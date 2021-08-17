@@ -495,146 +495,135 @@ Result handle_sign_tx(InternalCommandRequest_SignTxRequest *request,
   char CONFIDENTIAL xpub[MULTISIG_PARTS][XPUB_SIZE] = {0};
   uint8_t CONFIDENTIAL public_key[33] = {0};
 
-  do {
-    if (!validate_fees(request)) {
-      ERROR("validate_fees failed");
-      r = Result_FEE_VALIDATION_FAILED;
-      break;
-    }
+  if (!validate_fees(request)) {
+    ERROR("validate_fees failed");
+    r = Result_FEE_VALIDATION_FAILED;
+    goto cleanup;
+  }
 
-    // Load encrypted wallet
-    r = expose_wallet(&request->encrypted_master_seed, seed);
+  // Load encrypted wallet
+  r = expose_wallet(&request->encrypted_master_seed, seed);
+  if (r != Result_SUCCESS) {
+    ERROR("expose_wallet failed: (%d).", r);
+    goto cleanup;
+  }
+
+  // Load enc_pub_keys
+  for (int i = 0; i < MULTISIG_PARTS; i++) {
+    r = expose_pubkey(&request->encrypted_pub_keys[i], xpub[i]);
     if (r != Result_SUCCESS) {
-      ERROR("expose_wallet failed: (%d).", r);
-      break;
+      ERROR("expose_pubkey failed");
+      goto cleanup;
     }
+    DEBUG("Loaded pubkey %d: %s", i, xpub[i]);
+  }
 
-    // Load enc_pub_keys
-    for (int i = 0; i < MULTISIG_PARTS; i++) {
-      r = expose_pubkey(&request->encrypted_pub_keys[i], xpub[i]);
-      if (r != Result_SUCCESS) {
-        ERROR("expose_pubkey failed");
-        break;
-      }
-      DEBUG("Loaded pubkey %d: %s", i, xpub[i]);
-    }
-    if (r != Result_SUCCESS){
-        break;
-    }
+  DEBUG("Gateway: %s", GATEWAY);
 
-    DEBUG("Gateway: %s", GATEWAY);
+  // Compute what BIP 0143 calls "midstate": three hashes shared by all
+  // signatures below.
+  uint8_t prevoutsHash[HASHER_DIGEST_LENGTH];
+  compute_prevout_hash(request->inputs, request->inputs_count, prevoutsHash);
+  DEBUG("prevoutsHash");
+  print_bytes(prevoutsHash, HASHER_DIGEST_LENGTH);
 
-    // Compute what BIP 0143 calls "midstate": three hashes shared by all
-    // signatures below.
-    uint8_t prevoutsHash[HASHER_DIGEST_LENGTH];
-    compute_prevout_hash(request->inputs, request->inputs_count, prevoutsHash);
-    DEBUG("prevoutsHash");
-    print_bytes(prevoutsHash, HASHER_DIGEST_LENGTH);
+  uint8_t seqHash[HASHER_DIGEST_LENGTH];
+  // We assume all inputs have this fixed sequence. TODO: Do they? If not, they
+  // need to be in the request.
+  uint32_t sequence = 0xfffffffe;
+  compute_sequence_hash(sequence, request->inputs_count, seqHash);
+  DEBUG("seqHash");
+  print_bytes(seqHash, HASHER_DIGEST_LENGTH);
 
-    uint8_t seqHash[HASHER_DIGEST_LENGTH];
-    // We assume all inputs have this fixed sequence. TODO: Do they? If not, they
-    // need to be in the request.
-    uint32_t sequence = 0xfffffffe;
-    compute_sequence_hash(sequence, request->inputs_count, seqHash);
-    DEBUG("seqHash");
-    print_bytes(seqHash, HASHER_DIGEST_LENGTH);
+  uint8_t outputHash[HASHER_DIGEST_LENGTH];
+  r = compute_output_hash(xpub, request->outputs, request->outputs_count, outputHash);
+  if (r != Result_SUCCESS) {
+    ERROR("compute_output_hash failed: (%d).", r);
+    goto cleanup;
+  }
+  DEBUG("outputHash");
+  print_bytes(outputHash, HASHER_DIGEST_LENGTH);
 
-    uint8_t outputHash[HASHER_DIGEST_LENGTH];
-    r = compute_output_hash(xpub, request->outputs, request->outputs_count, outputHash);
+  // Create a signature for each input.
+  for (int i = 0; i < request->inputs_count; i++) {
+
+    // Compute hash to sign: BIP-0143
+    uint8_t hash[HASHER_DIGEST_LENGTH];
+
+    r = hash_input(xpub, &request->inputs[i], sequence, request->lock_time,
+                  prevoutsHash, seqHash, outputHash, hash);
     if (r != Result_SUCCESS) {
-      ERROR("compute_output_hash failed: (%d).", r);
-      break;
+      ERROR("hash_input failed: (%d).", r);
+      goto cleanup;
     }
-    DEBUG("outputHash");
-    print_bytes(outputHash, HASHER_DIGEST_LENGTH);
-
-    // Create a signature for each input.
-    for (int i = 0; i < request->inputs_count; i++) {
-
-      // Compute hash to sign: BIP-0143
-      uint8_t hash[HASHER_DIGEST_LENGTH];
-
-      r = hash_input(xpub, &request->inputs[i], sequence, request->lock_time,
-                    prevoutsHash, seqHash, outputHash, hash);
+    // Derive the private key used for this input
+    r = derive_private_key(seed, &request->inputs[i].path, &wallet);
+    if (r != Result_SUCCESS) {
+      ERROR("derive_private_key failed: (%d).", r);
+      goto cleanup;
+    }
+    hdnode_fill_public_key(&wallet);
+    // Validate the pubkey we're signing with is one of our public keys.
+    bool found = false;
+    for (int j = 0; j < MULTISIG_PARTS; j++) {
+      r = derive_public_key(xpub[j], &request->inputs[i].path, public_key);
       if (r != Result_SUCCESS) {
-        ERROR("hash_input failed: (%d).", r);
-        break;
+        ERROR("Failed deriving public key");
+        goto cleanup;
       }
-      // Derive the private key used for this input
-      r = derive_private_key(seed, &request->inputs[i].path, &wallet);
-      if (r != Result_SUCCESS) {
-        ERROR("derive_private_key failed: (%d).", r);
-        break;
+      static_assert(sizeof(public_key) == sizeof(wallet.public_key),
+                    "Pubkey size mismatch");
+      if (memcmp(public_key, wallet.public_key, sizeof(public_key)) == 0) {
+        DEBUG("Signing for pubkey %d", j);
+        found = true;
       }
-      hdnode_fill_public_key(&wallet);
-      // Validate the pubkey we're signing with is one of our public keys.
-      bool found = false;
-      for (int j = 0; j < MULTISIG_PARTS; j++) {
-        r = derive_public_key(xpub[j], &request->inputs[i].path, public_key);
-        if (r != Result_SUCCESS) {
-          ERROR("Failed deriving public key");
-          break;
-        }
-        static_assert(sizeof(public_key) == sizeof(wallet.public_key),
-                      "Pubkey size mismatch");
-        if (memcmp(public_key, wallet.public_key, sizeof(public_key)) == 0) {
-          DEBUG("Signing for pubkey %d", j);
-          found = true;
-        }
-      }
-      if (r != Result_SUCCESS){
-            break;
-      }
-      if (!found) {
-        ERROR("We're signing with a private key that doesn't match one of our "
-              "public keys");
-        print_bytes(wallet.public_key, sizeof(wallet.public_key));
-        r = Result_UNKNOWN_INTERNAL_FAILURE;
-        break;
-      }
-
-      // sign the hash
-      uint8_t sig[64] = {0};
-      if (hdnode_sign_digest(&wallet, hash, sig, NULL, NULL) != 0) {
-        ERROR("hdnode_sign_digest failed");
-        r = Result_UNKNOWN_INTERNAL_FAILURE;
-        break;
-      }
-
-      // Validate the signature.  Validating after signing is important to ensure
-      // we are operating correctly, and can also potentially prevent some types
-      // of glitch attacks.
-      hdnode_fill_public_key(&wallet);
-      if (ecdsa_verify_digest(wallet.curve->params, wallet.public_key, sig,
-                              hash) != 0) {
-        ERROR("Verifying signature we just created failed");
-        r = Result_UNKNOWN_INTERNAL_FAILURE;
-        break;
-      } else {
-        DEBUG("Successfully validated with public key:");
-        print_bytes(wallet.public_key, 33);
-      }
-
-      int der_len = ecdsa_sig_to_der(sig, response->signatures[i].der.bytes);
-      response->signatures[i].has_der = true;
-      response->signatures[i].der.size = (pb_size_t)der_len;
-      DEBUG("Signature:");
-      for (int j = 0; j < der_len; j++) {
-        DEBUG_("%02x", response->signatures[i].der.bytes[j]);
-      }
-      DEBUG_("\n");
-
-      response->signatures[i].has_hash = true;
-      static_assert(sizeof(hash) == sizeof(response->signatures[i].hash),
-                    "Expect hash size to match proto size");
-      memcpy(response->signatures[i].hash, hash, sizeof(hash));
     }
-    if (r != Result_SUCCESS){
-          break;
+    if (!found) {
+      ERROR("We're signing with a private key that doesn't match one of our "
+            "public keys");
+      print_bytes(wallet.public_key, sizeof(wallet.public_key));
+      r = Result_UNKNOWN_INTERNAL_FAILURE;
+      goto cleanup;
     }
-    response->signatures_count = request->inputs_count;
-  }while(0);
 
+    // sign the hash
+    uint8_t sig[64] = {0};
+    if (hdnode_sign_digest(&wallet, hash, sig, NULL, NULL) != 0) {
+      ERROR("hdnode_sign_digest failed");
+      r = Result_UNKNOWN_INTERNAL_FAILURE;
+      goto cleanup;
+    }
+
+    // Validate the signature.  Validating after signing is important to ensure
+    // we are operating correctly, and can also potentially prevent some types
+    // of glitch attacks.
+    hdnode_fill_public_key(&wallet);
+    if (ecdsa_verify_digest(wallet.curve->params, wallet.public_key, sig,
+                            hash) != 0) {
+      ERROR("Verifying signature we just created failed");
+      r = Result_UNKNOWN_INTERNAL_FAILURE;
+      goto cleanup;
+    } else {
+      DEBUG("Successfully validated with public key:");
+      print_bytes(wallet.public_key, 33);
+    }
+
+    int der_len = ecdsa_sig_to_der(sig, response->signatures[i].der.bytes);
+    response->signatures[i].has_der = true;
+    response->signatures[i].der.size = (pb_size_t)der_len;
+    DEBUG("Signature:");
+    for (int j = 0; j < der_len; j++) {
+      DEBUG_("%02x", response->signatures[i].der.bytes[j]);
+    }
+    DEBUG_("\n");
+
+    response->signatures[i].has_hash = true;
+    static_assert(sizeof(hash) == sizeof(response->signatures[i].hash),
+                  "Expect hash size to match proto size");
+    memcpy(response->signatures[i].hash, hash, sizeof(hash));
+  }
+  response->signatures_count = request->inputs_count;
+  cleanup:
   // cleanup the house be it error or success.
   memzero((void *) seed, SHA512_DIGEST_LENGTH);
   memzero((void *) &wallet, sizeof(HDNode));
