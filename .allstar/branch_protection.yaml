@@ -1,0 +1,9 @@
+optConfig:
+  optIn: true
+action: issue
+enforceDefault: true
+enforceBranches: [ master ]
+requireApproval: true
+approvalCount: 1
+dismissStale: true
+blockForce: true
