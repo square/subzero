@@ -300,7 +300,6 @@ public class Framebuffer {
           read = asyncInput.getAndSet(null);
         }
       }
-
       // Backspace.
       if ((read == BACKSPACE) || (read == DELETE)) {
         if (input.length() > 0) {

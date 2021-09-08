@@ -48,3 +48,7 @@ message EncryptedMasterSeed {
 message EncryptedPubKey {
   optional bytes encrypted_pub_key = 1;
 }
+
+message QrCodeSignature {
+  optional bytes signature = 1;
+}

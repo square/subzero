@@ -11,3 +11,6 @@ Signature.hash fixed_length:true max_size:32
 EncryptedPubKey.encrypted_pub_key max_size:156
 
 EncryptedMasterSeed.encrypted_master_seed max_size:1024
+
+//ECDSA raw signature.
+QrCodeSignature.signature max_size:64

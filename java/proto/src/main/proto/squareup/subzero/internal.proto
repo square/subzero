@@ -42,6 +42,10 @@ message InternalCommandRequest {
     FinalizeWalletRequest FinalizeWallet = 6;
     SignTxRequest SignTx = 7;
   }
+  optional bytes serialized_command_request = 8;
+  // Only assign a value when sending across to the HSM.
+  // When generating the bytes-to-sign leave it blank.
+  optional QrCodeSignature qrsignature = 9;
 }
 
 enum Result {
@@ -105,6 +109,14 @@ enum Result {
 
   GET_MODULE_CERTIFICATE_NO_SIGNERS = 46;
   GET_MODULE_CERTIFICATE_TOO_MANY_SIGNERS = 47;
+  
+  NO_ROLLBACK_FILE_NOT_FOUND = 48;
+  NO_ROLLBACK_INVALID_FORMAT = 49;
+  NO_ROLLBACK_INVALID_MAGIC = 50;
+  NO_ROLLBACK_INVALID_VERSION = 51;
+
+  QRSIG_CHECK_FAILED = 52;
+  REQUIRED_FIELDS_NOT_PRESENT = 53;
 
   // any other error messages, such as INSERT_OCS, incorrect passphrase, etc.
   // 5xx represents failures which user input shouldn't be able to trigger

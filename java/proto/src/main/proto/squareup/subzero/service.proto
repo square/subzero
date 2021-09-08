@@ -48,6 +48,8 @@ message CommandRequest {
     FinalizeWalletRequest FinalizeWallet = 4;
     SignTxRequest SignTx = 5;
   }
+  optional bytes serialized_command_request = 7;
+  optional QrCodeSignature qrsignature = 8;
 }
 
 /* CommandResponse is returned from the subzero CLI, back to persephone */
