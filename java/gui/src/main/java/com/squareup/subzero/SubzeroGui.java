@@ -257,7 +257,30 @@ public class SubzeroGui {
         byte[] proto = base64().decode(request);
 
         CommandRequest commandRequest = CommandRequest.parseFrom(proto);
+      if (filePathInJAR.contains("negative")) {
+          try {
+              CommandResponse response =
+                      CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port),
+                              commandRequest);
+          } catch (Exception e) {
+              // A list of negative test cases can be added here.
+              if (
+                      filePathInJAR.contains("bad_qrsignature") && e.toString().contains("SIG_CHECK_FAILED") ||
+                              (true)
+              ) {
+                  System.out.println("testcase " + filePathInJAR + " : OK");
+                  ok_valid++;
+              } else {
+                  System.out.println("testcase " + filePathInJAR + " : FAIL");
+                  fail_valid++;
+              }
+              continue;
+          }
+          fail_valid++;
+          System.out.println("testcase " + filePathInJAR + " : FAIL");
+          continue;
 
+      }
         CommandResponse response =
             CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port),
                 commandRequest);

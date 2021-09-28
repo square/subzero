@@ -51,7 +51,11 @@ static Result populate_internal_command(InternalCommandRequest * to){
     ERROR("Could not decode input bytes for command request.");
     goto cleanup;
   }
-    
+  if(from.which_command != CommandRequest_SignTx_tag){
+    res = Result_COMMAND_DECODE_FAILED;
+    ERROR("Input command is not Sign tx");
+    goto cleanup;
+  }  
   to->command.SignTx.inputs_count = from.command.SignTx.inputs_count;
   to->command.SignTx.outputs_count = from.command.SignTx.outputs_count;
   for(pb_size_t i = 0; i < from.command.SignTx.inputs_count ; i++){

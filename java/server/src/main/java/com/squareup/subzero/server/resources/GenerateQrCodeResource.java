@@ -9,6 +9,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.squareup.subzero.proto.service.Common;
+import com.squareup.subzero.proto.service.Internal;
 import com.squareup.subzero.proto.service.Service;
 import com.squareup.subzero.shared.Constants;
 import java.util.List;
@@ -143,11 +144,18 @@ public class GenerateQrCodeResource {
     builder.setSignTx(signTxBuilder);
 
     byte [] command_bytes = builder.build().toByteArray();
-    // Sign with a known dev key. This is for testing only.
-    // This needs to be in sync with the public key(QR_PUBKEY) in config.h on the
-    // subzero core side.
+    //TODO: This will be used later to add another test negative test case.
+    // assign an unexpected protobuf schema to make the decoding fail in subzero core.
+    //Internal.InternalCommandRequest.Builder temp_builder = Internal.InternalCommandRequest.newBuilder();
+    //temp_builder.setInitWallet(Internal.InternalCommandRequest.InitWalletRequest.newBuilder());
+    //command_bytes = temp_builder.build().toByteArray();
+    //Sign with a know dev key. This is for testing only.
     QrSigner signer = new QrSigner(Hex.decode("3d9b97530af1d91e1d818c9498d8a53d9b97530af1d91e1d818c9498d8a59fe3"));
     byte [] signature = signer.sign(command_bytes);
+    //flip bits for testing.
+    // This generates negative_bad_qrsignature vector.
+    //signature[63] = (byte) ((Byte.toUnsignedInt(signature[63])) ^ 0xFF);
+
     Common.QrCodeSignature.Builder qrsigbuilder = Common.QrCodeSignature.newBuilder();
     qrsigbuilder.setSignature(ByteString.copyFrom(signature));
     builder.setQrsignature(qrsigbuilder.build());
