@@ -44,7 +44,7 @@ int run_self_checks() {
     r = -1;
     ERROR("self check failure: verify_sign_tx failed.");
   }
-  t = verify_check_signature_pub();
+  t = verify_check_qrsignature_pub();
   if (t != 0) {
     r = -1;
     ERROR("self check failure: verify_check_signature_pub failed. rc = %d", t);

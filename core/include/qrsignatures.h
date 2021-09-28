@@ -15,6 +15,6 @@ bool check_qrsignature(const uint8_t * const data, size_t data_len, const uint8_
  * You get to choose the public key to verify sig with.
  * So it can be used in self checks.
  */
-bool check_qrsignature_pub(const uint8_t * const data, size_t data_len, const uint8_t * const signature, const uin8_t * const pubkey);
+bool check_qrsignature_pub(const uint8_t * const data, size_t data_len, const uint8_t * const signature, const uint8_t * const pubkey);
 
 

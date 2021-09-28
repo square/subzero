@@ -53,7 +53,7 @@ static Result populate_internal_command(InternalCommandRequest * to){
   }
   if(from.which_command != CommandRequest_SignTx_tag){
     res = Result_COMMAND_DECODE_FAILED;
-    ERROR("Input command is not Sign tx");
+    ERROR("Input command is not Sign Tx");
     goto cleanup;
   }  
   to->command.SignTx.inputs_count = from.command.SignTx.inputs_count;

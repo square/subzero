@@ -13,10 +13,10 @@
 
 static const uint8_t QR_PUBKEY[65] = _QR_PUBKEY;
 bool check_qrsignature(const uint8_t * const data, size_t data_len, const uint8_t * const signature){
-  return check_signature_pub(data, data_len, signature, QR_PUBKEY);
+  return check_qrsignature_pub(data, data_len, signature, QR_PUBKEY);
 }
 
-bool check_signature_pub(const uint8_t * const data, size_t data_len, const uint8_t * const signature, const uint8_t * const pub){
+bool check_qrsignature_pub(const uint8_t * const data, size_t data_len, const uint8_t * const signature, const uint8_t * const pub){
 
   if (data_len == 0){
     ERROR("Input length is zero.");

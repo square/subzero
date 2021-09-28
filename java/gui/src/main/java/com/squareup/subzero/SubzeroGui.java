@@ -265,8 +265,7 @@ public class SubzeroGui {
           } catch (Exception e) {
               // A list of negative test cases can be added here.
               if (
-                      filePathInJAR.contains("bad_qrsignature") && e.toString().contains("SIG_CHECK_FAILED") ||
-                              (true)
+                      filePathInJAR.contains("bad_qrsignature") && e.toString().contains("QRSIG_CHECK_FAILED")
               ) {
                   System.out.println("testcase " + filePathInJAR + " : OK");
                   ok_valid++;

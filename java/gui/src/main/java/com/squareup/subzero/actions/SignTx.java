@@ -106,10 +106,6 @@ public class SignTx {
     signTx.addAllOutputs(command_request.getSignTx().getOutputsList());
     signTx.setLockTime(command_request.getSignTx().getLockTime());
 
-    signTx.addAllInputs(command_request.getSignTx().getInputsList());
-    signTx.addAllOutputs(command_request.getSignTx().getOutputsList());
-    signTx.setLockTime(command_request.getSignTx().getLockTime());
-
 
     NCipher nCipher = null;
     if (subzero.nCipher) {
