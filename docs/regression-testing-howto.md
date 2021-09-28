@@ -102,7 +102,46 @@ python3 utils/txsign_testcase_from_expect_log.py -i ./expect_subzero.log -o /tmp
 # test vector files should now show up
 ls -l /tmp/out_dir
 ```
+### QR code vectors
+As of this [PR](https://github.com/square/subzero/pull/410), Server generates QR codes that are automatically signed using a dev key.
+Some [new test vectors](https://github.com/square/subzero/blob/master/java/gui/src/main/resources/txsign-testvectors/valid-qr0000) were added in this PR which were named a little differently to mark the distinction.
+All of them have the naming `valid-qrXXXX`.
+To generate files with this naming convention, use [--qrsigner](https://github.com/square/subzero/blob/f2537251eb28bf5ba70170d880e0915144d407a3/utils/txsign_testcase_from_expect_log.py#L52) option as below:
+```bash
+python3 utils/txsign_testcase_from_expect_log.py --qrsigner -i ./expect_subzero.log -o /tmp/out_dir
+```
+### negative test vectors
+As of this [PR](https://github.com/square/subzero/pull/417), some [negative](https://github.com/square/subzero/blob/master/java/gui/src/main/resources/txsign-testvectors/valid-negative_bad_qrsignature) test cases were also added to regression suite.
+These test cases have QR codes that are bound to trigger subzero core to return an error code.
+At the moment, they are generated in a bespoke manner by hacking [GenerateQrCodeResource.java](https://github.com/square/subzero/blob/f2537251eb28bf5ba70170d880e0915144d407a3/java/server/src/main/java/com/squareup/subzero/server/resources/GenerateQrCodeResource.java#L157).
+Look for the below in [comments](https://github.com/square/subzero/blob/f2537251eb28bf5ba70170d880e0915144d407a3/java/server/src/main/java/com/squareup/subzero/server/resources/GenerateQrCodeResource.java#L157) on hints to force the server to generate inputs that trigger
+negative cases:
+- REQUIRED_FIELDS_NOT_PRESENT
+- QRSIG_CHECK_FAILED
 
+#### Generation process(manual)
+The base64 input generation can simply be triggered by:
+1. Following the comments and building the bespoke version of the server jar.
+2. Following the `How to create test vectors` section until:
+    ```bash
+    python3 ./utils/txsign_testcase_expect_script_gen.py > /tmp/subzero_expect.sh
+    ```
+3. ```bash
+    less /tmp/subzero_expect.sh
+   ```
+4. In the less output, copy off the first base64 input(it's right after send). Less output looks like:
+  ```
+  expect "Please scan the QR-Code using the red scanner"
+  send -- "ENQLKlEKMgogxDWtt0dgwAmN4ISc0MOWwGTTmUUiiIo4nckDVeaiA/QQABjVutiZprYJIgQQABgGEhAIh6nDxsznCBACGgQQABgDIgApAAAAAAAAAAA6VhDUCypRCjIKIMQ1rbdHYMAJjeCEnNDDlsBk05lFIoiKOJ3JA1XmogP0EAAY1brYmaa2CSIEEAAYBhIQCIepw8bM5wgQAhoEEAAYAyIAKQAAAAAAAAAAQkIKQL3apd5VJgNv/2Z2/nJfu+taixWignWVsfn2fKvpViy/PDFkfgSK4ob6afOsSWpXFQVUPFgFROrowcfgjkbcF7g=\r"
+
+  expect "Type exactly \"yes\" + <enter> to approve or \"no\" + <enter> to abort."
+  send -- "yes\r"
+  ```
+5. handwrite a new file named `valid-negative-<testname>` in which like 1 is `request:<nbase64>` and line 2 is `response:ERROR`.
+   Note that a response is never returned for negative cases. Hence, the `response:` tag is just a mnemonic. 
+
+
+******
 Here is the content of a sample test vector (`cat /tmp/out_dir/valid-0000`).
 
 ```no-highlight
