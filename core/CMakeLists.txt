@@ -42,6 +42,7 @@ set(main_SRC
     "src/rpc.c"
     "src/script.c"
     "src/sign.c"
+    "src/qrsignatures.c"
 )
 
 set(checks_SRC

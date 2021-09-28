@@ -1,0 +1,16 @@
+# Nanopb options
+
+# Force all fields to be statically allocated
+* type:FT_STATIC
+
+CommandRequest.FinalizeWalletRequest.encrypted_pub_keys max_count:4
+CommandRequest.FinalizeWalletRequest.encrypted_pub_keys max_size:200
+
+CommandRequest.SignTxRequest.inputs max_count:128
+CommandRequest.SignTxRequest.outputs max_count:128
+CommandRequest.SignTxRequest.local_currency max_size:10
+
+CommandRequest.serialized_command_request max_size: 4000
+
+// just like uuid4 maybe ?
+CommandRequest.token max_size:37

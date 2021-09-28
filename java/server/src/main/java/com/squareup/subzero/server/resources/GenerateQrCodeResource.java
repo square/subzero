@@ -19,6 +19,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+
+import com.squareup.subzero.shared.QrSigner;
 import org.spongycastle.util.encoders.Hex;
 
 import static java.lang.String.format;
@@ -139,6 +141,17 @@ public class GenerateQrCodeResource {
     Service.CommandRequest.Builder builder = Service.CommandRequest.newBuilder();
     builder.setWalletId(request.wallet);
     builder.setSignTx(signTxBuilder);
+
+    byte [] command_bytes = builder.build().toByteArray();
+    // Sign with a known dev key. This is for testing only.
+    // This needs to be in sync with the public key(QR_PUBKEY) in config.h on the
+    // subzero core side.
+    QrSigner signer = new QrSigner(Hex.decode("3d9b97530af1d91e1d818c9498d8a53d9b97530af1d91e1d818c9498d8a59fe3"));
+    byte [] signature = signer.sign(command_bytes);
+    Common.QrCodeSignature.Builder qrsigbuilder = Common.QrCodeSignature.newBuilder();
+    qrsigbuilder.setSignature(ByteString.copyFrom(signature));
+    builder.setQrsignature(qrsigbuilder.build());
+    builder.setSerializedCommandRequest(ByteString.copyFrom(command_bytes));
 
     return generateQrCode(builder);
   }

@@ -26,11 +26,13 @@ message InternalCommandRequest {
   message SignTxRequest {
     required EncryptedMasterSeed encrypted_master_seed = 1;
     repeated EncryptedPubKey encrypted_pub_keys = 2;
+    //TODO: deprecate these fields and take from CommandRequest instead.
     repeated TxInput inputs = 3;
     repeated TxOutput outputs = 4;
     required uint32 lock_time = 5;
-  }
 
+  }
+ 
   required uint32 version = 1;
   required uint32 wallet_id = 2;
   // nCipher tickets allow loading a key outside CodeSafe but then actually use the key inside
@@ -43,7 +45,11 @@ message InternalCommandRequest {
     FinalizeWalletRequest FinalizeWallet = 6;
     SignTxRequest SignTx = 7;
   }
+  optional bytes serialized_command_request = 8;
+  optional QrCodeSignature qrsignature = 9;
 }
+
+
 
 enum Result {
   SUCCESS = 0;
@@ -111,6 +117,8 @@ enum Result {
   NO_ROLLBACK_INVALID_FORMAT = 49;
   NO_ROLLBACK_INVALID_MAGIC = 50;
   NO_ROLLBACK_INVALID_VERSION = 51;
+  QRSIG_CHECK_FAILED = 52;
+  REQUIRED_FIELDS_NOT_PRESENT = 53;
 
   // any other error messages, such as INSERT_OCS, incorrect passphrase, etc.
   // 5xx represents failures which user input shouldn't be able to trigger

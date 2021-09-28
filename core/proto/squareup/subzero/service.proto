@@ -1,0 +1,44 @@
+syntax = "proto2";
+
+option java_package = "com.squareup.subzero.proto.service";
+
+option java_multiple_files = true;
+
+import "squareup/subzero/common.proto";
+
+
+/* CommandRequest is sent to the subzero CLI from coordinator service */
+message CommandRequest {
+  /* Initialize a new wallet in cold storage */
+  message InitWalletRequest {
+  }
+
+  /* Finalize a wallet to get its public key */
+  message FinalizeWalletRequest {
+    /* An encrypted response from the HSM from an InitWalletResponse */
+    repeated EncryptedPubKey encrypted_pub_keys = 1;
+  }
+
+  /* Sign a transaction */
+  message SignTxRequest {
+    repeated TxInput inputs = 1;
+    repeated TxOutput outputs = 2;
+    optional uint32 lock_time = 3;
+    optional string local_currency = 4; // USD (or your local currency)
+    optional double local_rate = 5;     // USD per Satoshi (or your local currency per Satoshi)
+  }
+
+  /** @Deprecated */
+  optional uint32 unused = 1;
+  /* The wallet ID is an arbitrary number used to designate which offline wallet should be used */
+  optional uint32 wallet_id = 2;
+  /* The token is echoed back from the request to allow pairing requests and responses */
+  optional string token = 6;
+  oneof command {
+    InitWalletRequest InitWallet = 3;
+    FinalizeWalletRequest FinalizeWallet = 4;
+    SignTxRequest SignTx = 5;
+  }
+  optional bytes serialized_command_request = 7;
+  optional QrCodeSignature qrsignature = 8;
+}

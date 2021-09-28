@@ -5,6 +5,7 @@ include_directories(${NANOPB_INCLUDE_DIRS})
 set(protos
     "${CMAKE_CURRENT_LIST_DIR}/squareup/subzero/internal.proto"
     "${CMAKE_CURRENT_LIST_DIR}/squareup/subzero/common.proto"
+    "${CMAKE_CURRENT_LIST_DIR}/squareup/subzero/service.proto"
 )
 
 nanopb_generate_cpp(PROTO_SRCS PROTO_HDRS ${protos} RELPATH ${CMAKE_CURRENT_SOURCE_DIR})

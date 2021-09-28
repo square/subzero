@@ -6,6 +6,7 @@ import com.ncipher.nfast.NFException;
 import com.squareup.subzero.InternalCommandConnector;
 import com.squareup.subzero.ncipher.NCipher;
 import com.squareup.subzero.SubzeroGui;
+import com.squareup.subzero.proto.service.Service;
 import com.squareup.subzero.wallet.WalletLoader;
 import com.squareup.subzero.proto.service.Common.Destination;
 import com.squareup.subzero.proto.service.Common.TxInput;
@@ -24,12 +25,23 @@ public class SignTx {
   public static CommandResponse.SignTxResponse signTx(SubzeroGui subzero,
       InternalCommandConnector conn, CommandRequest request,
       InternalCommandRequest.Builder internalRequest) throws IOException, NFException {
-
+    boolean isSerializedCommand = false;
+    //This determines if the coordinator service is sending in serialized bytes.
+    if (request.hasSerializedCommandRequest()){
+      isSerializedCommand = true;
+    }
+    // command_request will be used everywhere instead of the `request`.
+    // If the coordinator service sent in the serialized bytes then we change
+    // it accordingly.
+    Service.CommandRequest command_request = request;
+    if(isSerializedCommand){
+      command_request = Service.CommandRequest.parseFrom(request.getSerializedCommandRequest().toByteArray());
+    }
     if (Strings.isNullOrEmpty(subzero.debug)) {
       // Compute amount being sent
       long amount = 0L;
       long fee = 0L;
-      CommandRequest.SignTxRequest signTxRequest = request.getSignTx();
+      CommandRequest.SignTxRequest signTxRequest = command_request.getSignTx();
       for (TxInput input : signTxRequest.getInputsList()) {
         fee += input.getAmount();
       }
@@ -75,7 +87,7 @@ public class SignTx {
       wallet = walletLoader.loadTestWallet(subzero.nCipher);
     } else {
       // Load wallet file
-      wallet = walletLoader.load(request.getWalletId());
+      wallet = walletLoader.load(command_request.getWalletId());
 
       // Check that the wallet file has enc_pub_keys
       if (wallet.getEncryptedPubKeysCount() == 0) {
@@ -88,10 +100,12 @@ public class SignTx {
 
     signTx.setEncryptedMasterSeed(wallet.getEncryptedMasterSeed());
     signTx.addAllEncryptedPubKeys(wallet.getEncryptedPubKeysList());
+    // TODO: remove this once there is no need to send duplicate data.
+    //       below values are also a part of the serialized_command_request.
+    signTx.addAllInputs(command_request.getSignTx().getInputsList());
+    signTx.addAllOutputs(command_request.getSignTx().getOutputsList());
+    signTx.setLockTime(command_request.getSignTx().getLockTime());
 
-    signTx.addAllInputs(request.getSignTx().getInputsList());
-    signTx.addAllOutputs(request.getSignTx().getOutputsList());
-    signTx.setLockTime(request.getSignTx().getLockTime());
 
     NCipher nCipher = null;
     if (subzero.nCipher) {
@@ -112,7 +126,13 @@ public class SignTx {
 
     // Send Request
     internalRequest.setSignTx(signTx);
+    //TODO: right now duplicate data will be sent for backwards compatibility. Remove that later.
+    if (isSerializedCommand){
+      internalRequest.setQrsignature(request.getQrsignature());
+      internalRequest.setSerializedCommandRequest(request.getSerializedCommandRequest());
+    }
     InternalCommandResponse.SignTxResponse iresp = conn.run(internalRequest.build()).getSignTx();
+
 
     if (subzero.nCipher) {
       nCipher.unloadOcs();
