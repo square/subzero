@@ -6,8 +6,11 @@
 #include <config.h>
 #include <protection.h>
 #include <rpc.h>
+#include <pb_encode.h>
+#include <pb_decode.h>
 #include <squareup/subzero/common.pb.h>
 #include <squareup/subzero/internal.pb.h>
+#include <squareup/subzero/service.pb.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -20,7 +23,11 @@
 #include "print.h"
 #include "script.h"
 #include "sign.h"
-#include "squareup/subzero/internal.pb.h"
+#include "ecdsa.h"
+#include "nist256p1.h"
+#include "memzero.h"
+#include "qrsignatures.h"
+
 
 // Return a constructed request for test
 static int construct_request(InternalCommandRequest_SignTxRequest *tx) {
@@ -126,6 +133,62 @@ int verify_sign_tx(void) {
     print_bytes(resp.signatures[0].der.bytes, resp.signatures[0].der.size);
     return -1;
   }
+  
   INFO("sign_tx passed");
   return 0;
+}
+/**
+ * This function does not make an effort to zeroize
+ * anything as all of the values are test values.
+ * It will just test our verify signature wrapper.
+ */
+
+int verify_check_signature_pub(void){
+  //random ECDSA private key.
+  unsigned char private_key[32] = {
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01
+  };
+  unsigned char buf[8] = {
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01
+  };
+  unsigned char signature[64] = {0};
+  if(0 != ecdsa_sign(
+      (const ecdsa_curve *)&nist256p1,
+      HASHER_SHA2,
+      private_key,
+      buf,
+      8,
+      signature,
+      NULL,
+      NULL
+    )
+  ){
+    ERROR("Could not sign during self check.");
+    return 1;
+  }
+  unsigned char pub[65] = {0};
+  ecdsa_get_public_key65((const ecdsa_curve *)&nist256p1, private_key, pub);
+  if (!check_signature_pub(buf, 8, signature, pub)) {
+    ERROR("verify signature does not seem to work.");
+    return 1;
+  }
+  //flip sig bits.
+  signature[63] ^= 0xff;
+  if (check_signature_pub(buf, 8, signature, pub)) {
+    ERROR("Signature should not have verified.");
+    return 2;
+  }
+  signature[63] ^= 0xff;
+  //flip data bits.
+  buf[0] ^= 0xff;
+  if (check_signature_pub(buf, 8, signature, pub)) {
+    ERROR("Signature should not have verified with wrong data.");
+    return 3;
+  }
+  
+  return 0; 
+
 }
