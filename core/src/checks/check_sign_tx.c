@@ -6,8 +6,11 @@
 #include <config.h>
 #include <protection.h>
 #include <rpc.h>
+#include <pb_encode.h>
+#include <pb_decode.h>
 #include <squareup/subzero/common.pb.h>
 #include <squareup/subzero/internal.pb.h>
+#include <squareup/subzero/service.pb.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -20,7 +23,11 @@
 #include "print.h"
 #include "script.h"
 #include "sign.h"
-#include "squareup/subzero/internal.pb.h"
+#include "ecdsa.h"
+#include "nist256p1.h"
+#include "memzero.h"
+#include "qrsignatures.h"
+
 
 // Return a constructed request for test
 static int construct_request(InternalCommandRequest_SignTxRequest *tx) {
@@ -126,6 +133,88 @@ int verify_sign_tx(void) {
     print_bytes(resp.signatures[0].der.bytes, resp.signatures[0].der.size);
     return -1;
   }
+  
   INFO("sign_tx passed");
   return 0;
+}
+/**
+ * This function does not make an effort to zeroize
+ * anything as all of the values are test values.
+ * It will just test our verify signature wrapper.
+ */
+
+int verify_check_qrsignature_pub(void){
+  INFO("Checking check_qrsignature_pub.");
+  // Test ECDSA private key.
+  uint8_t private_key[32] = {
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01
+  };
+  // bytes to be signed.
+  uint8_t buf[8] = {
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01
+  };
+
+  uint8_t signature[64] = {0};
+
+  // echo "ef3fd8719c72b1410df9494c61bc99825b73a2236b54832d524dc9f8d261c3c04c7b5c0f1527a74e3432f319e576fba8ac402b378c47fed2760dfc933e382096" | xxd -r -p | xxd -i 
+  uint8_t expected_signature[64] = {
+    0xef, 0x3f, 0xd8, 0x71, 0x9c, 0x72, 0xb1, 0x41, 0x0d, 0xf9, 0x49, 0x4c,
+    0x61, 0xbc, 0x99, 0x82, 0x5b, 0x73, 0xa2, 0x23, 0x6b, 0x54, 0x83, 0x2d,
+    0x52, 0x4d, 0xc9, 0xf8, 0xd2, 0x61, 0xc3, 0xc0, 0x4c, 0x7b, 0x5c, 0x0f,
+    0x15, 0x27, 0xa7, 0x4e, 0x34, 0x32, 0xf3, 0x19, 0xe5, 0x76, 0xfb, 0xa8,
+    0xac, 0x40, 0x2b, 0x37, 0x8c, 0x47, 0xfe, 0xd2, 0x76, 0x0d, 0xfc, 0x93,
+    0x3e, 0x38, 0x20, 0x96
+  };
+
+
+  if(0 != ecdsa_sign(
+      (const ecdsa_curve *)&nist256p1,
+      HASHER_SHA2,
+      private_key,
+      buf,
+      8,
+      signature,
+      NULL,
+      NULL
+    )
+  ){
+    ERROR("Could not sign during self check.");
+    return 1;
+  }
+  DEBUG("Signature:");
+  print_bytes(signature, 64);
+
+  if(memcmp(signature, expected_signature, 64) != 0){
+    ERROR("Expected signature was not generated.");
+    return 2;
+  }
+
+  uint8_t pub[65] = {0};
+  ecdsa_get_public_key65((const ecdsa_curve *)&nist256p1, private_key, pub);
+  if (!check_qrsignature_pub(buf, 8, signature, pub)) {
+    ERROR("verify signature does not seem to work.");
+    return 3;
+  }
+  //flip sig bits.
+  signature[63] ^= 0xff;
+  //This should return false.
+  if (check_qrsignature_pub(buf, 8, signature, pub)) {
+    ERROR("Signature should not have verified.");
+    return 4;
+  }
+  signature[63] ^= 0xff;
+  //flip data bits.
+  buf[0] ^= 0xff;
+  //this should return false.
+  if (check_qrsignature_pub(buf, 8, signature, pub)) {
+    ERROR("Signature should not have verified with wrong data.");
+    return 5;
+  }
+
+  INFO("check_qrsignature_pub passed.");
+  return 0; 
+
 }

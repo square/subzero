@@ -13,6 +13,11 @@
 
 static const uint8_t QR_PUBKEY[65] = _QR_PUBKEY;
 bool check_qrsignature(const uint8_t * const data, size_t data_len, const uint8_t * const signature){
+  return check_qrsignature_pub(data, data_len, signature, QR_PUBKEY);
+}
+
+bool check_qrsignature_pub(const uint8_t * const data, size_t data_len, const uint8_t * const signature, const uint8_t * const pub){
+
   if (data_len == 0){
     ERROR("Input length is zero.");
     return false;
@@ -26,10 +31,11 @@ bool check_qrsignature(const uint8_t * const data, size_t data_len, const uint8_
     return false;
   }
 
+  
   int result_verify = ecdsa_verify(
     (const ecdsa_curve *)&nist256p1,
     HASHER_SHA2,
-    (const uint8_t *)QR_PUBKEY,
+    (const uint8_t *)pub,
     signature,
     data,
     (uint32_t)data_len);

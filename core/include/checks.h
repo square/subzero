@@ -30,6 +30,7 @@ int verify_validate_fees(void);
 int verify_mix_entropy(void);
 int verify_protect_pubkey(void);
 int verify_no_rollback(void);
+int verify_check_qrsignature_pub(void);
 
 #define ASSERT_STR_EQUAL(value, expecting, message) \
   do {                                              \
