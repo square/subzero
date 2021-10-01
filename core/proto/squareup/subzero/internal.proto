@@ -119,6 +119,7 @@ enum Result {
   NO_ROLLBACK_INVALID_VERSION = 51;
   QRSIG_CHECK_FAILED = 52;
   REQUIRED_FIELDS_NOT_PRESENT = 53;
+  COMMAND_SHOULD_BE_SIGNTX = 54;
 
   // any other error messages, such as INSERT_OCS, incorrect passphrase, etc.
   // 5xx represents failures which user input shouldn't be able to trigger

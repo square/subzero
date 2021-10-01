@@ -135,6 +135,8 @@ public class GenerateQrCodeResource {
               .setIsChange(destination == Common.Destination.CHANGE)
               .setIndex(output.index)));
     }
+    // don't set the locktime below to trigger REQUIRED_FIELDS_NOT_PRESENT.
+    // This helped in generating valid-negative_required_fields_not_present vector.
     signTxBuilder.setLockTime(request.lockTime);
     signTxBuilder.setLocalCurrency(request.currency);
     signTxBuilder.setLocalRate(request.rate);
@@ -144,15 +146,12 @@ public class GenerateQrCodeResource {
     builder.setSignTx(signTxBuilder);
 
     byte [] command_bytes = builder.build().toByteArray();
-    //TODO: This will be used later to add another test negative test case.
-    // assign an unexpected protobuf schema to make the decoding fail in subzero core.
-    //Internal.InternalCommandRequest.Builder temp_builder = Internal.InternalCommandRequest.newBuilder();
-    //temp_builder.setInitWallet(Internal.InternalCommandRequest.InitWalletRequest.newBuilder());
-    //command_bytes = temp_builder.build().toByteArray();
-    //Sign with a know dev key. This is for testing only.
+    // Sign with a known dev key. This is for testing only.
+    // This needs to be in sync with the public key(QR_PUBKEY) in config.h on the
+    // subzero core side.
     QrSigner signer = new QrSigner(Hex.decode("3d9b97530af1d91e1d818c9498d8a53d9b97530af1d91e1d818c9498d8a59fe3"));
     byte [] signature = signer.sign(command_bytes);
-    //flip bits for testing.
+    // flip bits to get an invalid sig and trigger QRSIG_CHECK_FAILED
     // This generates negative_bad_qrsignature vector.
     //signature[63] = (byte) ((Byte.toUnsignedInt(signature[63])) ^ 0xFF);
 

@@ -257,30 +257,35 @@ public class SubzeroGui {
         byte[] proto = base64().decode(request);
 
         CommandRequest commandRequest = CommandRequest.parseFrom(proto);
-      if (filePathInJAR.contains("negative")) {
-          try {
-              CommandResponse response =
-                      CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port),
-                              commandRequest);
-          } catch (Exception e) {
-              // A list of negative test cases can be added here.
-              if (
-                      filePathInJAR.contains("bad_qrsignature") && e.toString().contains("QRSIG_CHECK_FAILED")
-              ) {
-                  System.out.println("testcase " + filePathInJAR + " : OK");
-                  ok_valid++;
-              } else {
-                  System.out.println("testcase " + filePathInJAR + " : FAIL");
-                  fail_valid++;
-              }
-              continue;
-          }
-          fail_valid++;
-          System.out.println("testcase " + filePathInJAR + " : FAIL");
-          continue;
+        // If the filename for the test vector has a "negative" then it's
+        // expected that subzero core will return an error code.
+        // These test vectors are handcrafted. Like the `bad_qr_signature` one was crafted
+        // by temporarily changing the Server code in `GenerateQrCodeResource.java`.
+        if (filePathInJAR.contains("negative")) {
+            try {
+                CommandResponse response =
+                        CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port),
+                                commandRequest);
+            } catch (Exception e) {
+                // A list of negative test cases can be added here.
+                if (
+                        filePathInJAR.contains("bad_qrsignature") && e.toString().contains("QRSIG_CHECK_FAILED") ||
+                                filePathInJAR.contains("required_fields_not_present") && e.toString().contains("REQUIRED_FIELDS_NOT_PRESENT")
+                ) {
+                    System.out.println("testcase " + filePathInJAR + " : OK");
+                    ok_valid++;
+                } else {
+                    System.out.println("testcase " + filePathInJAR + " : FAIL");
+                    fail_valid++;
+                }
+                continue;
+            }
+            fail_valid++;
+            System.out.println("testcase " + filePathInJAR + " : FAIL");
+            continue;
 
-      }
-        CommandResponse response =
+        }
+          CommandResponse response =
             CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port),
                 commandRequest);
 
