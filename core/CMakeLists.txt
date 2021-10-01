@@ -8,11 +8,16 @@ string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_SIZE)
 add_definitions("-DSOURCE_PATH_SIZE=${SOURCE_PATH_SIZE}")
 
 if ($ENV{TARGET} MATCHES "nCipher")
+  message("Building for nCipher(powerpc32) architecture.")
   include(codesafe.cmake)
 
   if ($ENV{UNSIGNED} MATCHES "yes")
-     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUNSIGNED")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUNSIGNED")
   endif ()
+elseif($ENV{TARGET} MATCHES "dev")
+  message("Building for the host architecture")
+else()
+  message(FATAL_ERROR "Unsupported TARGET value.")
 endif ()
 
 add_subdirectory(trezor-crypto)
