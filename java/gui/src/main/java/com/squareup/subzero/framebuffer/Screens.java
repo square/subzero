@@ -213,7 +213,7 @@ public class Screens {
     System.out.println("Displaying QR code. Data: " + encodedData);
 
     String message = "We are done. Please scan the following QR-code with the blue scanner.\n"
-            + "Then type 'exit' + <enter> or 'restart' + <enter>."
+            + "Then type 'exit' + <enter> or 'restart' + <enter>.\n"
             + "To turn off the machine type 'poweroff' + <enter>.";
 
     framebuffer.draw((Graphics2D g) -> {
@@ -249,7 +249,7 @@ public class Screens {
     });
 
     int offset = framebuffer.getHeight() - 60;
-    framebuffer.text("Type 'exit' or 'restart'", 18, offset);
+    framebuffer.text("Type 'exit' or 'restart' or 'poweroff'", 18, offset);
     while (true) {
       String command = framebuffer.prompt(18, offset + 20, false);
       if (command.equalsIgnoreCase("restart")) {
@@ -259,7 +259,7 @@ public class Screens {
       } else if (command.equalsIgnoreCase("poweroff")){
         return ExitOrRestartOrPowerOff.PowerOff;
       }
-      framebuffer.text("That wasn't 'exit' or 'restart'. Try again.", 18, offset);
+      framebuffer.text("That wasn't 'exit' or 'restart' or 'poweroff'. Try again.", 18, offset);
     }
   }
 
