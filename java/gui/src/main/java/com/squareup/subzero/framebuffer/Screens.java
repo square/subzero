@@ -195,9 +195,10 @@ public class Screens {
     return promptPassword("Please confirm the password");
   }
 
-  public enum ExitOrRestart {
+  public enum ExitOrRestartOrPowerOff {
     Exit,
     Restart,
+    PowerOff,
   }
 
   /**
@@ -207,12 +208,13 @@ public class Screens {
    * @throws IOException
    * @throws WriterException
    */
-  public ExitOrRestart displayQRCode(String encodedData) throws IOException {
+  public ExitOrRestartOrPowerOff displayQRCode(String encodedData) throws IOException {
 
     System.out.println("Displaying QR code. Data: " + encodedData);
 
-    String message = "We are done. Please scan the following QR-code with the blue scanner.\n" +
-        "Then type 'exit' + <enter> or 'restart' + <enter>.";
+    String message = "We are done. Please scan the following QR-code with the blue scanner.\n"
+            + "Then type 'exit' + <enter> or 'restart' + <enter>.\n"
+            + "To turn off the machine type 'poweroff' + <enter>.";
 
     framebuffer.draw((Graphics2D g) -> {
       baseScreenLayout(g, "QR Code Output", message, Color.white);
@@ -247,15 +249,17 @@ public class Screens {
     });
 
     int offset = framebuffer.getHeight() - 60;
-    framebuffer.text("Type 'exit' or 'restart'", 18, offset);
+    framebuffer.text("Type 'exit' or 'restart' or 'poweroff'", 18, offset);
     while (true) {
       String command = framebuffer.prompt(18, offset + 20, false);
       if (command.equalsIgnoreCase("restart")) {
-        return ExitOrRestart.Restart;
+        return ExitOrRestartOrPowerOff.Restart;
       } else if (command.equalsIgnoreCase("exit")) {
-        return ExitOrRestart.Exit;
+        return ExitOrRestartOrPowerOff.Exit;
+      } else if (command.equalsIgnoreCase("poweroff")){
+        return ExitOrRestartOrPowerOff.PowerOff;
       }
-      framebuffer.text("That wasn't 'exit' or 'restart'. Try again.", 18, offset);
+      framebuffer.text("That wasn't 'exit' or 'restart' or 'poweroff'. Try again.", 18, offset);
     }
   }
 

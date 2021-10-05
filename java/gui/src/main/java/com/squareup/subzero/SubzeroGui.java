@@ -144,8 +144,11 @@ public class SubzeroGui {
 
         String encoded = base64().encode(response.toByteArray());
 
-        Screens.ExitOrRestart command = screens.displayQRCode(encoded);
-        if (command == Screens.ExitOrRestart.Exit) {
+        Screens.ExitOrRestartOrPowerOff command = screens.displayQRCode(encoded);
+        if (command == Screens.ExitOrRestartOrPowerOff.Exit) {
+          return;
+        } else if (command == Screens.ExitOrRestartOrPowerOff.PowerOff){
+          SystemShutdown.systemShutdown();
           return;
         }
       }
@@ -191,8 +194,8 @@ public class SubzeroGui {
         String big = new String(new char[1999]).replace("\0", "M");
         screens.displayQRCode(big); // return value ignored so exit doesn't work
         // reflect back the original scanned QR code:
-        Screens.ExitOrRestart command = screens.displayQRCode(input);
-        if (command == Screens.ExitOrRestart.Exit) {
+        Screens.ExitOrRestartOrPowerOff command = screens.displayQRCode(input);
+        if (command == Screens.ExitOrRestartOrPowerOff.Exit) {
           return;
         }
         // otherwise command was restart, and we loop.
