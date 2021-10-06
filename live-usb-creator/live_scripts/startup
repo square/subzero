@@ -6,6 +6,7 @@
 # Install protobuf and enable sshd, only for dev ISO
 if [ -f "/usr/local/bin/.isotype_dev" ]; then
   /usr/local/bin/install_protobuf
+  /usr/local/bin/install_pillow
   ln -Tsf /bin/python3 /bin/python
   /usr/local/bin/install_nfast_tools_dev
   cp /data/app/subzero/sshd_config /etc/ssh/sshd_config

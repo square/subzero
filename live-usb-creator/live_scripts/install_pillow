@@ -1,0 +1,9 @@
+#!/bin/bash
+
+###############################################################################
+# Install Python Image Library (PIL) for QR code tool
+###############################################################################
+
+python3 -m pip install \
+  /data/app/subzero/Pillow-8.3.2-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
+rm -rf /data/app/subzero/Pillow-8.3.2-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
