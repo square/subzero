@@ -493,7 +493,7 @@ Result handle_sign_tx(InternalCommandRequest_SignTxRequest *request,
   uint8_t CONFIDENTIAL seed[SHA512_DIGEST_LENGTH] = {0};
   HDNode CONFIDENTIAL wallet;
   memzero(&wallet, sizeof(HDNode));
-  char CONFIDENTIAL xpub[MULTISIG_PARTS][XPUB_SIZE] = {0};
+  char CONFIDENTIAL xpub[MULTISIG_PARTS][XPUB_SIZE] = {{0}};
   uint8_t CONFIDENTIAL public_key[33] = {0};
 
   if (!validate_fees(request)) {
