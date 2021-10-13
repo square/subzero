@@ -1,0 +1,40 @@
+# Subzero java unit tests
+name: "Java Test"
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [master]
+  schedule:
+    # Daily at 1am
+    - cron: '0 1 * * *'
+
+jobs:
+  signtx-test:
+    name: "Java Test"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -euxo pipefail {0}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.9]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        # We must fetch at least the immediate parents so that if this is
+        # a pull request then we can checkout the head.
+        fetch-depth: 2
+        submodules: 'recursive'
+
+    # Unit tests forJava
+    - name: Run Unit tests
+      run: |
+        cd ${{ github.workspace }}/java
+        mvn test
