@@ -1,5 +1,5 @@
 # Subzero java unit tests
-name: "Java Test"
+name: "Java Unit Test"
 
 on:
   push:
@@ -12,8 +12,8 @@ on:
     - cron: '0 1 * * *'
 
 jobs:
-  signtx-test:
-    name: "Java Test"
+  java-unit-test:
+    name: "Java Unit Test"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -33,7 +33,7 @@ jobs:
         fetch-depth: 2
         submodules: 'recursive'
 
-    # Unit tests forJava
+    # Unit tests for Java
     - name: Run Unit tests
       run: |
         cd ${{ github.workspace }}/java
