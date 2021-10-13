@@ -48,7 +48,6 @@ public class QrSigner implements Destroyable {
      */
     @Override
     public void destroy() throws DestroyFailedException {
-        Destroyable.super.destroy();
         Arrays.fill(this.key, (byte) 0);
         this.is_destroyed = true;
     }
