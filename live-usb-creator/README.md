@@ -45,6 +45,9 @@ Build the image in a CentOS VM guest as follows:
 
   ```bash
   # install virtualbox using brew cask if virtualbox is not installed
+  # Post install, make sure you click "allow" in settings->security and privacy for virtualbox.
+  # That is required for virtual box to work properly.
+  # After enabling that you will have to reboot your machine.
   brew cask install virtualbox
   # install vagrant using brew cask if vagrant is not installed
   brew cask install vagrant
