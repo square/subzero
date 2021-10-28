@@ -106,7 +106,7 @@
 #define VERSION_MAGIC 0x20de
 
 // VERSION of this code. Must match the value in java/shared/src/main/java/com/squareup/subzero/shared/Constants.java
-#define VERSION 209
+#define VERSION 210
 
 // size of the VERSION file / nvram.
 #define VERSION_SIZE 100
