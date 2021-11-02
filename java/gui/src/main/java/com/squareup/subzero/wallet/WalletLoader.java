@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static com.google.common.base.Charsets.UTF_8;
@@ -75,6 +76,7 @@ public class WalletLoader {
   public void saveNumbered(int walletId, Wallet wallet, int hsmNumber, String prefix) throws IOException{
     Path path = directory.resolve(format("%s/subzero-%d.wallet-%d", prefix, walletId, hsmNumber));
     System.out.println(format("Saving wallet file to: %s", path));
+    Files.createDirectories(directory.resolve(prefix));
     FileOutputStream fos = new FileOutputStream(path.toFile());
     OutputStreamWriter osw = new OutputStreamWriter(fos, UTF_8);
 

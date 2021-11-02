@@ -2,6 +2,7 @@ package com.squareup.subzero;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.TextFormat;
 import com.squareup.subzero.framebuffer.Framebuffer;
 import com.squareup.subzero.framebuffer.Screens;
@@ -30,6 +31,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import static com.google.common.io.BaseEncoding.base64;
 
 public class SubzeroGui {
+  private final int walletID = 100001;
   @Parameter(names = "--help", help = true)
   private boolean help = false;
 
@@ -61,6 +63,9 @@ public class SubzeroGui {
 
   // Generate a wallet.
   @Parameter(names = "--generate-wallet") public Boolean genWallet = false;
+
+  // Sign using wallet.
+  @Parameter(names = "--sign-using-wallet") public Boolean signUsingWallet = false;
 
   public SubzeroConfig config;
   private Screens screens;
@@ -105,6 +110,8 @@ public class SubzeroGui {
       subzero.signTxTest();
     } else if(subzero.genWallet) {
       subzero.generateWallet();
+    } else if(subzero.signUsingWallet) {
+      subzero.signUsingWallet();
     } else if (subzero.debug != null) {
       subzero.debugMode();
     } else {
@@ -224,7 +231,6 @@ public class SubzeroGui {
     }
   }
   private void generateWallet() throws Exception {
-    final int walletID  = 101;
     WalletLoader  loader  = new WalletLoader();
     //clean start
     Files.deleteIfExists(loader.getWalletPath(walletID));
@@ -261,6 +267,48 @@ public class SubzeroGui {
       Files.delete(loader.getWalletPath(walletID));
       System.out.println("pubkey: " + Hex.toHexString(response.getFinalizeWallet().getPubKey().toByteArray()));
     }
+  }
+
+  /**
+   * Use this to test signatures using a newly generated wallet.
+   * Helpful in release testing.
+    * @throws Exception
+   */
+  private void signUsingWallet() throws  Exception {
+    WalletLoader loader = new WalletLoader();
+    Files.deleteIfExists(loader.getWalletPath(walletID));
+    Service.CommandRequest.Builder builder = Service.CommandRequest.newBuilder();
+    Service.CommandRequest.SignTxRequest.Builder internalBuilder = Service.CommandRequest.SignTxRequest.newBuilder();
+    internalBuilder.setLockTime(0);
+    Common.TxInput.Builder txinputBuilder = Common.TxInput.newBuilder();
+    txinputBuilder.setPrevHash(ByteString.copyFrom(new byte[32]));
+    txinputBuilder.setPrevIndex(1);
+    txinputBuilder.setAmount(10000);
+    Common.Path.Builder pathBuilder = Common.Path.newBuilder();
+    pathBuilder.setIndex(1);
+    pathBuilder.setIsChange(false);
+    txinputBuilder.setPath(pathBuilder);
+    Common.TxOutput.Builder txoutputBuilder = Common.TxOutput.newBuilder();
+    txoutputBuilder.setAmount(9000);
+    txoutputBuilder.setDestination(Common.Destination.GATEWAY);
+    txoutputBuilder.setPath(pathBuilder);
+    List<Common.TxInput> inputlist = new ArrayList<>();
+    inputlist.add(txinputBuilder.build());
+    internalBuilder.addAllInputs(inputlist);
+    List<Common.TxOutput> outputList = new ArrayList<>();
+    outputList.add(txoutputBuilder.build());
+    internalBuilder.addAllOutputs(outputList);
+    builder.setSignTx(internalBuilder.build());
+    builder.setToken("FIXED");
+    builder.setWalletId(walletID);
+    for (int i = 0 ; i < 4 ; i++){
+      Files.deleteIfExists(loader.getWalletPath(walletID));
+      //set the wallet file as per the hsm you are imitating in this iteration.
+      loader.save(walletID, loader.loadNumbered(walletID,i+1, "finalized"));
+      CommandResponse response = CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port), builder.build());
+      System.out.println("Signature for hsm number " + (i+1) + ": " + Hex.toHexString( response.getSignTx().getSignatures(0).getDer().toByteArray()));
+    }
+
   }
   private void signTxTest() throws Exception {
 
