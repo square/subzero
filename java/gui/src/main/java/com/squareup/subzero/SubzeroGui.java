@@ -6,17 +6,25 @@ import com.google.protobuf.TextFormat;
 import com.squareup.subzero.framebuffer.Framebuffer;
 import com.squareup.subzero.framebuffer.Screens;
 import com.squareup.subzero.ncipher.NCipher;
+import com.squareup.subzero.proto.service.Common;
+import com.squareup.subzero.proto.service.Internal;
+import com.squareup.subzero.proto.service.Service;
 import com.squareup.subzero.proto.service.Service.CommandRequest;
 import com.squareup.subzero.proto.service.Service.CommandResponse;
+import com.squareup.subzero.proto.wallet.WalletProto;
 import com.squareup.subzero.shared.SubzeroUtils;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.IllegalFormatException;
 import java.util.List;
+
+import com.squareup.subzero.wallet.WalletLoader;
+import org.bouncycastle.util.encoders.Hex;
+import org.spongycastle.util.encoders.HexEncoder;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static com.google.common.io.BaseEncoding.base64;
@@ -50,6 +58,9 @@ public class SubzeroGui {
 
   // Blackbox signTx Test
   @Parameter(names = "--signtx-test") public Boolean signtxTest = false;
+
+  // Generate a wallet.
+  @Parameter(names = "--generate-wallet") public Boolean genWallet = false;
 
   public SubzeroConfig config;
   private Screens screens;
@@ -92,6 +103,8 @@ public class SubzeroGui {
       subzero.uiTest();
     } else if (subzero.signtxTest) {
       subzero.signTxTest();
+    } else if(subzero.genWallet) {
+      subzero.generateWallet();
     } else if (subzero.debug != null) {
       subzero.debugMode();
     } else {
@@ -210,7 +223,45 @@ public class SubzeroGui {
       super(msg);
     }
   }
+  private void generateWallet() throws Exception {
+    final int walletID  = 101;
+    WalletLoader  loader  = new WalletLoader();
+    //clean start
+    Files.deleteIfExists(loader.getWalletPath(walletID));
 
+
+
+    List<Common.EncryptedPubKey> encPubKeys = new ArrayList<Common.EncryptedPubKey>();
+    for (int i = 0 ; i < 4 ; i++) {
+      Service.CommandRequest.Builder builder = Service.CommandRequest.newBuilder();
+      builder.setWalletId(walletID);
+      Service.CommandRequest.InitWalletRequest.Builder internalBuilder = Service.CommandRequest.InitWalletRequest.newBuilder();
+      builder.setInitWallet(internalBuilder.build());
+      CommandResponse response = CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port), builder.build());
+      encPubKeys.add(response.getInitWallet().getEncryptedPubKey());
+      WalletProto.Wallet w = loader.load(walletID);
+      loader.saveNumbered(walletID, w, i+1, "initialized");
+      // clear up the default name for next iteration.
+      Files.delete(loader.getWalletPath(walletID));
+    }
+
+    for (int i = 0; i < 4 ; i++){
+      Service.CommandRequest.Builder builder = Service.CommandRequest.newBuilder();
+      builder.setWalletId(walletID);
+      Service.CommandRequest.FinalizeWalletRequest.Builder internalBuilder = Service.CommandRequest.FinalizeWalletRequest.newBuilder();
+      internalBuilder.addAllEncryptedPubKeys(encPubKeys);
+      // Write the wallet file corresponding to the HSM being imitated.
+      loader.save(walletID, loader.loadNumbered(walletID, i+1, "initialized"));
+      builder.setFinalizeWallet(internalBuilder.build());
+
+      CommandResponse response = CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port), builder.build());
+      WalletProto.Wallet w = loader.load(walletID);
+      loader.saveNumbered(walletID, w, i+1, "finalized");
+      // clear up the default name for next iteration.
+      Files.delete(loader.getWalletPath(walletID));
+      System.out.println("pubkey: " + Hex.toHexString(response.getFinalizeWallet().getPubKey().toByteArray()));
+    }
+  }
   private void signTxTest() throws Exception {
 
     // Passed and failed test cases, for valid and invalid test vectors.

@@ -64,6 +64,41 @@ public class WalletLoader {
 
     // TODO: save to USB backup drive
   }
+  /**
+   * Utility method for generate wallet test.
+   * Note: Only for testing.
+   * @param walletId Integer representation of wallet number.
+   * @param wallet data structure to be written.
+   * @param hsmNumber hsmNumber representing which HSM out of the 4 generated this wallet.
+   * @throws IOException
+   */
+  public void saveNumbered(int walletId, Wallet wallet, int hsmNumber, String prefix) throws IOException{
+    Path path = directory.resolve(format("%s/subzero-%d.wallet-%d", prefix, walletId, hsmNumber));
+    System.out.println(format("Saving wallet file to: %s", path));
+    FileOutputStream fos = new FileOutputStream(path.toFile());
+    OutputStreamWriter osw = new OutputStreamWriter(fos, UTF_8);
+
+    // We save the wallet in JSON format, because it's simpler if we need to fix anything manually.
+    JsonFormat.printer().preservingProtoFieldNames().omittingInsignificantWhitespace().appendTo(wallet, osw);
+    osw.flush();
+    fos.getFD().sync();
+  }
+
+  /**
+   * Utility method to load a specific wallet with for a specific hsm number.
+   * Note: Only for testing.
+   * @param walletId
+   * @param hsmNumber
+   * @throws IOException
+   */
+  public Wallet loadNumbered(int walletId, int hsmNumber, String prefix)  throws IOException{
+    Path path = directory.resolve(format("%s/subzero-%d.wallet-%d", prefix, walletId, hsmNumber));
+    System.out.println(format("Loading wallet file from: %s", path));
+    FileReader fr = new FileReader(path.toFile());
+    Wallet.Builder wallet = Wallet.newBuilder();
+    JsonFormat.parser().merge(fr, wallet);
+    return wallet.build();
+  }
 
   public Wallet load(int walletId) throws IOException {
     Path path = getWalletPath(walletId);
@@ -93,7 +128,7 @@ public class WalletLoader {
   /**
    * Path to folder which contains the wallet files.
    */
-  private Path getWalletPath(int walletId) {
+  public Path getWalletPath(int walletId) {
     // Check that the marker file exists.
     Path marker = directory.resolve(MARKER_FILE);
     if (!marker.toFile().exists()) {
