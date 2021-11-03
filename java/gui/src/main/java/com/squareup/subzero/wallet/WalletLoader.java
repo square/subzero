@@ -71,6 +71,7 @@ public class WalletLoader {
    * @param walletId Integer representation of wallet number.
    * @param wallet data structure to be written.
    * @param hsmNumber hsmNumber representing which HSM out of the 4 generated this wallet.
+   * @param prefix Directory name to save the wallet file in.
    * @throws IOException
    */
   public void saveNumbered(int walletId, Wallet wallet, int hsmNumber, String prefix) throws IOException{
@@ -91,6 +92,7 @@ public class WalletLoader {
    * Note: Only for testing.
    * @param walletId
    * @param hsmNumber
+   * @param prefix Directory name to load the wallet file from.
    * @throws IOException
    */
   public Wallet loadNumbered(int walletId, int hsmNumber, String prefix)  throws IOException{

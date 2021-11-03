@@ -8,7 +8,6 @@ import com.squareup.subzero.framebuffer.Framebuffer;
 import com.squareup.subzero.framebuffer.Screens;
 import com.squareup.subzero.ncipher.NCipher;
 import com.squareup.subzero.proto.service.Common;
-import com.squareup.subzero.proto.service.Internal;
 import com.squareup.subzero.proto.service.Service;
 import com.squareup.subzero.proto.service.Service.CommandRequest;
 import com.squareup.subzero.proto.service.Service.CommandResponse;
@@ -20,13 +19,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.IllegalFormatException;
 import java.util.List;
 
 import com.squareup.subzero.wallet.WalletLoader;
 import org.bouncycastle.util.encoders.Hex;
-import org.spongycastle.util.encoders.HexEncoder;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static com.google.common.io.BaseEncoding.base64;
 
@@ -62,10 +58,10 @@ public class SubzeroGui {
   @Parameter(names = "--signtx-test") public Boolean signtxTest = false;
 
   // Generate a wallet.
-  @Parameter(names = "--generate-wallet") public Boolean genWallet = false;
+  @Parameter(names = "--generate-wallet-files-test") public Boolean genWalletFilesTest = false;
 
   // Sign using wallet.
-  @Parameter(names = "--sign-using-wallet") public Boolean signUsingWallet = false;
+  @Parameter(names = "--sign-using-wallet-files-test") public Boolean signUsingWalletFilesTest = false;
 
   public SubzeroConfig config;
   private Screens screens;
@@ -108,9 +104,9 @@ public class SubzeroGui {
       subzero.uiTest();
     } else if (subzero.signtxTest) {
       subzero.signTxTest();
-    } else if(subzero.genWallet) {
+    } else if(subzero.genWalletFilesTest) {
       subzero.generateWallet();
-    } else if(subzero.signUsingWallet) {
+    } else if(subzero.signUsingWalletFilesTest) {
       subzero.signUsingWallet();
     } else if (subzero.debug != null) {
       subzero.debugMode();
@@ -232,8 +228,7 @@ public class SubzeroGui {
   }
   private void generateWallet() throws Exception {
     WalletLoader  loader  = new WalletLoader();
-    //clean start
-    Files.deleteIfExists(loader.getWalletPath(walletID));
+    loader.ensureDoesNotExist(walletID);
 
 
 
@@ -276,7 +271,8 @@ public class SubzeroGui {
    */
   private void signUsingWallet() throws  Exception {
     WalletLoader loader = new WalletLoader();
-    Files.deleteIfExists(loader.getWalletPath(walletID));
+    loader.ensureDoesNotExist(walletID);
+
     Service.CommandRequest.Builder builder = Service.CommandRequest.newBuilder();
     Service.CommandRequest.SignTxRequest.Builder internalBuilder = Service.CommandRequest.SignTxRequest.newBuilder();
     internalBuilder.setLockTime(0);
