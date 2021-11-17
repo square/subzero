@@ -59,8 +59,8 @@
     <dependency>
       <groupId>org.bitcoinj</groupId>
       <artifactId>bitcoinj-core</artifactId>
-      <version>0.16</version>
-      <!--Excluding protobuf-lite(newly added in 0.16 bitcoinj-core) as subzero uses protobuf-java-->
+      <version>0.16.1</version>
+      <!--Excluding protobuf-lite(newly added in 0.16.1 bitcoinj-core) as subzero uses protobuf-java-->
       <!--As per https://github.com/protocolbuffers/protobuf/issues/8104, lite and non lite cannot coexist-->
       <exclusions>
         <exclusion>
