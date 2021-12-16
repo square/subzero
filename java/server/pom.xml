@@ -15,7 +15,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <dropwizard.version>2.0.26</dropwizard.version>
+        <dropwizard.version>2.0.27</dropwizard.version>
         <mainClass>com.squareup.subzero.server.ServerApplication</mainClass>
     </properties>
 
