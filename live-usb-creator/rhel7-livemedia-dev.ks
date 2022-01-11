@@ -371,6 +371,8 @@ vim
 vim-common
 python3
 protobuf-python
+expect
+
 
 # QR tool
 qrencode

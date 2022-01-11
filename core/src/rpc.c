@@ -83,6 +83,20 @@ static Result populate_internal_command(InternalCommandRequest * to){
   
   return res;
 }
+static void handle_error(pb_istream_t * input, pb_ostream_t * output, Result error_code, const char * error_message){
+  InternalCommandResponse out = InternalCommandResponse_init_default;
+  ERROR("%s: %s", error_message, PB_GET_ERROR(input));
+  out.which_response = InternalCommandResponse_Error_tag;
+  out.response.Error.code = error_code;
+  snprintf(out.response.Error.message, sizeof(out.response.Error.message),
+            "%s: %s", error_message, PB_GET_ERROR(input));
+  out.response.Error.has_message = true;
+  if (!pb_encode_delimited(output, InternalCommandResponse_fields, &out)) {
+    ERROR("Encoding error message about decoding failed: %s",
+          PB_GET_ERROR(output));
+  }
+  return; 
+}
 // handle_incoming_message is the central RPC entry point that invokes the
 // requested command.
 void handle_incoming_message(pb_istream_t *input, pb_ostream_t *output) {
@@ -90,50 +104,25 @@ void handle_incoming_message(pb_istream_t *input, pb_ostream_t *output) {
   InternalCommandResponse out = InternalCommandResponse_init_default;
 
   if (!pb_decode_delimited(input, InternalCommandRequest_fields, &cmd)) {
-    ERROR("Decode failed: %s", PB_GET_ERROR(input));
-    out.which_response = InternalCommandResponse_Error_tag;
-    out.response.Error.code = Result_COMMAND_DECODE_FAILED;
-    snprintf(out.response.Error.message, sizeof(out.response.Error.message),
-             "Error decoding: %s", PB_GET_ERROR(input));
-    out.response.Error.has_message = true;
-    if (!pb_encode_delimited(output, InternalCommandResponse_fields, &out)) {
-      ERROR("Encoding error message about decoding failed: %s",
-            PB_GET_ERROR(output));
-    }
+    handle_error(input, output, Result_COMMAND_DECODE_FAILED, "Decode Input failed");
     return;
   }
-  // Only parse the binary blob if it's present and only for sign transaction.
-  // We could enable this code for init wallet/finalize wallet as well at a later point.
-  // for backwards compatibility.
-  if (cmd.has_serialized_command_request && cmd.which_command == InternalCommandRequest_SignTx_tag) {
+  // For sign command QR code needs to be signed.
+  if (cmd.which_command == InternalCommandRequest_SignTx_tag) {
+    if(!cmd.has_serialized_command_request){
+      handle_error(input, output, Result_SERIALIZED_BYTES_SHOULD_BE_PRESENT, "Serialized QR code not present in input");
+      return;
+    }
     Result res = populate_internal_command(&cmd);
     if (res != Result_SUCCESS) {
-      ERROR("Populating internal command with authenticated payload failed.");
-      out.which_response = InternalCommandResponse_Error_tag;
-      out.response.Error.code = res;
-      snprintf(out.response.Error.message, sizeof(out.response.Error.message),
-              "Populating internal command with authenticated payload failed.");
-      out.response.Error.has_message = true;
-      if (!pb_encode_delimited(output, InternalCommandResponse_fields, &out)) {
-        ERROR("Encoding error message about encoding failed: %s",
-              PB_GET_ERROR(output));
-      }
-    return;     
+      handle_error(input, output, res, "Populating internal command with authenticated payload failed");
+      return;
     }
   }
   execute_command(&cmd, &out);
 
   if (!pb_encode_delimited(output, InternalCommandResponse_fields, &out)) {
-    ERROR("Encoding failed: %s", PB_GET_ERROR(output));
-    out.which_response = InternalCommandResponse_Error_tag;
-    out.response.Error.code = Result_COMMAND_ENCODE_FAILED;
-    snprintf(out.response.Error.message, sizeof(out.response.Error.message),
-             "Error encoding: %s", PB_GET_ERROR(output));
-    out.response.Error.has_message = true;
-    if (!pb_encode_delimited(output, InternalCommandResponse_fields, &out)) {
-      ERROR("Encoding error message about encoding failed: %s",
-            PB_GET_ERROR(output));
-    }
+    handle_error(input, output, Result_COMMAND_ENCODE_FAILED, "Encoding failed");
     return;
   }
   DEBUG("done: %zd", output->bytes_written);
