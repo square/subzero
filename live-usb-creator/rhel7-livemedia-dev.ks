@@ -372,6 +372,10 @@ vim-common
 python3
 protobuf-python
 expect
+# Run the test vector generation script without an actual X server.
+# xvfb-run /tmp/subzero_expect.sh ./gui.jar
+xorg-x11-server-Xvfb
+
 
 
 # QR tool
