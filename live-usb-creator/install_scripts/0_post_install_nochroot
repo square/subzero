@@ -65,3 +65,5 @@ cp /vagrant/protoc-3.14.0-linux-x86_64.zip /mnt/sysimage/data/app/subzero
 cp /vagrant/protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl /mnt/sysimage/data/app/subzero
 cp /vagrant/six-1.15.0-py2.py3-none-any.whl /mnt/sysimage/data/app/subzero
 cp /vagrant/Pillow-8.3.2-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl /mnt/sysimage/data/app/subzero
+# copy in a version of maven that works.
+cp /vagrant/apache-maven-3.8.4-bin.tar.gz /mnt/sysimage/data/apache-maven-3.8.4-bin.tar.gz

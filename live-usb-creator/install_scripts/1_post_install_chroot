@@ -43,3 +43,19 @@ systemctl disable kdump.service
 if [ -f "/usr/local/bin/.isotype_rel" ]; then
   echo 'exec /data/app/subzero/subzero-cli.sh' >> /root/.bash_profile
 fi
+
+if [ -f "/usr/local/bin/.isotype_dev" ]; then
+  # For future if we want to install more packages.
+  echo "make python2 the default python. Yum on centos7 still uses that."
+  rm /usr/bin/python
+  ln -s /usr/bin/python2 /usr/bin/python
+
+  # centos 7 repos have the latest version of maven as 3.0.5. 
+  # Current master on subzero does not build with that version.
+  echo "install latest version of maven"
+  cd /root
+  tar -xf /data/apache-maven-3.8.4-bin.tar.gz
+  echo 'PATH=/root/apache-maven-3.8.4/bin:$PATH' >> /root/.bash_profile
+  rm /data/apache-maven-3.8.4-bin.tar.gz
+fi
+

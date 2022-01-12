@@ -87,6 +87,9 @@ Under the hood in `txsign_testcase_expect_script_gen.py`:
 # remove existing log file, if any
 rm expect_subzero.log
 # invoke expect script, pointing to the GUI jar
+# Note: The below expects X server to be running. If you are running this
+#       on the dev iso(No X server) then prefix it with xvfb-run <command>. 
+#       That will make awt happy and let the command pass through peacefully!
 /tmp/subzero_expect.sh ./java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar
 # 'expect_subzero.log' should show up below
 ls -l expect_subzero.log
