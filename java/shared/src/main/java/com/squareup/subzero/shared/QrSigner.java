@@ -125,6 +125,21 @@ public class QrSigner implements Destroyable {
      */
     public byte[] sign(byte[] data) {
         ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
+        //BigIntegers.fromUnsignedByteArray is the way to do it.
+        signer.init(true, new ECPrivateKeyParameters(BigIntegers.fromUnsignedByteArray(this.key, 0, 32), this.domain));
+        byte[] hashed_data = this.sha256(data);
+
+        BigInteger[] signature = signer.generateSignature(hashed_data);
+        ByteArrayOutputStream ret = new ByteArrayOutputStream();
+        ret.write(BigIntegers.asUnsignedByteArray(32, signature[0]),0, 32);
+        ret.write(BigIntegers.asUnsignedByteArray(32, signature[1]),0, 32);
+        return ret.toByteArray();
+    }
+
+    // Only added to demonstrate error
+    public byte[] incorrectSignTest(byte[] data) {
+        ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
+        // BigInteger is signed. This is wrong. Just for Test.
         signer.init(true, new ECPrivateKeyParameters(new BigInteger(this.key), this.domain));
         byte[] hashed_data = this.sha256(data);
 
@@ -145,7 +160,7 @@ public class QrSigner implements Destroyable {
             throw new RuntimeException("Input signature of incorrect length.");
         }
         ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
-        signer.init(false, new ECPublicKeyParameters(this.domain.getG().multiply(new BigInteger(this.key)), this.domain));
+        signer.init(false, new ECPublicKeyParameters(this.domain.getG().multiply(BigIntegers.fromUnsignedByteArray(this.key, 0 ,32)), this.domain));
 
         byte[] hashed_data = sha256(data);
 
@@ -154,6 +169,15 @@ public class QrSigner implements Destroyable {
 
     public byte[] dumpPublicKey() {
         ECPoint base = this.domain.getG();
+        //BigIntegers.fromUnsignedByteArray is the way to do it.
+        ECPoint pub = base.multiply(BigIntegers.fromUnsignedByteArray(this.key, 0, 32));
+        return pub.getEncoded(false);
+
+    }
+    // Only added to demonstrate and test for a prior Bug.
+    public byte[] dumpIncorrectPublicKeyTest() {
+        ECPoint base = this.domain.getG();
+        // BigInteger is signed. This is wrong. Just for Test.
         ECPoint pub = base.multiply(new BigInteger(this.key));
         return pub.getEncoded(false);
 
