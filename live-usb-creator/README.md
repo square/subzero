@@ -17,7 +17,7 @@ Set the following files in place in the same directory as the `Vagrantfile`.
 * six-1.15.0-py2.py3-none-any.whl (11.0kB): `curl -L -O https://files.pythonhosted.org/packages/ee/ff/48bde5c0f013094d729fe4b0316ba2a24774b3ff1c52d924a8a4cb04078a/six-1.15.0-py2.py3-none-any.whl`
 * protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl (1MB): `curl -O -L https://files.pythonhosted.org/packages/fe/fd/247ef25f5ec5f9acecfbc98ca3c6aaf66716cf52509aca9a93583d410493/protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl`
 * Pillow-8.3.2-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl (3.0 MB): `curl -O -L  https://files.pythonhosted.org/packages/6f/2b/7c242e58b1b332a123b4a7bf358e2cc7fa7d904b3576b87defc9528e2bfd/Pillow-8.3.2-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl`
-* apache-maven-3.8.4-bin.tar.gz: `curl -O -L https://dlcdn.apache.org/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.tar.gz`
+* apache-maven-3.8.4-bin.tar.gz: `curl -O -L https://archive.apache.org/dist/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.tar.gz`
 
 Verify the shasums programmatically(checksum file is the output of the manual command below):
 
