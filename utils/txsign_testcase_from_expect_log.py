@@ -46,7 +46,7 @@ def generate_test_vectors_from_expect_log(logfile, out_dir, is_qr=False):
   print("{0} test cases written to {1}".format(len(requests), out_dir))
 
 if __name__ == "__main__":
-  parser = argparse.ArgumentParser("Create subzero txsign test vectors from a log file")
+  parser = argparse.ArgumentParser(description="Create subzero txsign test vectors from a log file")
   parser.add_argument("-o", "--out_dir", nargs=1, help="output directory for test vectors", required=True)
   parser.add_argument("-i", "--input_log", nargs=1, help="input log file from expect script", required=True)
   parser.add_argument("--qrsigner", help="generated test vectors for qr signing", action='store_true')
