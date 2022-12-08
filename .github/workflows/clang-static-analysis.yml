@@ -48,8 +48,8 @@ jobs:
     - name: Install clang tools
       run: |
         sudo apt-get update
-        sudo apt-get install clang-tools-10 -y
-        sudo ln -sf /usr/bin/clang-check-10 /usr/bin/clang-check
+        sudo apt-get install clang-tools-14 -y
+        sudo ln -sf /usr/bin/clang-check-14 /usr/bin/clang-check
 
     # Run static analysis
     - name: Run clang static analysis
