@@ -7,6 +7,9 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -Wextra -Wwrite-strings -Wst
 string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_SIZE)
 add_definitions("-DSOURCE_PATH_SIZE=${SOURCE_PATH_SIZE}")
 
+option(ENABLE_ASAN "Enable Address Sanitizer" OFF) # enable with -DENABLE_ASAN=ON
+option(ENABLE_UBSAN "Enable Undefined Behavior Sanitizer" OFF) # enable with -DENABLE_UBSAN=ON
+
 if ($ENV{TARGET} MATCHES "nCipher")
   message("Building for nCipher(powerpc32) architecture.")
   include(codesafe.cmake)
@@ -20,6 +23,27 @@ else()
   message(FATAL_ERROR "Unsupported TARGET value.")
 endif ()
 
+# Note that in order for ASAN and UBSAN to be enabled in subdirectories
+# (e.g. trezor-crypto, external-crypto, proto, etc), the logic that enables
+# it has to run before the corresponding add_subdirectory() calls.
+if (ENABLE_ASAN)
+  message(STATUS "Enabling ASAN")
+  list(APPEND FSANITIZE "address")
+  list(APPEND EXTRA_SANITIZER_FLAGS "-fno-omit-frame-pointer")
+endif ()
+
+if (ENABLE_UBSAN)
+  message(STATUS "Enabling UBSAN")
+  list(APPEND FSANITIZE "undefined")
+  list(APPEND EXTRA_SANITIZER_FLAGS "-fno-sanitize-recover=undefined")
+endif ()
+ 
+if (ENABLE_ASAN OR ENABLE_UBSAN)
+  string(REPLACE ";" "," FSANITIZE_STR "${FSANITIZE}")
+  add_compile_options(-fsanitize=${FSANITIZE_STR} ${EXTRA_SANITIZER_FLAGS})
+  add_link_options(-fsanitize=${FSANITIZE_STR})
+endif()
+
 add_subdirectory(trezor-crypto)
 add_subdirectory(external-crypto)
 add_subdirectory(proto)
@@ -32,6 +56,9 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -Wno-unknown-pragmas")
 if ($ENV{CURRENCY} MATCHES "btc-testnet")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DBTC_TESTNET")
 elseif ($ENV{CURRENCY} MATCHES "btc-mainnet")
+  if (ENABLE_ASAN OR ENABLE_UBSAN)
+    message(FATAL_ERROR "Sanitizers are not supported with CURRENCY=btc-mainnet")
+  endif ()
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DBTC_MAINNET")
 endif ()
 
