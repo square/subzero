@@ -51,7 +51,7 @@ static Result populate_internal_command(InternalCommandRequest * to){
   CommandRequest from = CommandRequest_init_default;
   // Cannot use pb_decode_delimited as on the coordinator service the java code is generating bytes
   // without the delimited values.
-  if(!pb_decode(&pb_command, CommandRequest_fields, &from)){
+  if (!pb_decode(&pb_command, &CommandRequest_msg, &from)) {
     res = Result_COMMAND_DECODE_FAILED;
     ERROR("Could not decode input bytes for command request.");
     goto cleanup;
@@ -96,7 +96,7 @@ static void handle_error(pb_istream_t * input, pb_ostream_t * output, Result err
   snprintf(out.response.Error.message, sizeof(out.response.Error.message),
             "%s: %s", error_message, PB_GET_ERROR(input));
   out.response.Error.has_message = true;
-  if (!pb_encode_delimited(output, InternalCommandResponse_fields, &out)) {
+  if (!pb_encode_delimited(output, &InternalCommandResponse_msg, &out)) {
     ERROR("Encoding error message about decoding failed: %s",
           PB_GET_ERROR(output));
   }
@@ -108,7 +108,7 @@ void handle_incoming_message(pb_istream_t *input, pb_ostream_t *output) {
   InternalCommandRequest cmd = InternalCommandRequest_init_default;
   InternalCommandResponse out = InternalCommandResponse_init_default;
 
-  if (!pb_decode_delimited(input, InternalCommandRequest_fields, &cmd)) {
+  if (!pb_decode_delimited(input, &InternalCommandRequest_msg, &cmd)) {
     handle_error(input, output, Result_COMMAND_DECODE_FAILED, "Decode Input failed");
     return;
   }
@@ -126,7 +126,7 @@ void handle_incoming_message(pb_istream_t *input, pb_ostream_t *output) {
   }
   execute_command(&cmd, &out);
 
-  if (!pb_encode_delimited(output, InternalCommandResponse_fields, &out)) {
+  if (!pb_encode_delimited(output, &InternalCommandResponse_msg, &out)) {
     handle_error(input, output, Result_COMMAND_ENCODE_FAILED, "Encoding failed");
     return;
   }
