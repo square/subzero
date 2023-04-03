@@ -20,6 +20,7 @@ fi
 grep file "${COMPILE_DB}" |
 awk '{ print $2; }' |
 sed 's/\"//g' |
+sed 's/,//g' |
 while read FILE; do
   if ! grep -q ${EXCLUDE_PATH_PATTERN} <<< "${FILE}"; then
     cd $(dirname ${FILE});
