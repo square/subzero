@@ -6,6 +6,9 @@
 #include "gcm.h"
 #include "rand.h"
 
+#define IV_SIZE_IN_BYTES (12)
+#define TAG_SIZE_IN_BYTES (16)
+
 // Temp buffer for backing up content, etc.
 // Because subzero CORE is supposed to be single-threaded, we use a global
 // buffer here.
@@ -41,8 +44,8 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t * plaintext, size_t plaintext_len,
     return Result_UNKNOWN_INTERNAL_FAILURE;
   }
 
-  uint8_t iv[12] = {0};
-  uint8_t tag[16] = {0};
+  uint8_t iv[IV_SIZE_IN_BYTES] = {0};
+  uint8_t tag[TAG_SIZE_IN_BYTES] = {0};
   // In theory, we don't need the following array to be static to zero
   // initialize it. We could have done "gcm_ctx ctx[1] = {0}" according to the
   // C standard. Unfortunately, a gcc version (4.8.5) that we would like to
@@ -131,8 +134,8 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext, size_t cipherte
     return Result_UNKNOWN_INTERNAL_FAILURE;
   }
 
-  uint8_t iv[12] = {0};
-  uint8_t tag[16] = {0};
+  uint8_t iv[IV_SIZE_IN_BYTES] = {0};
+  uint8_t tag[TAG_SIZE_IN_BYTES] = {0};
   // Declare static to work around a bug in gcc 4.8.5
   static gcm_ctx ctx[1];
 
