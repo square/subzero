@@ -31,7 +31,7 @@ public class InitWallet {
     }
 
     // Ensure we don't already have a wallet
-    WalletLoader walletLoader = new WalletLoader();
+    WalletLoader walletLoader = new WalletLoader(subzero.walletFilePath);
     walletLoader.ensureDoesNotExist(request.getWalletId());
     Wallet.Builder wallet = Wallet.newBuilder()
         .setCurrency(Wallet.Currency.TEST_NET);

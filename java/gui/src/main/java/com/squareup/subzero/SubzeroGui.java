@@ -16,6 +16,7 @@ import com.squareup.subzero.shared.SubzeroUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -53,6 +54,9 @@ public class SubzeroGui {
 
   // Almost always you want to talk to subzero on localhost
   @Parameter(names = "--hostname") public String hostname = "localhost";
+
+  // Wallet file location
+  @Parameter(names = "--wallet-file") public String walletFilePath = "/data/app/subzero/wallets/";
 
   // Blackbox signTx Test
   @Parameter(names = "--signtx-test") public Boolean signtxTest = false;
@@ -227,7 +231,7 @@ public class SubzeroGui {
     }
   }
   private void generateWallet() throws Exception {
-    WalletLoader  loader  = new WalletLoader();
+    WalletLoader  loader  = new WalletLoader(walletFilePath);
     loader.ensureDoesNotExist(walletID);
 
 
@@ -270,7 +274,7 @@ public class SubzeroGui {
     * @throws Exception
    */
   private void signUsingWallet() throws  Exception {
-    WalletLoader loader = new WalletLoader();
+    WalletLoader loader = new WalletLoader(walletFilePath);
     loader.ensureDoesNotExist(walletID);
 
     Service.CommandRequest.Builder builder = Service.CommandRequest.newBuilder();

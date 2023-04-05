@@ -8,6 +8,7 @@ import com.squareup.subzero.proto.wallet.WalletProto.Wallet;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import org.junit.Before;
 import org.junit.Test;
@@ -103,6 +104,12 @@ public class WalletLoaderTest {
     Wallet roundtrip = walletLoader.load(1234);
 
     assertThat(roundtrip).isEqualTo(wallet);
+  }
+
+  @Test
+  public void walletLoaderBadFilePaths() throws Exception {
+    assertThatThrownBy(() -> new WalletLoader("\0"))
+        .isInstanceOf(IllegalArgumentException.class);
   }
 
   private static void writeMarkerFile(File tempDir) throws IOException {
