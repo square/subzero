@@ -12,10 +12,10 @@
 #include "sign.h"
 #include "qrsignatures.h"
 
-static void execute_command(InternalCommandRequest *,
-                            InternalCommandResponse *);
+static void execute_command(const InternalCommandRequest* const cmd,
+                            InternalCommandResponse *out);
 
-static int check_version(InternalCommandRequest *cmd) {
+static int check_version(const InternalCommandRequest* const cmd) {
   if (VERSION != cmd->version) {
     ERROR("Version mismatch. Expecting %d, got %d.", VERSION, cmd->version);
     return false;
@@ -129,7 +129,7 @@ void handle_incoming_message(pb_istream_t *input, pb_ostream_t *output) {
 }
 
 // execute command
-static void execute_command(InternalCommandRequest *cmd,
+static void execute_command(const InternalCommandRequest* const cmd,
                             InternalCommandResponse *out) {
   if (!check_version(cmd)) {
     out->which_response = InternalCommandResponse_Error_tag;

@@ -20,18 +20,19 @@
 #include "sign.h"
 #include "memzero.h"
 
-static void compute_prevout_hash(TxInput *inputs, pb_size_t inputs_count,
+static void compute_prevout_hash(const TxInput* const inputs,
+                                 pb_size_t inputs_count,
                                  uint8_t hash[static HASHER_DIGEST_LENGTH]) {
   Hasher hasher;
   hasher_Init(&hasher, HASHER_SHA2D);
   for (int i = 0; i < inputs_count; i++) {
-    TxInput input = inputs[i];
+    const TxInput* const input = &inputs[i];
     DEBUG("Computing prevout hash, input %d", i);
-    hash_rev_bytes(&hasher, input.prev_hash, sizeof(input.prev_hash));
-    print_rev_bytes(input.prev_hash, sizeof(input.prev_hash));
+    hash_rev_bytes(&hasher, input->prev_hash, sizeof(input->prev_hash));
+    print_rev_bytes(input->prev_hash, sizeof(input->prev_hash));
 
-    hash_uint32(&hasher, input.prev_index);
-    print_uint32(input.prev_index);
+    hash_uint32(&hasher, input->prev_index);
+    print_uint32(input->prev_index);
     DEBUG_("\n");
   }
   hasher_Final(&hasher, hash);
@@ -52,7 +53,8 @@ static void compute_sequence_hash(uint32_t sequence, pb_size_t inputs_count,
  * Takes an (decrypted) extended public key and produces the public key derived
  * from the path specified.
  */
-static Result derive_public_key(const char *xpub, Path *path,
+static Result derive_public_key(const char *xpub,
+                                const Path* const path,
                                 uint8_t public_key[static COMPRESSED_PUBKEY_SIZE]) {
   HDNode node;
 
@@ -91,7 +93,8 @@ static Result derive_public_key(const char *xpub, Path *path,
  * at that path.
  */
 static Result derive_private_key(uint8_t seed[static SHA512_DIGEST_LENGTH],
-                                 Path *path, HDNode *out) {
+                                 const Path* const path,
+                                 HDNode *out) {
   if (hdnode_from_seed(seed, SHA512_DIGEST_LENGTH, SECP256K1_NAME, out) != 1) {
     ERROR("error: hdnode_from_seed failed.");
     return Result_DERIVE_PRIVATE_KEY_HDNODE_FROM_SEED_FAILURE;
@@ -145,7 +148,10 @@ static void sort_public_keys(
 /**
  * Returns the script (i.e. 2 [addr1] [addr2] [addr3] [addr4] 4 checkmultisig).
  */
-static Result multisig_script(script_t *script, char xpub[static MULTISIG_PARTS][XPUB_SIZE], Path *path) {
+static Result multisig_script(
+    script_t *script,
+    char xpub[static MULTISIG_PARTS][XPUB_SIZE],
+    const Path* const path) {
   // Derive addresses for this path
   uint8_t public_keys[MULTISIG_PARTS][COMPRESSED_PUBKEY_SIZE];
   for (int i = 0; i < MULTISIG_PARTS; i++) {
@@ -199,7 +205,7 @@ static Result multisig_script(script_t *script, char xpub[static MULTISIG_PARTS]
  * java module
  * @param request to validate fees for
  */
-bool validate_fees(InternalCommandRequest_SignTxRequest *request) {
+bool validate_fees(const InternalCommandRequest_SignTxRequest* const request) {
   // these are in satoshis
   uint64_t total = 0;
   uint64_t fee = 0;
@@ -232,7 +238,9 @@ bool validate_fees(InternalCommandRequest_SignTxRequest *request) {
 }
 
 static Result hash_input(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
-                         TxInput *input, uint32_t sequence, uint32_t lock_time,
+                         const TxInput* const input,
+                         uint32_t sequence,
+                         uint32_t lock_time,
                          uint8_t prevoutsHash[static HASHER_DIGEST_LENGTH],
                          uint8_t seqHash[static HASHER_DIGEST_LENGTH],
                          uint8_t outputHash[static HASHER_DIGEST_LENGTH],
@@ -300,7 +308,10 @@ static Result hash_input(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
 }
 
 // hash_p2pkh_address derives a P2PKH address and hashes it into hasher
-static Result hash_p2pkh_address(Hasher *hasher, const char *xpub, Path *path) {
+static Result hash_p2pkh_address(
+    Hasher *hasher,
+    const char *xpub,
+    const Path* const path) {
   uint8_t public_key[COMPRESSED_PUBKEY_SIZE];
   Result r = derive_public_key(xpub, path, public_key);
   if (r != Result_SUCCESS) {
@@ -357,7 +368,7 @@ static Result hash_p2pkh_address(Hasher *hasher, const char *xpub, Path *path) {
 // TODO: While this looks mostly right, it's untested.
 static Result hash_change_address(Hasher *hasher,
                                   char xpub[static MULTISIG_PARTS][XPUB_SIZE],
-                                  Path *path) {
+                                  const Path* const path) {
   // Here we need to generate a P2SH-P2WSH change transaction back to the
   // cold wallet
 
@@ -447,7 +458,8 @@ static Result hash_change_address(Hasher *hasher,
 // compute_output_hash iterates over all
 static Result
 compute_output_hash(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
-                    TxOutput *outputs, pb_size_t outputs_count,
+                    const TxOutput* const outputs,
+                    pb_size_t outputs_count,
                     uint8_t output_hash[static HASHER_DIGEST_LENGTH]) {
 
   Hasher hasher;
@@ -486,7 +498,7 @@ compute_output_hash(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
  * An effort has been made to zeroize them regardless of success or failure of this function.
  *
  */
-Result handle_sign_tx(InternalCommandRequest_SignTxRequest *request,
+Result handle_sign_tx(const InternalCommandRequest_SignTxRequest* const request,
                       InternalCommandResponse_SignTxResponse *response) {
   Result r = Result_SUCCESS;
 

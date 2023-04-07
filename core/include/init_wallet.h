@@ -7,4 +7,4 @@
 #include "config.h"
 
 Result mix_entropy(uint8_t wallet_entropy[static MASTER_SEED_SIZE],
-                   InternalCommandRequest *in);
+                   const InternalCommandRequest* const in);

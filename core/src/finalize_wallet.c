@@ -10,8 +10,9 @@
 #include "strlcpy.h"
 
 Result
-handle_finalize_wallet(InternalCommandRequest_FinalizeWalletRequest *in,
-                       InternalCommandResponse_FinalizeWalletResponse *out) {
+handle_finalize_wallet(
+    const InternalCommandRequest_FinalizeWalletRequest* const in,
+    InternalCommandResponse_FinalizeWalletResponse *out) {
   if (in->encrypted_pub_keys_count != MULTISIG_PARTS) {
     ERROR("expecting %d encrypted_pub_keys, received %d.", MULTISIG_PARTS,
           in->encrypted_pub_keys_count);
