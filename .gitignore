@@ -1,2 +1,4 @@
 vendor/
 .venv3
+**/.vscode/**
+**/.idea/**
