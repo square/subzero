@@ -11,7 +11,7 @@
  *
  * Returns -1 if any test failed.
  */
-int run_self_checks() {
+int run_self_checks(void) {
   int t, r = 0;
 
   // environment specific initialization

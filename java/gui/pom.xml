@@ -38,12 +38,12 @@
     <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
-      <version>1.31</version>
+      <version>1.33</version>
     </dependency>
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java-util</artifactId>
-      <version>3.21.5</version>
+      <version>3.21.7</version>
     </dependency>
     <dependency>
       <groupId>com.google.protobuf</groupId>
@@ -146,7 +146,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.4.0</version>
           <configuration>
             <shadedArtifactAttached>true</shadedArtifactAttached>
             <shadedClassifierName>shaded</shadedClassifierName>

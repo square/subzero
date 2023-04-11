@@ -15,13 +15,14 @@
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <protoBufVersion>3.21.5</protoBufVersion>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
-      <version>3.21.5</version>
+      <version>${protoBufVersion}</version>
     </dependency>
   </dependencies>
 
@@ -38,6 +39,7 @@
               <goal>run</goal>
             </goals>
             <configuration>
+              <protocVersion>${protoBufVersion}</protocVersion>
               <addProtoSources>all</addProtoSources>
               <inputDirectories>
                 <include>src/main/proto</include>

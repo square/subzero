@@ -20,7 +20,7 @@ static int initialized = false;
  * returns -2 if nCipher connect fails.
  */
  //TODO: convert to Result
-int init() {
+int init(void) {
   NFastAppInitArgs ia = {0};
   M_Status rc;
 
@@ -46,7 +46,7 @@ int init() {
   return 0;
 }
 
-void cleanup() {
+void cleanup(void) {
   if (initialized) {
     NFastApp_Disconnect(conn, NULL);
     NFastApp_Finish(app, NULL);

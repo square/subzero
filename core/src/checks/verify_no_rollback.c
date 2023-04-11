@@ -2,7 +2,7 @@
 #include "log.h"
 #include "no_rollback.h"
 
-int verify_no_rollback() {
+int verify_no_rollback(void) {
   char verify_file[] = "selfcheck01";
   Result r;
   r = no_rollback_write_version(verify_file, 1, 1);
