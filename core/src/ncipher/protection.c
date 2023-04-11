@@ -15,4 +15,3 @@ M_KeyID pub_key_encryption_key = 0;
 
 // The following implementation is shared between dev and ncipher targets
 #include "../protect.c"
-

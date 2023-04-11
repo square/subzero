@@ -4,5 +4,4 @@
 
 #include <seelib.h>
 
-Result transact(M_Command *command, M_Reply *reply);
-
+Result transact(M_Command* command, M_Reply* reply);

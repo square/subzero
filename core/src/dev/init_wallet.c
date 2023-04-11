@@ -31,10 +31,8 @@
  *   - derive the pubkey
  *   - encrypt the master_seed and pubkey
  */
-Result handle_init_wallet(const InternalCommandRequest* const in,
-                          InternalCommandResponse_InitWalletResponse *out) {
-
-  uint8_t entropy[MASTER_SEED_SIZE] = {0};
+Result handle_init_wallet(const InternalCommandRequest* const in, InternalCommandResponse_InitWalletResponse* out) {
+  uint8_t entropy[MASTER_SEED_SIZE] = { 0 };
   random_buffer(entropy, sizeof(entropy));
   Result r = mix_entropy(entropy, in);
   if (r != Result_SUCCESS) {
@@ -44,7 +42,7 @@ Result handle_init_wallet(const InternalCommandRequest* const in,
 
   // Only use 32 bytes of entropy to derive mnemonic and print it to stdout for
   // debugging purpose.
-  const char *mnemonic = mnemonic_from_data(entropy, 32);
+  const char* mnemonic = mnemonic_from_data(entropy, 32);
   DEBUG("mnemonic: %s", mnemonic);
 
   uint8_t master_seed[MASTER_SEED_SIZE];
@@ -64,8 +62,7 @@ Result handle_init_wallet(const InternalCommandRequest* const in,
   hdnode_fill_public_key(&node);
 
   char pub_key[128];
-  int ret = hdnode_serialize_public(&node, fingerprint, PUBKEY_PREFIX,
-                                    pub_key, sizeof(pub_key));
+  int ret = hdnode_serialize_public(&node, fingerprint, PUBKEY_PREFIX, pub_key, sizeof(pub_key));
   if (ret <= 0) {
     // TODO: create an error code for serialization failure?
     return Result_UNKNOWN_INTERNAL_FAILURE;

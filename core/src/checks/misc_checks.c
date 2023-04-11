@@ -10,6 +10,7 @@ int verify_byte_order(void) {
     uint8_t bytes[sizeof(uint32_t) / sizeof(uint8_t)];
     uint32_t word;
   } u;
+
   u.word = 1;
   const bool is_little_endian = (u.bytes[0] == (uint8_t) 1);
 #if BYTE_ORDER == LITTLE_ENDIAN

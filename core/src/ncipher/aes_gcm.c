@@ -28,10 +28,13 @@ uint8_t aes_gcm_buffer[1000];
  *
  * All pointer arguments of the function must not be NULL.
  */
-Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
-                       uint8_t *ciphertext, size_t ciphertext_len,
-                       size_t *bytes_written) {
-
+Result aes_gcm_encrypt(
+    M_KeyID keyId,
+    uint8_t* plaintext,
+    size_t plaintext_len,
+    uint8_t* ciphertext,
+    size_t ciphertext_len,
+    size_t* bytes_written) {
   // NULL pointer checks.
   if (!plaintext) {
     ERROR("%s: plaintext must not be NULL", __func__);
@@ -57,8 +60,7 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
     return Result_AES_GCM_ENCRYPT_PLAINTEXT_TOO_LONG_FAILURE;
   }
 
-  size_t expected_ciphertext_len = plaintext_len + IV_SIZE_IN_BYTES +
-    TAG_SIZE_IN_BYTES;
+  size_t expected_ciphertext_len = plaintext_len + IV_SIZE_IN_BYTES + TAG_SIZE_IN_BYTES;
   if (ciphertext_len < expected_ciphertext_len) {
     ERROR("aes_gcm_encrypt: ciphertext buffer too small.");
     memzero(plaintext, plaintext_len);
@@ -71,8 +73,8 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
     return Result_AES_GCM_ENCRYPT_PLAINTEXT_TOO_LONG_FAILURE;
   }
 
-  M_Command command = {0};
-  M_Reply reply = {0};
+  M_Command command = { 0 };
+  M_Reply reply = { 0 };
 
   command.cmd = Cmd_Encrypt;
   command.args.encrypt.key = keyId;
@@ -96,8 +98,7 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
     return r;
   }
 
-  if (reply.reply.encrypt.cipher.data.genericgcm128.cipher.len !=
-      plaintext_len) {
+  if (reply.reply.encrypt.cipher.data.genericgcm128.cipher.len != plaintext_len) {
     ERROR("aes_gcm_encrypt: unexpected cipher len.");
     NFastApp_Free_Reply(app, NULL, NULL, &reply);
     return Result_AES_GCM_ENCRYPT_UNEXPECTED_CIPHERTEXT_LEN_FAILURE;
@@ -110,11 +111,11 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
   }
 
   memcpy(ciphertext, reply.reply.encrypt.cipher.iv.genericgcm128.iv.ptr, IV_SIZE_IN_BYTES);
-  memcpy(ciphertext + IV_SIZE_IN_BYTES,
-         reply.reply.encrypt.cipher.data.genericgcm128.cipher.ptr,
-         plaintext_len);
-  memcpy(ciphertext + plaintext_len + IV_SIZE_IN_BYTES,
-         reply.reply.encrypt.cipher.data.genericgcm128.tag.bytes, TAG_SIZE_IN_BYTES);
+  memcpy(ciphertext + IV_SIZE_IN_BYTES, reply.reply.encrypt.cipher.data.genericgcm128.cipher.ptr, plaintext_len);
+  memcpy(
+      ciphertext + plaintext_len + IV_SIZE_IN_BYTES,
+      reply.reply.encrypt.cipher.data.genericgcm128.tag.bytes,
+      TAG_SIZE_IN_BYTES);
   *bytes_written = expected_ciphertext_len;
 
   NFastApp_Free_Reply(app, NULL, NULL, &reply);
@@ -124,9 +125,13 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
 /**
  * AES-GCM decryption.
  */
-Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext,
-                       size_t ciphertext_len, uint8_t *plaintext,
-                       size_t plaintext_len, size_t *bytes_written) {
+Result aes_gcm_decrypt(
+    M_KeyID keyId,
+    const uint8_t* ciphertext,
+    size_t ciphertext_len,
+    uint8_t* plaintext,
+    size_t plaintext_len,
+    size_t* bytes_written) {
   // NULL pointer checks.
   if (!plaintext) {
     ERROR("%s: plaintext must not be NULL", __func__);
@@ -145,8 +150,7 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext,
 
   memzero(plaintext, plaintext_len);
 
-  if (ciphertext_len < IV_SIZE_IN_BYTES + TAG_SIZE_IN_BYTES)
-  {
+  if (ciphertext_len < IV_SIZE_IN_BYTES + TAG_SIZE_IN_BYTES) {
     ERROR("%s: ciphertext buffer too small.", __func__);
     return Result_AES_GCM_DECRYPT_BUFFER_TOO_SMALL_FAILURE;
   }
@@ -156,8 +160,7 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext,
     return Result_AES_GCM_DECRYPT_CIPHERTEXT_TOO_LONG_FAILURE;
   }
 
-  size_t expected_plaintext_len = ciphertext_len - IV_SIZE_IN_BYTES -
-    TAG_SIZE_IN_BYTES;
+  size_t expected_plaintext_len = ciphertext_len - IV_SIZE_IN_BYTES - TAG_SIZE_IN_BYTES;
   if (plaintext_len < expected_plaintext_len) {
     ERROR("aes_gcm_decrypt: plaintext buffer too small.");
     return Result_AES_GCM_DECRYPT_BUFFER_TOO_SMALL_FAILURE;
@@ -167,8 +170,8 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext,
     return Result_AES_GCM_DECRYPT_CIPHERTEXT_TOO_LONG_FAILURE;
   }
 
-  M_Command command = {0};
-  M_Reply reply = {0};
+  M_Command command = { 0 };
+  M_Reply reply = { 0 };
   Result r;
 
   command.cmd = Cmd_Decrypt;
@@ -178,12 +181,12 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext,
 
   memcpy(aes_gcm_buffer, ciphertext, ciphertext_len);
   command.args.decrypt.cipher.mech = Mech_RijndaelmGCM;
-  command.args.decrypt.cipher.data.genericgcm128.cipher.len =
-      expected_plaintext_len;
-  command.args.decrypt.cipher.data.genericgcm128.cipher.ptr =
-      aes_gcm_buffer + IV_SIZE_IN_BYTES;
-  memcpy(command.args.decrypt.cipher.data.genericgcm128.tag.bytes,
-         aes_gcm_buffer + ciphertext_len - TAG_SIZE_IN_BYTES, TAG_SIZE_IN_BYTES);
+  command.args.decrypt.cipher.data.genericgcm128.cipher.len = expected_plaintext_len;
+  command.args.decrypt.cipher.data.genericgcm128.cipher.ptr = aes_gcm_buffer + IV_SIZE_IN_BYTES;
+  memcpy(
+      command.args.decrypt.cipher.data.genericgcm128.tag.bytes,
+      aes_gcm_buffer + ciphertext_len - TAG_SIZE_IN_BYTES,
+      TAG_SIZE_IN_BYTES);
   command.args.decrypt.cipher.iv.genericgcm128.taglen = TAG_SIZE_IN_BYTES;
   command.args.decrypt.cipher.iv.genericgcm128.iv.len = IV_SIZE_IN_BYTES;
   command.args.decrypt.cipher.iv.genericgcm128.iv.ptr = aes_gcm_buffer;
@@ -203,8 +206,7 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext,
   }
 
   // success!
-  memcpy(plaintext, reply.reply.decrypt.plain.data.bytes.data.ptr,
-         expected_plaintext_len);
+  memcpy(plaintext, reply.reply.decrypt.plain.data.bytes.data.ptr, expected_plaintext_len);
 
   *bytes_written = expected_plaintext_len;
 
