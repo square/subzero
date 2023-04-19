@@ -41,7 +41,7 @@ static Result gen_random(uint8_t *buffer, uint32_t buffer_len);
  *   - derive the pubkey
  *   - encrypt the master_seed and pubkey
  */
-Result handle_init_wallet(InternalCommandRequest *in,
+Result handle_init_wallet(const InternalCommandRequest* const in,
                           InternalCommandResponse_InitWalletResponse *out) {
   DEBUG("in handle_init_wallet");
 

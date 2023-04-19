@@ -2,7 +2,7 @@
 
 #include "rpc.h"
 
-Result pre_execute_command(InternalCommandRequest *in) {
+Result pre_execute_command(const InternalCommandRequest* const in) {
   (void)in;
   return Result_SUCCESS;
 }

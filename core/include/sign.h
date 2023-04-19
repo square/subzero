@@ -1,6 +1,7 @@
 #pragma once
 
-Result handle_sign_tx(InternalCommandRequest_SignTxRequest *,
-                      InternalCommandResponse_SignTxResponse *);
+Result handle_sign_tx(
+    const InternalCommandRequest_SignTxRequest* const request,
+    InternalCommandResponse_SignTxResponse *response);
 
-bool validate_fees(InternalCommandRequest_SignTxRequest *request);
+bool validate_fees(const InternalCommandRequest_SignTxRequest* const request);

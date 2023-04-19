@@ -34,7 +34,7 @@
  *   - derive the pubkey
  *   - encrypt the master_seed and pubkey
  */
-Result handle_init_wallet(InternalCommandRequest *in,
+Result handle_init_wallet(const InternalCommandRequest* const in,
                           InternalCommandResponse_InitWalletResponse *out) {
 
   uint8_t entropy[MASTER_SEED_SIZE] = {0};

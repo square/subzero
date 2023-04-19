@@ -9,7 +9,7 @@
  * TODO(alok): replace with HMAC, which is slightly better.
  */
 Result mix_entropy(uint8_t master_seed[static MASTER_SEED_SIZE],
-                   InternalCommandRequest *in) {
+                   const InternalCommandRequest* const in) {
   if (in->command.InitWallet.random_bytes.size != MASTER_SEED_SIZE) {
     ERROR("unexpected random_bytes.size");
     return Result_INCORRECT_RANDOM_BYTES_SIZE;

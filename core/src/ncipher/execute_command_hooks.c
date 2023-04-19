@@ -29,7 +29,7 @@ extern M_KeyID pub_key_encryption_key;
 /**
  * Load keys using tickets.
  */
-Result pre_execute_command(InternalCommandRequest *in) {
+Result pre_execute_command(const InternalCommandRequest* const in) {
   DEBUG("in pre_execute_command");
 
   if (!in->has_master_seed_encryption_key_ticket) {
