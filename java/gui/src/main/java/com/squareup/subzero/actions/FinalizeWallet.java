@@ -32,7 +32,7 @@ public class FinalizeWallet {
     }
 
     // Load wallet file
-    WalletLoader walletLoader = new WalletLoader();
+    WalletLoader walletLoader = new WalletLoader(subzero.walletDirectory);
     Wallet wallet = walletLoader.load(request.getWalletId());
 
     // Check that the wallet file does not have any enc_pub_keys

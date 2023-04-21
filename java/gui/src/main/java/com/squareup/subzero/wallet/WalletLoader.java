@@ -23,13 +23,16 @@ import static java.lang.String.format;
  * file.
  */
 public class WalletLoader {
-  private final static String HD_PATH = "/data/app/subzero/wallets/";
   protected final static String MARKER_FILE = ".subzero_702e63a9";
 
   private Path directory;
 
-  public WalletLoader() {
-    directory =  FileSystems.getDefault().getPath(HD_PATH);
+  /**
+   * Creates a new WalletLoader and sets the wallet file location to the path provided.
+   * Will throw runtime exceptions if the path provided is invalid.
+   */
+  public WalletLoader(String walletDirectory) {
+    this(FileSystems.getDefault().getPath(walletDirectory));
   }
 
   @VisibleForTesting

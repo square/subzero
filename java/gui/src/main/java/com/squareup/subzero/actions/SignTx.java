@@ -79,7 +79,7 @@ public class SignTx {
     }
 
     // Load wallet
-    WalletLoader walletLoader = new WalletLoader();
+    WalletLoader walletLoader = new WalletLoader(subzero.walletDirectory);
     Wallet wallet;
 
     if (subzero.signtxTest) {
