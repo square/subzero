@@ -56,7 +56,7 @@ public class SubzeroGui {
   @Parameter(names = "--hostname") public String hostname = "localhost";
 
   // Wallet file location
-  @Parameter(names = "--wallet-file") public String walletFilePath = "/data/app/subzero/wallets/";
+  @Parameter(names = "--wallet-dir") public String walletDirectory = "/data/app/subzero/wallets/";
 
   // Blackbox signTx Test
   @Parameter(names = "--signtx-test") public Boolean signtxTest = false;
@@ -231,7 +231,7 @@ public class SubzeroGui {
     }
   }
   private void generateWallet() throws Exception {
-    WalletLoader  loader  = new WalletLoader(walletFilePath);
+    WalletLoader  loader  = new WalletLoader(walletDirectory);
     loader.ensureDoesNotExist(walletID);
 
 
@@ -274,7 +274,7 @@ public class SubzeroGui {
     * @throws Exception
    */
   private void signUsingWallet() throws  Exception {
-    WalletLoader loader = new WalletLoader(walletFilePath);
+    WalletLoader loader = new WalletLoader(walletDirectory);
     loader.ensureDoesNotExist(walletID);
 
     Service.CommandRequest.Builder builder = Service.CommandRequest.newBuilder();

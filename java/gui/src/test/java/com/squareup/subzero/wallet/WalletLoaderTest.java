@@ -107,10 +107,37 @@ public class WalletLoaderTest {
   }
 
   @Test
-  public void walletLoaderBadFilePaths() throws Exception {
+  public void walletLoaderBadDirectory() throws Exception {
     assertThatThrownBy(() -> new WalletLoader("\0"))
         .isInstanceOf(IllegalArgumentException.class);
   }
+
+  @Test
+  public void walletLoaderDirectoryDoesNotExist() throws Exception {
+    WalletLoader walletLoader = new WalletLoader("/abc");
+
+    // Loading should fail because the directory does not exist and subsequently no marker file.
+    assertThatThrownBy(() -> walletLoader.load(1234))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("marker file not found");
+  }
+
+  @Test
+  public void walletLoaderDirectoryIsFile() throws Exception {
+    File tempDir = Files.createTempDir();
+    tempDir.deleteOnExit();
+    Path f = tempDir.toPath().resolve("filename");
+    FileWriter fileWriter = new FileWriter(f.toFile());
+    fileWriter.write("");
+    fileWriter.close();
+    WalletLoader walletLoader = new WalletLoader(f);
+
+    // Loading should fail because the path points to a file and subsequently no marker file.
+    assertThatThrownBy(() -> walletLoader.load(1234))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("marker file not found");
+  }
+
 
   private static void writeMarkerFile(File tempDir) throws IOException {
     Path f = tempDir.toPath().resolve(WalletLoader.MARKER_FILE);

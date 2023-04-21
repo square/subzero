@@ -31,8 +31,8 @@ public class WalletLoader {
    * Creates a new WalletLoader and sets the wallet file location to the path provided.
    * Will throw runtime exceptions if the path provided is invalid.
    */
-  public WalletLoader(String walletFilePath) {
-    directory =  FileSystems.getDefault().getPath(walletFilePath);
+  public WalletLoader(String walletDirectory) {
+    this(FileSystems.getDefault().getPath(walletDirectory));
   }
 
   @VisibleForTesting
