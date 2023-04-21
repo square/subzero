@@ -32,7 +32,7 @@ static void register_self_check(self_check_function func, const char* name) {
 }
 
 // For each new self check function added, this constant needs to be incremented by 1.
-#define EXPECTED_SELF_CHECKS_COUNT ((size_t) 11)
+#define EXPECTED_SELF_CHECKS_COUNT ((size_t) 12)
 
 #define REGISTER_SELF_CHECK(name) register_self_check(name, #name)
 
@@ -54,6 +54,7 @@ static void register_all_self_checks(void) {
   REGISTER_SELF_CHECK(verify_no_rollback);
   REGISTER_SELF_CHECK(verify_no_rollback_write_to_buf);
   REGISTER_SELF_CHECK(verify_conv_btc_to_satoshi);
+  REGISTER_SELF_CHECK(verify_wycheproof);
   REGISTER_SELF_CHECK(verify_rpc_oversized_message_rejected);
 
   if (EXPECTED_SELF_CHECKS_COUNT != self_checks_count) {

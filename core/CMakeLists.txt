@@ -168,7 +168,9 @@ set(checks_SRC
     "src/checks/validate_fees.c"
     "src/checks/verify_mix_entropy.c"
     "src/checks/verify_protect_pubkey.c"
-    "src/checks/verify_no_rollback.c")
+    "src/checks/verify_no_rollback.c"
+    "src/checks/wycheproof_checks.c"
+)
 list(APPEND main_SRC ${checks_SRC})
 
 set(include_SRC
