@@ -122,7 +122,7 @@ int verify_sign_tx(void) {
     return -1;
   }
   if (resp.signatures[0].der.size != sizeof(expected_der)) {
-    ERROR("unexpected der_len: %d != %ld.", resp.signatures[0].der.size,
+    ERROR("unexpected der_len: %d != %zu.", resp.signatures[0].der.size,
           sizeof(expected_der));
     return -1;
   }
