@@ -68,6 +68,12 @@ int run_self_checks(void) {
     ERROR("self check failure: verify_conv_btc_to_satoshi failed.");
   }
 
+  t = verify_memzero();
+  if (t != 0) {
+    r = -1;
+    ERROR("self check failure: verify_memzero failed.");
+  }
+
   // environment specific additional checks + cleanup
   t = post_run_self_checks();
   if (t != 0) {

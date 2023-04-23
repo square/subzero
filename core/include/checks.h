@@ -33,6 +33,11 @@ int verify_no_rollback(void);
 int verify_check_qrsignature_pub(void);
 int verify_conv_btc_to_satoshi(void);
 
+/**
+ * Checks that the memzero() function erases memory as expected.
+ */
+int verify_memzero(void);
+
 #define ASSERT_STR_EQUAL(value, expecting, message) \
   do {                                              \
     if (strcmp(expecting, value) != 0) {            \

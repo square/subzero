@@ -3,6 +3,12 @@ project (subzero)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -Wextra -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wcast-qual -std=gnu11 -DPB_FIELD_16BIT")
 
+include(CheckSymbolExists)
+check_symbol_exists(memset_s "string.h" CONFIG_HAVE_MEMSET_S)
+if (CONFIG_HAVE_MEMSET_S)
+  add_definitions("-DCONFIG_HAVE_MEMSET_S=1")
+endif ()
+
 # Part 1/2 of magic to drop the full path from __FILE__
 string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_SIZE)
 add_definitions("-DSOURCE_PATH_SIZE=${SOURCE_PATH_SIZE}")
@@ -81,6 +87,7 @@ set(checks_SRC
     "src/checks/bip32.c"
     "src/checks/check_sign_tx.c"
     "src/checks/conv_checks.c"
+    "src/checks/memzero_checks.c"
     "src/checks/self_checks.c"
     "src/checks/validate_fees.c"
     "src/checks/verify_mix_entropy.c"
