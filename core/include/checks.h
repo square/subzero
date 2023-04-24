@@ -24,6 +24,12 @@ int pre_run_self_checks(void);
  */
 int post_run_self_checks(void);
 
+/**
+ * Checks if the machine is little-endian or big-endian, and verifies that the
+ * result matches the BYTE_ORDER preprocessor constant.
+ */
+int verify_byte_order(void);
+
 int verify_bip32(void);
 int verify_sign_tx(void);
 int verify_validate_fees(void);
