@@ -81,6 +81,7 @@ set(checks_SRC
     "src/checks/bip32.c"
     "src/checks/check_sign_tx.c"
     "src/checks/conv_checks.c"
+    "src/checks/misc_checks.c"
     "src/checks/self_checks.c"
     "src/checks/validate_fees.c"
     "src/checks/verify_mix_entropy.c"

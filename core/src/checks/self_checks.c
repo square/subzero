@@ -21,6 +21,12 @@ int run_self_checks(void) {
     return r;
   }
 
+  t = verify_byte_order();
+  if (t != 0) {
+    r = -1;
+    ERROR("verify_byte_order failed.");
+  }
+
   t = verify_mix_entropy();
   if (t != 0) {
     r = -1;
