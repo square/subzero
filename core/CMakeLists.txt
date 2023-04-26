@@ -9,6 +9,7 @@ add_definitions("-DSOURCE_PATH_SIZE=${SOURCE_PATH_SIZE}")
 
 option(ENABLE_ASAN "Enable Address Sanitizer" OFF) # enable with -DENABLE_ASAN=ON
 option(ENABLE_UBSAN "Enable Undefined Behavior Sanitizer" OFF) # enable with -DENABLE_UBSAN=ON
+option(ENABLE_COVERAGE "Enable code coverage" OFF) # enable with -DENABLE_COVERAGE=ON
 
 if ($ENV{TARGET} MATCHES "nCipher")
   message("Building for nCipher(powerpc32) architecture.")
@@ -42,7 +43,59 @@ if (ENABLE_ASAN OR ENABLE_UBSAN)
   string(REPLACE ";" "," FSANITIZE_STR "${FSANITIZE}")
   add_compile_options(-fsanitize=${FSANITIZE_STR} ${EXTRA_SANITIZER_FLAGS})
   add_link_options(-fsanitize=${FSANITIZE_STR})
-endif()
+endif ()
+
+if (ENABLE_COVERAGE)
+  message(STATUS "Enabling code coverage")
+  if (CMAKE_C_COMPILER_ID MATCHES "Clang") # "Clang" or "AppleClang"
+    # To generate a coverage report from running './subzero --checks-only' using clang:
+    #   cd <subzero root>/core/build
+    #   cmake as normal and add -DENABLE_COVERAGE=ON
+    #   make
+    #   LLVM_PROFILE_FILE="subzero.profraw" ./subzero --checks-only
+    #   llvm-profdata merge -sparse subzero.profraw -o subzero.profdata
+    #   llvm-cov show ./subzero -instr-profile=subzero.profdata -format=html -output-dir=coverage ../{src,include}
+    #   open coverage/index.html
+    # Note that coverage can be combined with ASAN and/or UBSAN if desired.
+    # See more details at: https://clang.llvm.org/docs/SourceBasedCodeCoverage.html
+    #
+    # Note that Apple does NOT ship a full Clang toolchain on MacOS (tested on 13.3.1)!
+    # In order to get the llvm-profdata and llvm-cov command line tools, you need to install
+    # the full LLVM toolchain with homebrew, then switch your environment to use the homebrew
+    # versions of clang for building and re-run cmake. It's not recommended to do this
+    # globally, as using a 3rd party clang for everything can break your system, so just do
+    # it in a single shell - consider writing a script which does this.
+    # On my machine this looks like:
+    #   export PATH="/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/libiconv/bin:$PATH"
+    #   export LDFLAGS="-L/opt/homebrew/opt/llvm/lib/c++ -Wl,-rpath,/opt/homebrew/opt/llvm/lib/c++ -L/opt/homebrew/opt/llvm/lib"
+    #   export CFLAGS="-I/opt/homebrew/opt/llvm/include"
+    #   export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
+    #   export CXXFLAGS="-I/opt/homebrew/opt/llvm/include"
+    #   export CC=`which clang`
+    #   export CXX=`which clang`
+    add_compile_options(-fprofile-instr-generate -fcoverage-mapping -O0 -g)
+    add_link_options(-fprofile-instr-generate)
+  elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU") # GCC
+    # To generate a coverage report from running './subzero --checks-only' using gcc:
+    #   cd <subzero root>/core/build
+    #   cmake as normal and add -DENABLE_COVERAGE=ON
+    #   make
+    #   ./subzero --checks-only
+    #   lcov --capture --directory=./ --output-file coverage.info
+    #   genhtml coverage.info --output-directory coverage
+    #   open coverage/index.html
+    # Note that coverage can be combined with ASAN and/or UBSAN if desired.
+    #
+    # Note that you may need to install the lcov and/or genhtml binaries using your system's
+    # package manager.
+    # On my Xubuntu system this was done with 'sudo apt install lcov'.
+    add_compile_options(-coverage -O0 -g)
+    add_link_options(-coverage)
+  else ()
+    # MSVC / Intel CC / others not supported since we don't currently use them.
+    message(FATAL_ERROR "Code coverage not supported for your C compiler")
+  endif ()
+endif ()
 
 add_subdirectory(trezor-crypto)
 add_subdirectory(external-crypto)
