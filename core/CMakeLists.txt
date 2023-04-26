@@ -8,6 +8,7 @@ string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_SIZE)
 add_definitions("-DSOURCE_PATH_SIZE=${SOURCE_PATH_SIZE}")
 
 option(ENABLE_ASAN "Enable Address Sanitizer" OFF) # enable with -DENABLE_ASAN=ON
+option(ENABLE_MSAN "Enable Uninitialized Memory Sanitizer" OFF) # enable with -DENABLE_MSAN=ON
 option(ENABLE_UBSAN "Enable Undefined Behavior Sanitizer" OFF) # enable with -DENABLE_UBSAN=ON
 
 if ($ENV{TARGET} MATCHES "nCipher")
@@ -23,12 +24,26 @@ else()
   message(FATAL_ERROR "Unsupported TARGET value.")
 endif ()
 
-# Note that in order for ASAN and UBSAN to be enabled in subdirectories
+# Note that in order for ASAN/MSAN and UBSAN to be enabled in subdirectories
 # (e.g. trezor-crypto, external-crypto, proto, etc), the logic that enables
 # it has to run before the corresponding add_subdirectory() calls.
+if (ENABLE_ASAN AND ENABLE_MSAN)
+  message(FATAL_ERROR "ASAN and MSAN are mutually exclusive")
+endif ()
+
 if (ENABLE_ASAN)
   message(STATUS "Enabling ASAN")
   list(APPEND FSANITIZE "address")
+  list(APPEND EXTRA_SANITIZER_FLAGS "-fno-omit-frame-pointer")
+endif ()
+
+# Note that as of April 2023, MSAN requires Clang and works on x86_64 but not on arm64.
+if (ENABLE_MSAN)
+  if (NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+    message(FATAL_ERROR "MSAN only works with Clang")
+  endif ()
+  message(STATUS "Enabling MSAN")
+  list(APPEND FSANITIZE "memory")
   list(APPEND EXTRA_SANITIZER_FLAGS "-fno-omit-frame-pointer")
 endif ()
 
@@ -38,7 +53,7 @@ if (ENABLE_UBSAN)
   list(APPEND EXTRA_SANITIZER_FLAGS "-fno-sanitize-recover=undefined")
 endif ()
  
-if (ENABLE_ASAN OR ENABLE_UBSAN)
+if (ENABLE_ASAN OR ENABLE_MSAN OR ENABLE_UBSAN)
   string(REPLACE ";" "," FSANITIZE_STR "${FSANITIZE}")
   add_compile_options(-fsanitize=${FSANITIZE_STR} ${EXTRA_SANITIZER_FLAGS})
   add_link_options(-fsanitize=${FSANITIZE_STR})
