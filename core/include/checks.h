@@ -39,6 +39,15 @@ int verify_no_rollback(void);
 int verify_check_qrsignature_pub(void);
 int verify_conv_btc_to_satoshi(void);
 
+/**
+ * Verifies that calling handle_incoming_message() with a serialized protobuf
+ * message which exceeds nanopb field size limits (defined in proto .options
+ * files) fails as expected.
+ *
+ * Note that as this function uses statically-allocated buffers, it is not thread-safe.
+ */
+int verify_rpc_oversized_message_rejected(void);
+
 #define ASSERT_STR_EQUAL(value, expecting, message) \
   do {                                              \
     if (strcmp(expecting, value) != 0) {            \
