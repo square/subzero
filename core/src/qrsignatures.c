@@ -30,6 +30,10 @@ bool check_qrsignature_pub(const uint8_t * const data, size_t data_len, const ui
     ERROR("Signature is null");
     return false;
   }
+  if (pub == NULL) {
+    ERROR("pub is null.");
+    return false;
+  }
 
   
   int result_verify = ecdsa_verify(
