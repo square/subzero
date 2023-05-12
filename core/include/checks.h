@@ -5,6 +5,11 @@
 /**
  * Performs self checks before accepting any requests.
  *
+ * Make sure to update register_all_self_checks() in self_checks.c when
+ * adding new self-check functions, to make sure they get executed at
+ * start up. You will also need to increment EXPECTED_SELF_CHECKS_COUNT by 1
+ * for each new self check function.
+ *
  * Returns 0 on success. If any of these tests fail, the code should abort.
  */
 int run_self_checks(void);
