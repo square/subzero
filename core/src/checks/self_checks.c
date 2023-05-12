@@ -12,7 +12,7 @@ typedef struct self_check_function_info {
 } self_check_function_info;
 
 #define MAX_SELF_CHECKS ((size_t) 128)
-static self_check_function_info self_checks[MAX_SELF_CHECKS] = { 0 };
+static self_check_function_info self_checks[MAX_SELF_CHECKS] = { { 0 } };
 static size_t self_checks_count = 0;
 static bool self_checks_registered = false;
 
