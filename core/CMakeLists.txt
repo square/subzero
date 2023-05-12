@@ -88,6 +88,22 @@ if (ENABLE_COVERAGE)
     #   export CXXFLAGS="-I/opt/homebrew/opt/llvm/include"
     #   export CC=`which clang`
     #   export CXX=`which clang`
+    #
+    # Note: on Darwin (i.e. MacOS) it's possible to collect code coverage even when the process is killed by a signal.
+    # This *might* also work on Linux, but it's only confirmed to work on Darwin according to clang documentation,
+    # as of May 2023.
+    #
+    # This allows us to get code coverage of code paths exercised by the GUI tests (e.g. gui-...-.jar --signtx-test):
+    # In terminal 1:
+    #   LLVM_PROFILE_FILE="subzero.profraw%c" ./subzero
+    # In terminal 2:
+    #   run the GUI test (e.g. java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test)
+    # Can also run additional tests in terminal 2, e.g. for wallet creation.
+    # Back to terminal 1:
+    #   ctrl-C to kill the subzero process
+    #   llvm-profdata merge -sparse subzero.profraw -o subzero.profdata
+    #   llvm-cov show ./subzero -instr-profile=subzero.profdata -format=html -output-dir=coverage ../{src,include}
+    #   open coverage/index.html
     add_compile_options(-fprofile-instr-generate -fcoverage-mapping -O0 -g)
     add_link_options(-fprofile-instr-generate)
   elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU") # GCC
