@@ -1,12 +1,13 @@
-#include <assert.h>
-#include <protection.h>
-#include <squareup/subzero/common.pb.h>
-#include <squareup/subzero/internal.pb.h>
+#include "protection.h"
 
+#include "aes_gcm_dev.h"
 #include "log.h"
 #include "memzero.h"
-#include "aes_gcm_dev.h"
 #include "rand.h"
+
+#include <assert.h>
+#include <squareup/subzero/common.pb.h>
+#include <squareup/subzero/internal.pb.h>
 
 // Protection: developer edition.
 

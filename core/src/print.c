@@ -1,8 +1,9 @@
-#include <stdint.h>
-#include <stdio.h>
+#include "print.h"
 
 #include "log.h"
-#include "print.h"
+
+#include <stdint.h>
+#include <stdio.h>
 
 // TODO: this file and hash.c have a lot of code in common. We should
 // pull the common code in a set of serializer_* functions.

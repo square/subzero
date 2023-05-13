@@ -1,10 +1,11 @@
-#include <stdint.h>
-#include <squareup/subzero/internal.pb.h> // For error codes
-#include "log.h"
-#include "memzero.h"
 #include "aes_gcm_dev.h"
 #include "gcm.h"
+#include "log.h"
+#include "memzero.h"
 #include "rand.h"
+
+#include <squareup/subzero/internal.pb.h> // For error codes
+#include <stdint.h>
 
 #define IV_SIZE_IN_BYTES (12)
 #define TAG_SIZE_IN_BYTES (16)

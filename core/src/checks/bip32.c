@@ -1,14 +1,14 @@
-#include <stdio.h>
-#include <string.h>
-
 #include "bip32.h"
-#include "bip39.h"
-#include "curves.h"
 
-#include "config.h"
+#include "bip39.h"
 #include "checks.h"
+#include "config.h"
+#include "curves.h"
 #include "log.h"
 #include "squareup/subzero/internal.pb.h"
+
+#include <stdio.h>
+#include <string.h>
 
 /**
  * Perform BIP32 derivation using a hardcoded mnemonic and verify that we get

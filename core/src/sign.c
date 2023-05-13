@@ -1,3 +1,13 @@
+#include "sign.h"
+
+#include "bip32.h"
+#include "conv.h"
+#include "hash.h"
+#include "log.h"
+#include "memzero.h"
+#include "rpc.h"
+#include "script.h"
+
 #include <assert.h>
 #include <base58.h>
 #include <bip32.h>
@@ -10,15 +20,6 @@
 #include <squareup/subzero/internal.pb.h>
 #include <stdbool.h>
 #include <stdio.h>
-
-#include "bip32.h"
-#include "conv.h"
-#include "hash.h"
-#include "log.h"
-#include "rpc.h"
-#include "script.h"
-#include "sign.h"
-#include "memzero.h"
 
 static void compute_prevout_hash(const TxInput* const inputs,
                                  pb_size_t inputs_count,

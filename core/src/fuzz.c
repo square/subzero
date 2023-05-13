@@ -1,14 +1,14 @@
-#include <stdio.h>
-#include <sys/stat.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <unistd.h>
-
 #include "pb_decode.h"
 #include "pb_encode.h"
 #include "rpc.h"
+
+#include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /* This is useful for debugging the fuzz driver. from nanopb docs. */
 static bool fwrite_callback(pb_ostream_t *stream, const uint8_t *buf, size_t count) {

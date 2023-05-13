@@ -1,4 +1,5 @@
 #include "init_wallet.h"
+
 #include "log.h"
 
 /**

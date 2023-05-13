@@ -1,3 +1,9 @@
+#include "no_rollback.h"
+
+#include "config.h"
+#include "log.h"
+#include "transact.h"
+
 #include <assert.h>
 #include <nfastapp.h>
 #include <seelib.h>
@@ -5,11 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "no_rollback.h"
-#include "config.h"
-#include "log.h"
-#include "transact.h"
 
 extern NFast_AppHandle app;
 

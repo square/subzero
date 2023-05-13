@@ -1,13 +1,13 @@
+#include "aes_gcm_ncipher.h"
+#include "config.h"
+#include "log.h"
+
 #include <assert.h>
 #include <nfastapp.h>
 #include <protection.h>
 #include <seelib.h>
 #include <squareup/subzero/common.pb.h>
 #include <squareup/subzero/internal.pb.h>
-
-#include "aes_gcm_ncipher.h"
-#include "config.h"
-#include "log.h"
 
 // Protection: ncipher edition.
 

@@ -1,11 +1,11 @@
-#include <nfastapp.h>
-#include <stdbool.h>
-
-#include <squareup/subzero/internal.pb.h>
-
-#include "module_certificate.h"
 #include "init.h"
+
 #include "log.h"
+#include "module_certificate.h"
+
+#include <nfastapp.h>
+#include <squareup/subzero/internal.pb.h>
+#include <stdbool.h>
 
 NFastApp_Connection conn;
 NFast_AppHandle app;

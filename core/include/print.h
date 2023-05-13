@@ -1,5 +1,8 @@
 #pragma once
 
+#include <stddef.h>
+#include <stdint.h>
+
 void print_uint8(uint8_t value);
 void print_uint16(uint16_t value);
 void print_uint32(uint32_t value);

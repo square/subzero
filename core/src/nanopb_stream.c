@@ -2,12 +2,12 @@
  * This file is mostly a copy of nanopb/examples/network_server/common.h
  */
 
+#include "nanopb_stream.h"
+
 #include <pb_decode.h>
 #include <pb_encode.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-
-#include "nanopb_stream.h"
 
 static bool write_callback(pb_ostream_t *stream, const uint8_t *buf,
                            size_t count) {

@@ -1,7 +1,9 @@
-#include <stdlib.h> /* strtoul */
-#include <inttypes.h>
 #include "no_rollback.h"
+
 #include "log.h"
+
+#include <inttypes.h>
+#include <stdlib.h> /* strtoul */
 
 /**
  * Prevents running an older version of core after a newer version has been seen. The goal is to limit the attack
