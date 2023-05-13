@@ -1,9 +1,12 @@
 #include "no_rollback.h"
 
 #include "log.h"
+#include "squareup/subzero/internal.pb.h"
 
 #include <inttypes.h>
+#include <stdio.h>
 #include <stdlib.h> /* strtoul */
+#include <string.h>
 
 /**
  * Prevents running an older version of core after a newer version has been seen. The goal is to limit the attack

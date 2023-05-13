@@ -2,10 +2,9 @@
 
 #include "log.h"
 #include "module_certificate.h"
+#include "squareup/subzero/internal.pb.h"
 
 #include <nfastapp.h>
-#include <squareup/subzero/internal.pb.h>
-#include <stdbool.h>
 
 NFastApp_Connection conn;
 NFast_AppHandle app;

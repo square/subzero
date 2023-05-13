@@ -1,10 +1,10 @@
 #include "checks.h"
 #include "log.h"
-#include "rpc.h"
 #include "sign.h"
+#include "squareup/subzero/common.pb.h"
 #include "squareup/subzero/internal.pb.h"
 
-#include <stdio.h>
+#include <stdbool.h>
 
 int verify_validate_fees(void) {
   int r = 0;

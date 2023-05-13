@@ -2,11 +2,9 @@
 
 #include "config.h"
 #include "log.h"
+#include "squareup/subzero/internal.pb.h"
 
-#include <assert.h>
-#include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 Result no_rollback_read(const char* filename, char buf[static VERSION_SIZE]) {
   char tmp_file[100];

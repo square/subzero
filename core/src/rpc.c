@@ -3,13 +3,15 @@
 #include "checks.h"
 #include "config.h"
 #include "log.h"
+#include "pb_decode.h"
+#include "pb_encode.h"
 #include "qrsignatures.h"
 #include "sign.h"
+#include "squareup/subzero/common.pb.h"
+#include "squareup/subzero/internal.pb.h"
+#include "squareup/subzero/service.pb.h"
 
-#include <pb_decode.h>
-#include <pb_encode.h>
-#include <squareup/subzero/internal.pb.h>
-#include <squareup/subzero/service.pb.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 static void execute_command(const InternalCommandRequest* const cmd,

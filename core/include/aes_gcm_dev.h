@@ -1,6 +1,7 @@
 #pragma once
 
-#include <squareup/subzero/internal.pb.h>
+#include "squareup/subzero/internal.pb.h"
+
 #include <stddef.h>
 #include <stdint.h>
 

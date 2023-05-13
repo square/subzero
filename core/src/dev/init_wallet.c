@@ -2,19 +2,15 @@
 
 #include "bip32.h"
 #include "bip39.h"
-#include "checks.h"
 #include "config.h"
 #include "curves.h"
 #include "log.h"
 #include "protection.h"
 #include "rand.h"
 #include "rpc.h"
+#include "squareup/subzero/internal.pb.h"
 
 #include <assert.h>
-#include <pb_decode.h>
-#include <pb_encode.h>
-#include <squareup/subzero/common.pb.h>
-#include <squareup/subzero/internal.pb.h>
 #include <stdio.h>
 
 /**

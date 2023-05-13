@@ -2,15 +2,16 @@
 #include "config.h"
 #include "log.h"
 #include "memzero.h"
-#include "nanopb_stream.h"
-#include "print.h"
+#include "pb.h"
 #include "rand.h"
 #include "rpc.h"
+#include "squareup/subzero/internal.pb.h"
 
 #include <assert.h>
 #include <pb_decode.h>
 #include <pb_encode.h>
-#include <squareup/subzero/internal.pb.h>
+#include <stdbool.h>
+#include <string.h>
 
 // Helper which returns the size of a buffer that would be needed to hold the serialized version of the given
 // protobuf structure, assuming that pb_encode_delimited() serialization will be used.

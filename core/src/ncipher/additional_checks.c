@@ -1,11 +1,11 @@
 #include "aes_gcm_ncipher.h"
 #include "checks.h"
 #include "log.h"
+#include "squareup/subzero/internal.pb.h" // For error codes
 #include "transact.h"
 
 #include <nfastapp.h>
 #include <seelib.h>
-#include <squareup/subzero/internal.pb.h> // For error codes
 #include <stdint.h>
 
 extern M_KeyID master_seed_encryption_key;

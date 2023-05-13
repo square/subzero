@@ -1,28 +1,22 @@
-#include "base58.h"
-#include "bip32.h"
 #include "bip39.h"
 #include "checks.h"
-#include "conv.h"
 #include "curves.h"
 #include "ecdsa.h"
-#include "hash.h"
+#include "hasher.h"
 #include "log.h"
-#include "memzero.h"
 #include "nist256p1.h"
+#include "pb.h"
 #include "print.h"
 #include "qrsignatures.h"
-#include "script.h"
 #include "sign.h"
+#include "squareup/subzero/common.pb.h"
+#include "squareup/subzero/internal.pb.h"
 
 #include <assert.h>
 #include <config.h>
-#include <pb_decode.h>
-#include <pb_encode.h>
 #include <protection.h>
-#include <rpc.h>
-#include <squareup/subzero/common.pb.h>
-#include <squareup/subzero/internal.pb.h>
-#include <squareup/subzero/service.pb.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 

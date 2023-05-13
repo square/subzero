@@ -1,6 +1,11 @@
 #include "checks.h"
+#include "config.h"
 #include "init_wallet.h"
 #include "log.h"
+#include "squareup/subzero/internal.pb.h"
+
+#include <stdint.h>
+#include <string.h>
 
 int verify_mix_entropy(void) {
   // create the first buffer with known bytes

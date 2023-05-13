@@ -2,14 +2,12 @@
 #include "aes_gcm_ncipher.h"
 #include "log.h"
 #include "memzero.h"
+#include "squareup/subzero/internal.pb.h" // For error codes
 #include "transact.h"
 
 #include <nfastapp.h>
-#include <seelib.h>
-#include <squareup/subzero/internal.pb.h> // For error codes
 #include <stdint.h>
 #include <string.h>
-#include <strings.h>
 
 #define IV_SIZE_IN_BYTES AES_GCM_IV_SIZE_IN_BYTES
 #define TAG_SIZE_IN_BYTES AES_GCM_TAG_SIZE_IN_BYTES

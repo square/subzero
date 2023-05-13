@@ -1,7 +1,7 @@
 #pragma once
 
-#include "nanopb_stream.h"
-#include <squareup/subzero/internal.pb.h>
+#include "pb.h"
+#include "squareup/subzero/internal.pb.h"
 
 void handle_incoming_message(pb_istream_t *input, pb_ostream_t *output);
 

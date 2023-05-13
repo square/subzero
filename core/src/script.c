@@ -1,7 +1,8 @@
 #include "script.h"
 
+#include "squareup/subzero/internal.pb.h"
+
 #include <log.h>
-#include <squareup/subzero/internal.pb.h>
 
 Result script_push(script_t *script, enum opcodetype opcode) {
   if (script->len == SCRIPT_MAX_LEN) {

@@ -5,9 +5,8 @@
 #include "config.h"
 #include "curves.h"
 #include "log.h"
-#include "squareup/subzero/internal.pb.h"
+#include "sha2.h"
 
-#include <stdio.h>
 #include <string.h>
 
 /**
