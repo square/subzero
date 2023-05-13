@@ -1,15 +1,14 @@
-#include <nfastapp.h>
-#include <seelib.h>
-#include <stdint.h>
-#include <string.h>
-#include <strings.h>
-#include <squareup/subzero/internal.pb.h> // For error codes
-
 #include "aes_gcm_ncipher.h"
 #include "log.h"
 #include "memzero.h"
 #include "transact.h"
 
+#include <nfastapp.h>
+#include <seelib.h>
+#include <squareup/subzero/internal.pb.h> // For error codes
+#include <stdint.h>
+#include <string.h>
+#include <strings.h>
 
 #define IV_SIZE_IN_BYTES (12)
 #define TAG_SIZE_IN_BYTES (16)

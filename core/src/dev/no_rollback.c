@@ -1,11 +1,12 @@
+#include "no_rollback.h"
+
+#include "config.h"
+#include "log.h"
+
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "no_rollback.h"
-#include "config.h"
-#include "log.h"
 
 Result no_rollback_read(const char* filename, char buf[static VERSION_SIZE]) {
   char tmp_file[100];

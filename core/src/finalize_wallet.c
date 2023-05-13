@@ -1,13 +1,13 @@
-#include <assert.h>
-#include <bip32.h>
-#include <curves.h>
-#include <squareup/subzero/internal.pb.h>
-
 #include "config.h"
 #include "log.h"
 #include "protection.h"
 #include "rpc.h"
 #include "strlcpy.h"
+
+#include <assert.h>
+#include <bip32.h>
+#include <curves.h>
+#include <squareup/subzero/internal.pb.h>
 
 Result
 handle_finalize_wallet(

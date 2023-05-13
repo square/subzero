@@ -1,13 +1,3 @@
-#include <assert.h>
-#include <examples/network_server/common.h>
-#include <nfastapp.h>
-#include <pb_decode.h>
-#include <pb_encode.h>
-#include <seelib.h>
-#include <squareup/subzero/common.pb.h>
-#include <squareup/subzero/internal.pb.h>
-#include <stdio.h>
-
 #include "bip32.h"
 #include "bip39.h"
 #include "checks.h"
@@ -19,6 +9,16 @@
 #include "rand.h"
 #include "rpc.h"
 #include "transact.h"
+
+#include <assert.h>
+#include <examples/network_server/common.h>
+#include <nfastapp.h>
+#include <pb_decode.h>
+#include <pb_encode.h>
+#include <seelib.h>
+#include <squareup/subzero/common.pb.h>
+#include <squareup/subzero/internal.pb.h>
+#include <stdio.h>
 
 extern NFast_AppHandle app;
 

@@ -1,12 +1,13 @@
-#include <nfastapp.h>
-#include <seelib.h>
-#include <string.h>
-#include <stdlib.h>
-
 #include "module_certificate.h"
+
 #include "log.h"
 #include "memzero.h"
 #include "transact.h"
+
+#include <nfastapp.h>
+#include <seelib.h>
+#include <stdlib.h>
+#include <string.h>
 
 extern NFast_AppHandle app;
 

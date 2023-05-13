@@ -1,5 +1,9 @@
 #pragma once
 
+#include <squareup/subzero/internal.pb.h>
+#include <stddef.h>
+#include <stdint.h>
+
 /* This header is meant for the dev target, and should only be included in the
  * dev implementation */
 

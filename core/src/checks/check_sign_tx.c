@@ -1,33 +1,30 @@
 #include "base58.h"
 #include "bip32.h"
 #include "bip39.h"
+#include "checks.h"
+#include "conv.h"
 #include "curves.h"
+#include "ecdsa.h"
+#include "hash.h"
+#include "log.h"
+#include "memzero.h"
+#include "nist256p1.h"
+#include "print.h"
+#include "qrsignatures.h"
+#include "script.h"
+#include "sign.h"
+
 #include <assert.h>
 #include <config.h>
+#include <pb_decode.h>
+#include <pb_encode.h>
 #include <protection.h>
 #include <rpc.h>
-#include <pb_encode.h>
-#include <pb_decode.h>
 #include <squareup/subzero/common.pb.h>
 #include <squareup/subzero/internal.pb.h>
 #include <squareup/subzero/service.pb.h>
 #include <stdio.h>
 #include <string.h>
-
-#include <assert.h>
-
-#include "checks.h"
-#include "conv.h"
-#include "hash.h"
-#include "log.h"
-#include "print.h"
-#include "script.h"
-#include "sign.h"
-#include "ecdsa.h"
-#include "nist256p1.h"
-#include "memzero.h"
-#include "qrsignatures.h"
-
 
 // Return a constructed request for test
 static int construct_request(InternalCommandRequest_SignTxRequest *tx) {

@@ -1,9 +1,9 @@
-#include <inttypes.h>
-#include <stdint.h>
-
 #include "checks.h"
 #include "conv.h"
 #include "log.h"
+
+#include <inttypes.h>
+#include <stdint.h>
 
 int verify_conv_btc_to_satoshi(void) {
   uint32_t btc = 0;

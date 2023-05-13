@@ -1,7 +1,8 @@
-#include <nfastapp.h>
+#include "transact.h"
 
 #include "log.h"
-#include "transact.h"
+
+#include <nfastapp.h>
 
 /**
  * Sets certs_present and takes care of error handling.

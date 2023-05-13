@@ -2,15 +2,6 @@
  * nCipher wallet code.
  */
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#include <stdbool.h>
-
-#include "no_rollback.h"
 #include "checks.h"
 #include "config.h"
 #include "hash.h"
@@ -18,10 +9,19 @@
 #include "log.h"
 #include "memzero.h"
 #include "nanopb_stream.h"
+#include "no_rollback.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
 #include "print.h"
 #include "rpc.h"
+
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 int main(int argc, char **argv) {
   int r;

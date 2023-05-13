@@ -1,5 +1,10 @@
 #pragma once
 
+#include <nfastapp.h>
+#include <squareup/subzero/internal.pb.h>
+#include <stddef.h>
+#include <stdint.h>
+
 /* This header is meant for the nCipher target, and should only be included in the
  * codesafe/ncipher implementation */
 

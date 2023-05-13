@@ -1,6 +1,6 @@
-#include <stdint.h>
-
 #include "memzero.h"
+
+#include <stdint.h>
 
 /**
  * This function MUST NEVER be included in a file with any other functions.

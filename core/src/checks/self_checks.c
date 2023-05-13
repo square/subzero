@@ -1,8 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "checks.h"
 #include "log.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 typedef int (*self_check_function)(void);
 

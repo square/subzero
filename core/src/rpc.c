@@ -1,16 +1,16 @@
-#include <stdio.h>
+#include "rpc.h"
+
+#include "checks.h"
+#include "config.h"
+#include "log.h"
+#include "qrsignatures.h"
+#include "sign.h"
 
 #include <pb_decode.h>
 #include <pb_encode.h>
 #include <squareup/subzero/internal.pb.h>
 #include <squareup/subzero/service.pb.h>
-
-#include "checks.h"
-#include "config.h"
-#include "log.h"
-#include "rpc.h"
-#include "sign.h"
-#include "qrsignatures.h"
+#include <stdio.h>
 
 static void execute_command(const InternalCommandRequest* const cmd,
                             InternalCommandResponse *out);
