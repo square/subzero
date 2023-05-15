@@ -9,6 +9,11 @@ Result protect_pubkey(char xpub[static XPUB_SIZE],
   // This is extremely hacky, but works. ¯\_(ツ)_/¯
   printf(MAGIC);
 
+  if (NULL == encrypted_pub_key) {
+    ERROR("%s: null encrypted_pub_key input", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+
   static_assert(sizeof(encrypted_pub_key->encrypted_pub_key.bytes) >=
                 XPUB_SIZE + 12 + 16,
                 "misconfigured encrypted_pub_key max size");
@@ -52,6 +57,11 @@ Result expose_pubkey(const EncryptedPubKey* const encrypted_pub_key,
   if (pub_key_encryption_key == 0) {
     ERROR("pub_key_encryption_key not initialized");
     return Result_EXPOSE_PUBKEY_NO_PUBKEY_ENCRYPTION_KEY_FAILURE;
+  }
+
+  if (NULL == encrypted_pub_key) {
+    ERROR("%s: null encrypted_pub_key input", __func__);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
   }
 
   if (!encrypted_pub_key->has_encrypted_pub_key) {

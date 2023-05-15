@@ -85,6 +85,7 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t * plaintext, size_t plaintext_len,
 
   // Encrypt plaintext.
   memcpy(aes_gcm_buffer, plaintext, plaintext_len);
+  memzero(plaintext, plaintext_len);
 
   if (RETURN_GOOD != gcm_encrypt_message(iv, sizeof(iv),
                                          NULL, 0, // empty header
@@ -100,6 +101,7 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t * plaintext, size_t plaintext_len,
   if (RETURN_GOOD != gcm_end(ctx))
   {
     ERROR("gcm_end failed");
+    memzero(aes_gcm_buffer, sizeof(aes_gcm_buffer));
     return Result_UNKNOWN_INTERNAL_FAILURE;
   }
 

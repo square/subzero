@@ -13,11 +13,65 @@ int verify_protect_pubkey(void) {
 
   char buffer3[XPUB_SIZE];
 
-  Result r = protect_pubkey(buffer1, &temp);
+  // Negative test for null pubkey input
+  ERROR("(next line is expected to show red text...)");
+  Result r = protect_pubkey(buffer1, NULL);
+  if (Result_UNKNOWN_INTERNAL_FAILURE != r) {
+    ERROR("%s: unexected result %d from protect_pubkey() with NULL pubkey pointer", __func__, r);
+    return -1;
+  }
+
+  // Positive test case
+  r = protect_pubkey(buffer1, &temp);
   if (r != Result_SUCCESS) {
     ERROR("protect_pubkey failed: (%d).", r);
     return -1;
   }
+
+  // Make sure the plaintext buffer has been zeroed.
+  char zerobuffer[sizeof(buffer1)] = { 0 };
+  if (0 != memcmp(zerobuffer, buffer1, sizeof(buffer1))) {
+    ERROR("%s: plaintext buffer not zero after encrypt op", __func__);
+    return -1;
+  }
+
+  // Negative test cases.
+  ERROR("(next line is expected to show red text...)");
+  r = expose_pubkey(NULL, buffer3);
+  if (Result_UNKNOWN_INTERNAL_FAILURE != r) {
+    ERROR("%s: unexected result %d from expose_pubkey() with NULL pubkey pointer", __func__, r);
+    return -1;
+  }
+
+  temp.has_encrypted_pub_key = false;
+  ERROR("(next line is expected to show red text...)");
+  r = expose_pubkey(&temp, buffer3);
+  if (Result_EXPOSE_PUBKEY_NO_ENCRYPTED_PUBKEY_FAILURE != r) {
+    ERROR("%s: unexected result %d from expose_pubkey() with unset encrypted pub key", __func__, r);
+    return -1;
+  }
+  temp.has_encrypted_pub_key = true;
+
+  size_t oldsize = temp.encrypted_pub_key.size;
+  temp.encrypted_pub_key.size = XPUB_SIZE + 16 + 12;
+  ERROR("(next line is expected to show red text...)");
+  r = expose_pubkey(&temp, buffer3);
+  if (Result_EXPOSE_PUBKEY_UNEXPECTED_ENCRYPTED_PUBKEY_SIZE_FAILURE != r) {
+    ERROR("%s: unexected result %d from expose_pubkey() with wrong size encrypted pub key", __func__, r);
+    return -1;
+  }
+  temp.encrypted_pub_key.size = oldsize;
+
+  temp.encrypted_pub_key.bytes[0] ^= 1; // flip a ciphertext bit
+  ERROR("(next line is expected to show red text...)");
+  r = expose_pubkey(&temp, buffer3);
+  if (Result_SUCCESS == r) {
+    ERROR("%s: unexected result %d from expose_pubkey() with corrupted ciphertext", __func__, r);
+    return -1;
+  }
+  temp.encrypted_pub_key.bytes[0] ^= 1; // flip the bit back
+
+  // Positive test case.
   r = expose_pubkey(&temp, buffer3);
   if (r != Result_SUCCESS) {
     ERROR("expose_pubkey failed: (%d).", r);
@@ -25,7 +79,7 @@ int verify_protect_pubkey(void) {
   }
 
   if (strcmp(buffer2, buffer3) != 0) {
-    ERROR("strcmp failed. %s != %s", buffer2, buffer3);
+    ERROR("%s: decrypted pubkey does not match original input: %s != %s", __func__, buffer2, buffer3);
     return -1;
   }
 
