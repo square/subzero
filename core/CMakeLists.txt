@@ -175,8 +175,7 @@ set(checks_SRC
 list(APPEND main_SRC ${checks_SRC})
 
 set(include_SRC
-    "include/aes_gcm_dev.h"
-    "include/aes_gcm_ncipher.h"
+    "include/aes_gcm_common.h"
     "include/checks.h"
     "include/config.h"
     "include/conv.h"
@@ -198,6 +197,7 @@ list(APPEND main_SRC ${include_SRC})
 
 if ($ENV{TARGET} MATCHES "nCipher")
   set(extra_SRC
+      "include/aes_gcm_ncipher.h"
       "src/ncipher/additional_checks.c"
       "src/ncipher/aes_gcm.c"
       "src/ncipher/execute_command_hooks.c"
@@ -211,6 +211,7 @@ if ($ENV{TARGET} MATCHES "nCipher")
   list(APPEND main_SRC ${extra_SRC})
 else ()
   set(extra_SRC
+      "include/aes_gcm_dev.h"
       "src/dev/additional_checks.c"
       "src/dev/no_rollback.c"
       "src/dev/execute_command_hooks.c"

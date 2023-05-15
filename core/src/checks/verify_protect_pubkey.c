@@ -1,3 +1,4 @@
+#include "aes_gcm_common.h"
 #include "checks.h"
 #include "config.h"
 #include "log.h"
@@ -53,7 +54,7 @@ int verify_protect_pubkey(void) {
   temp.has_encrypted_pub_key = true;
 
   size_t oldsize = temp.encrypted_pub_key.size;
-  temp.encrypted_pub_key.size = XPUB_SIZE + 16 + 12;
+  temp.encrypted_pub_key.size = XPUB_SIZE + AES_GCM_OVERHEAD_BYTES;
   ERROR("(next line is expected to show red text...)");
   r = expose_pubkey(&temp, buffer3);
   if (Result_EXPOSE_PUBKEY_UNEXPECTED_ENCRYPTED_PUBKEY_SIZE_FAILURE != r) {

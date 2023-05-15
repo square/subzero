@@ -1,3 +1,4 @@
+#include "aes_gcm_common.h"
 #include "aes_gcm_dev.h"
 #include "gcm.h"
 #include "log.h"
@@ -7,8 +8,8 @@
 #include <squareup/subzero/internal.pb.h> // For error codes
 #include <stdint.h>
 
-#define IV_SIZE_IN_BYTES (12)
-#define TAG_SIZE_IN_BYTES (16)
+#define IV_SIZE_IN_BYTES AES_GCM_IV_SIZE_IN_BYTES
+#define TAG_SIZE_IN_BYTES AES_GCM_TAG_SIZE_IN_BYTES
 
 // Temp buffer for backing up content, etc.
 // Because subzero CORE is supposed to be single-threaded, we use a global
