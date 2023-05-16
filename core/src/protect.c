@@ -1,3 +1,8 @@
+#include "aes_gcm_common.h"
+
+#define MAX_ENCRYPTED_PUBKEY_SIZE (XPUB_SIZE + AES_GCM_OVERHEAD_BYTES)
+#define ENCRYPTED_MASTER_SEED_SIZE (MASTER_SEED_SIZE + AES_GCM_OVERHEAD_BYTES)
+
 /**
  * Encrypt xpub with the pubkey encryption key.
  *
@@ -14,8 +19,7 @@ Result protect_pubkey(char xpub[static XPUB_SIZE],
     return Result_UNKNOWN_INTERNAL_FAILURE;
   }
 
-  static_assert(sizeof(encrypted_pub_key->encrypted_pub_key.bytes) >=
-                XPUB_SIZE + 12 + 16,
+  static_assert(sizeof(encrypted_pub_key->encrypted_pub_key.bytes) >= MAX_ENCRYPTED_PUBKEY_SIZE,
                 "misconfigured encrypted_pub_key max size");
   if (pub_key_encryption_key == 0) {
     ERROR("pub_key_encryption_key not initialized");
@@ -68,7 +72,7 @@ Result expose_pubkey(const EncryptedPubKey* const encrypted_pub_key,
     ERROR("missing encrypted_pub_key");
     return Result_EXPOSE_PUBKEY_NO_ENCRYPTED_PUBKEY_FAILURE;
   }
-  if (encrypted_pub_key->encrypted_pub_key.size >= (XPUB_SIZE + 16 + 12)) {
+  if (encrypted_pub_key->encrypted_pub_key.size >= MAX_ENCRYPTED_PUBKEY_SIZE) {
     ERROR("unexpected encrypted_pub_key size");
     return Result_EXPOSE_PUBKEY_UNEXPECTED_ENCRYPTED_PUBKEY_SIZE_FAILURE;
   }
@@ -139,8 +143,7 @@ Result expose_wallet(const EncryptedMasterSeed* const encrypted_master_seed,
     return Result_EXPOSE_WALLET_NO_MASTER_SEED_ENCRYPTION_KEY_FAILURE;
   }
 
-  if (encrypted_master_seed->encrypted_master_seed.size !=
-      MASTER_SEED_SIZE + 16 + 12) {
+  if (encrypted_master_seed->encrypted_master_seed.size != ENCRYPTED_MASTER_SEED_SIZE) {
     ERROR("Unexpected encrypted_master_seed size");
     return Result_EXPOSE_WALLET_UNEXPECTED_ENCRYPTED_MASTER_SEED_SIZE_FAILURE;
   }

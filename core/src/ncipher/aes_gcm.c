@@ -1,3 +1,4 @@
+#include "aes_gcm_common.h"
 #include "aes_gcm_ncipher.h"
 #include "log.h"
 #include "memzero.h"
@@ -10,8 +11,8 @@
 #include <string.h>
 #include <strings.h>
 
-#define IV_SIZE_IN_BYTES (12)
-#define TAG_SIZE_IN_BYTES (16)
+#define IV_SIZE_IN_BYTES AES_GCM_IV_SIZE_IN_BYTES
+#define TAG_SIZE_IN_BYTES AES_GCM_TAG_SIZE_IN_BYTES
 
 extern NFast_AppHandle app;
 
@@ -104,18 +105,18 @@ Result aes_gcm_encrypt(M_KeyID keyId, uint8_t *plaintext, size_t plaintext_len,
     return Result_AES_GCM_ENCRYPT_UNEXPECTED_CIPHERTEXT_LEN_FAILURE;
   }
 
-  if (reply.reply.encrypt.cipher.iv.genericgcm128.iv.len != 12) {
+  if (reply.reply.encrypt.cipher.iv.genericgcm128.iv.len != IV_SIZE_IN_BYTES) {
     ERROR("aes_gcm_encrypt: unexpected IV len.");
     NFastApp_Free_Reply(app, NULL, NULL, &reply);
     return Result_AES_GCM_ENCRYPT_UNEXPECTED_IV_LEN_FAILURE;
   }
 
-  memcpy(ciphertext, reply.reply.encrypt.cipher.iv.genericgcm128.iv.ptr, 12);
-  memcpy(ciphertext + 12,
+  memcpy(ciphertext, reply.reply.encrypt.cipher.iv.genericgcm128.iv.ptr, IV_SIZE_IN_BYTES);
+  memcpy(ciphertext + IV_SIZE_IN_BYTES,
          reply.reply.encrypt.cipher.data.genericgcm128.cipher.ptr,
          plaintext_len);
-  memcpy(ciphertext + plaintext_len + 12,
-         reply.reply.encrypt.cipher.data.genericgcm128.tag.bytes, 16);
+  memcpy(ciphertext + plaintext_len + IV_SIZE_IN_BYTES,
+         reply.reply.encrypt.cipher.data.genericgcm128.tag.bytes, TAG_SIZE_IN_BYTES);
   *bytes_written = expected_ciphertext_len;
 
   NFastApp_Free_Reply(app, NULL, NULL, &reply);
@@ -182,11 +183,11 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext,
   command.args.decrypt.cipher.data.genericgcm128.cipher.len =
       expected_plaintext_len;
   command.args.decrypt.cipher.data.genericgcm128.cipher.ptr =
-      aes_gcm_buffer + 12;
+      aes_gcm_buffer + IV_SIZE_IN_BYTES;
   memcpy(command.args.decrypt.cipher.data.genericgcm128.tag.bytes,
-         aes_gcm_buffer + ciphertext_len - 16, 16);
-  command.args.decrypt.cipher.iv.genericgcm128.taglen = 16;
-  command.args.decrypt.cipher.iv.genericgcm128.iv.len = 12;
+         aes_gcm_buffer + ciphertext_len - TAG_SIZE_IN_BYTES, TAG_SIZE_IN_BYTES);
+  command.args.decrypt.cipher.iv.genericgcm128.taglen = TAG_SIZE_IN_BYTES;
+  command.args.decrypt.cipher.iv.genericgcm128.iv.len = IV_SIZE_IN_BYTES;
   command.args.decrypt.cipher.iv.genericgcm128.iv.ptr = aes_gcm_buffer;
   command.args.decrypt.cipher.iv.genericgcm128.header.len = 0;
 
