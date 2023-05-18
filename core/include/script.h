@@ -161,5 +161,5 @@ enum opcodetype {
   OP_INVALIDOPCODE = 0xff,
 };
 
-Result script_push(script_t *script, enum opcodetype opcode);
+Result script_push(script_t *script, uint8_t byte);
 Result script_push_data(script_t *script, const uint8_t *data, size_t len);
