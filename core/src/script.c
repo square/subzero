@@ -1,4 +1,5 @@
 #include "script.h"
+#include "conv.h"
 
 #include <log.h>
 #include <squareup/subzero/internal.pb.h>
@@ -20,6 +21,7 @@ Result script_push_data(script_t *script, const uint8_t *data, size_t len) {
       ERROR("script_push failed: (%d).", r);
       return r;
     }
+    // Fall through to pushing the data.
   } else if (len <= 0xff) {
     r = script_push(script, OP_PUSHDATA1);
     if (r != Result_SUCCESS) {
@@ -31,25 +33,49 @@ Result script_push_data(script_t *script, const uint8_t *data, size_t len) {
       ERROR("script_push failed: (%d).", r);
       return r;
     }
+    // Fall through to pushing the data.
   } else if (len <= 0xffff) {
     r = script_push(script, OP_PUSHDATA2);
     if (r != Result_SUCCESS) {
       ERROR("script_push failed: (%d).", r);
       return r;
     }
-    // TODO: handle endianess!
-    return Result_SCRIPT_PUSH_UNIMPLEMENTED;
+    uint8_t len_buf[sizeof(uint16_t)];
+    if (!u16_to_little_endian_bytes((uint16_t) len, len_buf, sizeof(len_buf))) {
+      ERROR("script_push failed after OP_PUSHDATA2");
+      return Result_UNKNOWN_INTERNAL_FAILURE;
+    }
+    for (size_t i = 0; i < sizeof(len_buf); ++i) {
+      r = script_push(script, len_buf[i]);
+      if (r != Result_SUCCESS) {
+        ERROR("script_push failed: (%d).", r);
+        return r;
+      }
+    }
+    // Fall through to pushing the data.
   } else {
     r = script_push(script, OP_PUSHDATA4);
     if (r != Result_SUCCESS) {
       ERROR("script_push failed: (%d).", r);
       return r;
     }
-    // TODO: handle endianess!
-    return Result_SCRIPT_PUSH_UNIMPLEMENTED;
+    uint8_t len_buf[sizeof(uint32_t)];
+    if (!u32_to_little_endian_bytes((uint32_t) len, len_buf, sizeof(len_buf))) {
+      ERROR("script_push failed after OP_PUSHDATA4");
+      return Result_UNKNOWN_INTERNAL_FAILURE;
+    }
+    for (size_t i = 0; i < sizeof(len_buf); ++i) {
+      r = script_push(script, len_buf[i]);
+      if (r != Result_SUCCESS) {
+        ERROR("script_push failed: (%d).", r);
+        return r;
+      }
+    }
+    // Fall through to pushing the data.
   }
-  size_t i;
-  for (i = 0; i < len; i++) {
+
+  // All of the branches above fall through to here on success.
+  for (size_t i = 0; i < len; i++) {
     r = script_push(script, data[i]);
     if (r != Result_SUCCESS) {
       ERROR("script_push failed: (%d).", r);

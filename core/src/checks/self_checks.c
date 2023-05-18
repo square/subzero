@@ -31,7 +31,7 @@ static void register_self_check(self_check_function func, const char* name) {
 }
 
 // For each new self check function added, this constant needs to be incremented by 1.
-#define EXPECTED_SELF_CHECKS_COUNT ((size_t) 10)
+#define EXPECTED_SELF_CHECKS_COUNT ((size_t) 12)
 
 #define REGISTER_SELF_CHECK(name) register_self_check(name, #name)
 
@@ -44,6 +44,8 @@ static void register_all_self_checks(void) {
   }
 
   REGISTER_SELF_CHECK(verify_byte_order);
+  REGISTER_SELF_CHECK(verify_u16_to_little_endian_bytes);
+  REGISTER_SELF_CHECK(verify_u32_to_little_endian_bytes);
   REGISTER_SELF_CHECK(verify_mix_entropy);
   REGISTER_SELF_CHECK(verify_protect_pubkey);
   REGISTER_SELF_CHECK(verify_bip32);

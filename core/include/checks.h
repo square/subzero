@@ -35,6 +35,14 @@ int post_run_self_checks(void);
  */
 int verify_byte_order(void);
 
+/**
+ * Makes sure that the *_to_little_endian_bytes() functions are implemented correctly.
+ * These are used by script.c and getting them wrong would result in corrupted bitcoin scripts
+ * which would get rejected by the network.
+ */
+int verify_u16_to_little_endian_bytes(void);
+int verify_u32_to_little_endian_bytes(void);
+
 int verify_bip32(void);
 int verify_sign_tx(void);
 int verify_validate_fees(void);
