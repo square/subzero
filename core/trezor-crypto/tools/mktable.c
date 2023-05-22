@@ -18,9 +18,13 @@ int main(int argc, char **argv) {
   }
   const char *name = argv[1];
   const curve_info *info = get_curve_by_name(name);
+  if (info == 0) {
+    printf("Unknown curve '%s'\n", name);
+    return 1;
+  }
   const ecdsa_curve *curve = info->params;
   if (curve == 0) {
-    printf("Unknown curve '%s'\n", name);
+    printf("Unknown curve params");
     return 1;
   }
 
@@ -39,7 +43,8 @@ int main(int argc, char **argv) {
       curve_point checkresult;
       bignum256 a;
       bn_zero(&a);
-      a.val[(4 * i) / 30] = ((uint32_t)2 * j + 1) << ((4 * i) % 30);
+      a.val[(4 * i) / BN_BITS_PER_LIMB] = ((uint32_t)2 * j + 1)
+                                          << ((4 * i) % BN_BITS_PER_LIMB);
       bn_normalize(&a);
       point_multiply(curve, &a, &curve->G, &checkresult);
       assert(point_is_equal(&checkresult, &ng));

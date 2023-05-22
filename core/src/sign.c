@@ -59,7 +59,7 @@ static Result derive_public_key(const char *xpub,
                                 uint8_t public_key[static COMPRESSED_PUBKEY_SIZE]) {
   HDNode node;
 
-  int r = hdnode_deserialize(xpub, PUBKEY_PREFIX, 0, SECP256K1_NAME, &node, NULL);
+  int r = hdnode_deserialize_public(xpub, PUBKEY_PREFIX, SECP256K1_NAME, &node, NULL);
   if (r < 0) {
     return Result_DERIVE_PUBKEY_DESERIALIZE_FAILURE;
   }

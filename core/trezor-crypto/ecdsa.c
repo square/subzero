@@ -43,7 +43,7 @@ void point_copy(const curve_point *cp1, curve_point *cp2) { *cp2 = *cp1; }
 // cp2 = cp1 + cp2
 void point_add(const ecdsa_curve *curve, const curve_point *cp1,
                curve_point *cp2) {
-  bignum256 lambda, inv, xr, yr;
+  bignum256 lambda = {0}, inv = {0}, xr = {0}, yr = {0};
 
   if (point_is_infinity(cp1)) {
     return;
@@ -61,6 +61,7 @@ void point_add(const ecdsa_curve *curve, const curve_point *cp1,
     return;
   }
 
+  // lambda = (y2 - y1) / (x2 - x1)
   bn_subtractmod(&(cp2->x), &(cp1->x), &inv, &curve->prime);
   bn_inverse(&inv, &curve->prime);
   bn_subtractmod(&(cp2->y), &(cp1->y), &lambda, &curve->prime);
@@ -88,7 +89,7 @@ void point_add(const ecdsa_curve *curve, const curve_point *cp1,
 
 // cp = cp + cp
 void point_double(const ecdsa_curve *curve, curve_point *cp) {
-  bignum256 lambda, xr, yr;
+  bignum256 lambda = {0}, xr = {0}, yr = {0};
 
   if (point_is_infinity(cp)) {
     return;
@@ -101,6 +102,8 @@ void point_double(const ecdsa_curve *curve, curve_point *cp) {
   // lambda = (3 x^2 + a) / (2 y)
   lambda = cp->y;
   bn_mult_k(&lambda, 2, &curve->prime);
+  bn_fast_mod(&lambda, &curve->prime);
+  bn_mod(&lambda, &curve->prime);
   bn_inverse(&lambda, &curve->prime);
 
   xr = cp->x;
@@ -162,22 +165,6 @@ int point_is_negative_of(const curve_point *p, const curve_point *q) {
   return !bn_is_equal(&(p->y), &(q->y));
 }
 
-// Negate a (modulo prime) if cond is 0xffffffff, keep it if cond is 0.
-// The timing of this function does not depend on cond.
-void conditional_negate(uint32_t cond, bignum256 *a, const bignum256 *prime) {
-  int j;
-  uint32_t tmp = 1;
-  assert(a->val[8] < 0x20000);
-  for (j = 0; j < 8; j++) {
-    tmp += 0x3fffffff + 2 * prime->val[j] - a->val[j];
-    a->val[j] = ((tmp & 0x3fffffff) & cond) | (a->val[j] & ~cond);
-    tmp >>= 30;
-  }
-  tmp += 0x3fffffff + 2 * prime->val[j] - a->val[j];
-  a->val[j] = ((tmp & 0x3fffffff) & cond) | (a->val[j] & ~cond);
-  assert(a->val[8] < 0x20000);
-}
-
 typedef struct jacobian_curve_point {
   bignum256 x, y, z;
 } jacobian_curve_point;
@@ -185,11 +172,11 @@ typedef struct jacobian_curve_point {
 // generate random K for signing/side-channel noise
 static void generate_k_random(bignum256 *k, const bignum256 *prime) {
   do {
-    int i;
+    int i = 0;
     for (i = 0; i < 8; i++) {
-      k->val[i] = random32() & 0x3FFFFFFF;
+      k->val[i] = random32() & ((1u << BN_BITS_PER_LIMB) - 1);
     }
-    k->val[8] = random32() & 0xFFFF;
+    k->val[8] = random32() & ((1u << BN_BITS_LAST_LIMB) - 1);
     // check that k is in range and not zero.
   } while (bn_is_zero(k) || !bn_is_less(k, prime));
 }
@@ -230,10 +217,10 @@ void jacobian_to_curve(const jacobian_curve_point *jp, curve_point *p,
 
 void point_jacobian_add(const curve_point *p1, jacobian_curve_point *p2,
                         const ecdsa_curve *curve) {
-  bignum256 r, h, r2;
-  bignum256 hcby, hsqx;
-  bignum256 xz, yz, az;
-  int is_doubling;
+  bignum256 r = {0}, h = {0}, r2 = {0};
+  bignum256 hcby = {0}, hsqx = {0};
+  bignum256 xz = {0}, yz = {0}, az = {0};
+  int is_doubling = 0;
   const bignum256 *prime = &curve->prime;
   int a = curve->a;
 
@@ -348,7 +335,7 @@ void point_jacobian_add(const curve_point *p1, jacobian_curve_point *p2,
 }
 
 void point_jacobian_double(jacobian_curve_point *p, const ecdsa_curve *curve) {
-  bignum256 az4, m, msq, ysq, xysq;
+  bignum256 az4 = {0}, m = {0}, msq = {0}, ysq = {0}, xysq = {0};
   const bignum256 *prime = &curve->prime;
 
   assert(-3 <= curve->a && curve->a <= 0);
@@ -416,23 +403,26 @@ void point_jacobian_double(jacobian_curve_point *p, const ecdsa_curve *curve) {
 }
 
 // res = k * p
-void point_multiply(const ecdsa_curve *curve, const bignum256 *k,
-                    const curve_point *p, curve_point *res) {
+// returns 0 on success
+int point_multiply(const ecdsa_curve *curve, const bignum256 *k,
+                   const curve_point *p, curve_point *res) {
   // this algorithm is loosely based on
   //  Katsuyuki Okeya and Tsuyoshi Takagi, The Width-w NAF Method Provides
   //  Small Memory and Fast Elliptic Scalar Multiplications Secure against
   //  Side Channel Attacks.
-  assert(bn_is_less(k, &curve->order));
+  if (!bn_is_less(k, &curve->order)) {
+    return 1;
+  }
 
-  int i, j;
+  int i = 0, j = 0;
   static CONFIDENTIAL bignum256 a;
-  uint32_t *aptr;
-  uint32_t abits;
-  int ashift;
+  uint32_t *aptr = NULL;
+  uint32_t abits = 0;
+  int ashift = 0;
   uint32_t is_even = (k->val[0] & 1) - 1;
-  uint32_t bits, sign, nsign;
+  uint32_t bits = {0}, sign = {0}, nsign = {0};
   static CONFIDENTIAL jacobian_curve_point jres;
-  curve_point pmult[8];
+  curve_point pmult[8] = {0};
   const bignum256 *prime = &curve->prime;
 
   // is_even = 0xffffffff if k is even, 0 otherwise.
@@ -443,18 +433,18 @@ void point_multiply(const ecdsa_curve *curve, const bignum256 *k,
   uint32_t is_non_zero = 0;
   for (j = 0; j < 8; j++) {
     is_non_zero |= k->val[j];
-    tmp += 0x3fffffff + k->val[j] - (curve->order.val[j] & is_even);
-    a.val[j] = tmp & 0x3fffffff;
-    tmp >>= 30;
+    tmp += (BN_BASE - 1) + k->val[j] - (curve->order.val[j] & is_even);
+    a.val[j] = tmp & (BN_BASE - 1);
+    tmp >>= BN_BITS_PER_LIMB;
   }
   is_non_zero |= k->val[j];
-  a.val[j] = tmp + 0xffff + k->val[j] - (curve->order.val[j] & is_even);
+  a.val[j] = tmp + 0xffffff + k->val[j] - (curve->order.val[j] & is_even);
   assert((a.val[0] & 1) != 0);
 
   // special case 0*p:  just return zero. We don't care about constant time.
   if (!is_non_zero) {
     point_set_infinity(res);
-    return;
+    return 1;
   }
 
   // Now a = k + 2^256 (mod curve->order) and a is odd.
@@ -490,7 +480,7 @@ void point_multiply(const ecdsa_curve *curve, const bignum256 *k,
   // since a is odd.
   aptr = &a.val[8];
   abits = *aptr;
-  ashift = 12;
+  ashift = 256 - (BN_BITS_PER_LIMB * 8) - 4;
   bits = abits >> ashift;
   sign = (bits >> 4) - 1;
   bits ^= sign;
@@ -513,7 +503,7 @@ void point_multiply(const ecdsa_curve *curve, const bignum256 *k,
       // leaks no private information to a side-channel.
       bits = abits << (-ashift);
       abits = *(--aptr);
-      ashift += 30;
+      ashift += BN_BITS_PER_LIMB;
       bits |= abits >> ashift;
     } else {
       bits = abits >> ashift;
@@ -525,30 +515,35 @@ void point_multiply(const ecdsa_curve *curve, const bignum256 *k,
 
     // negate last result to make signs of this round and the
     // last round equal.
-    conditional_negate(sign ^ nsign, &jres.z, prime);
+    bn_cnegate((sign ^ nsign) & 1, &jres.z, prime);
 
     // add odd factor
     point_jacobian_add(&pmult[bits >> 1], &jres, curve);
     sign = nsign;
   }
-  conditional_negate(sign, &jres.z, prime);
+  bn_cnegate(sign & 1, &jres.z, prime);
   jacobian_to_curve(&jres, res, prime);
   memzero(&a, sizeof(a));
   memzero(&jres, sizeof(jres));
+
+  return 0;
 }
 
 #if USE_PRECOMPUTED_CP
 
 // res = k * G
 // k must be a normalized number with 0 <= k < curve->order
-void scalar_multiply(const ecdsa_curve *curve, const bignum256 *k,
-                     curve_point *res) {
-  assert(bn_is_less(k, &curve->order));
+// returns 0 on success
+int scalar_multiply(const ecdsa_curve *curve, const bignum256 *k,
+                    curve_point *res) {
+  if (!bn_is_less(k, &curve->order)) {
+    return 1;
+  }
 
-  int i, j;
+  int i = {0}, j = {0};
   static CONFIDENTIAL bignum256 a;
   uint32_t is_even = (k->val[0] & 1) - 1;
-  uint32_t lowbits;
+  uint32_t lowbits = 0;
   static CONFIDENTIAL jacobian_curve_point jres;
   const bignum256 *prime = &curve->prime;
 
@@ -560,18 +555,18 @@ void scalar_multiply(const ecdsa_curve *curve, const bignum256 *k,
   uint32_t is_non_zero = 0;
   for (j = 0; j < 8; j++) {
     is_non_zero |= k->val[j];
-    tmp += 0x3fffffff + k->val[j] - (curve->order.val[j] & is_even);
-    a.val[j] = tmp & 0x3fffffff;
-    tmp >>= 30;
+    tmp += (BN_BASE - 1) + k->val[j] - (curve->order.val[j] & is_even);
+    a.val[j] = tmp & (BN_BASE - 1);
+    tmp >>= BN_BITS_PER_LIMB;
   }
   is_non_zero |= k->val[j];
-  a.val[j] = tmp + 0xffff + k->val[j] - (curve->order.val[j] & is_even);
+  a.val[j] = tmp + 0xffffff + k->val[j] - (curve->order.val[j] & is_even);
   assert((a.val[0] & 1) != 0);
 
   // special case 0*G:  just return zero. We don't care about constant time.
   if (!is_non_zero) {
     point_set_infinity(res);
-    return;
+    return 0;
   }
 
   // Now a = k + 2^256 (mod curve->order) and a is odd.
@@ -603,7 +598,8 @@ void scalar_multiply(const ecdsa_curve *curve, const bignum256 *k,
 
     // shift a by 4 places.
     for (j = 0; j < 8; j++) {
-      a.val[j] = (a.val[j] >> 4) | ((a.val[j + 1] & 0xf) << 26);
+      a.val[j] =
+          (a.val[j] >> 4) | ((a.val[j + 1] & 0xf) << (BN_BITS_PER_LIMB - 4));
     }
     a.val[j] >>= 4;
     // a = old(a)>>(4*i)
@@ -614,35 +610,42 @@ void scalar_multiply(const ecdsa_curve *curve, const bignum256 *k,
     lowbits &= 15;
     // negate last result to make signs of this round and the
     // last round equal.
-    conditional_negate((lowbits & 1) - 1, &jres.y, prime);
+    bn_cnegate(~lowbits & 1, &jres.y, prime);
 
     // add odd factor
     point_jacobian_add(&curve->cp[i][lowbits >> 1], &jres, curve);
   }
-  conditional_negate(((a.val[0] >> 4) & 1) - 1, &jres.y, prime);
+  bn_cnegate(~(a.val[0] >> 4) & 1, &jres.y, prime);
   jacobian_to_curve(&jres, res, prime);
   memzero(&a, sizeof(a));
   memzero(&jres, sizeof(jres));
+
+  return 0;
 }
 
 #else
 
-void scalar_multiply(const ecdsa_curve *curve, const bignum256 *k,
-                     curve_point *res) {
-  point_multiply(curve, k, &curve->G, res);
+int scalar_multiply(const ecdsa_curve *curve, const bignum256 *k,
+                    curve_point *res) {
+  return point_multiply(curve, k, &curve->G, res);
 }
 
 #endif
 
 int ecdh_multiply(const ecdsa_curve *curve, const uint8_t *priv_key,
                   const uint8_t *pub_key, uint8_t *session_key) {
-  curve_point point;
+  curve_point point = {0};
   if (!ecdsa_read_pubkey(curve, pub_key, &point)) {
     return 1;
   }
 
-  bignum256 k;
+  bignum256 k = {0};
   bn_read_be(priv_key, &k);
+  if (bn_is_zero(&k) || !bn_is_less(&k, &curve->order)) {
+    // Invalid private key.
+    return 2;
+  }
+
   point_multiply(curve, &k, &point, &point);
   memzero(&k, sizeof(k));
 
@@ -654,62 +657,13 @@ int ecdh_multiply(const ecdsa_curve *curve, const uint8_t *priv_key,
   return 0;
 }
 
-void init_rfc6979(const uint8_t *priv_key, const uint8_t *hash,
-                  rfc6979_state *state) {
-  uint8_t bx[2 * 32];
-  uint8_t buf[32 + 1 + 2 * 32];
-
-  memcpy(bx, priv_key, 32);
-  memcpy(bx + 32, hash, 32);
-
-  memset(state->v, 1, sizeof(state->v));
-  memset(state->k, 0, sizeof(state->k));
-
-  memcpy(buf, state->v, sizeof(state->v));
-  buf[sizeof(state->v)] = 0x00;
-  memcpy(buf + sizeof(state->v) + 1, bx, 64);
-  hmac_sha256(state->k, sizeof(state->k), buf, sizeof(buf), state->k);
-  hmac_sha256(state->k, sizeof(state->k), state->v, sizeof(state->v), state->v);
-
-  memcpy(buf, state->v, sizeof(state->v));
-  buf[sizeof(state->v)] = 0x01;
-  memcpy(buf + sizeof(state->v) + 1, bx, 64);
-  hmac_sha256(state->k, sizeof(state->k), buf, sizeof(buf), state->k);
-  hmac_sha256(state->k, sizeof(state->k), state->v, sizeof(state->v), state->v);
-
-  memzero(bx, sizeof(bx));
-  memzero(buf, sizeof(buf));
-}
-
-// generate next number from deterministic random number generator
-void generate_rfc6979(uint8_t rnd[32], rfc6979_state *state) {
-  uint8_t buf[32 + 1];
-
-  hmac_sha256(state->k, sizeof(state->k), state->v, sizeof(state->v), state->v);
-  memcpy(buf, state->v, sizeof(state->v));
-  buf[sizeof(state->v)] = 0x00;
-  hmac_sha256(state->k, sizeof(state->k), buf, sizeof(state->v) + 1, state->k);
-  hmac_sha256(state->k, sizeof(state->k), state->v, sizeof(state->v), state->v);
-  memcpy(rnd, buf, 32);
-  memzero(buf, sizeof(buf));
-}
-
-// generate K in a deterministic way, according to RFC6979
-// http://tools.ietf.org/html/rfc6979
-void generate_k_rfc6979(bignum256 *k, rfc6979_state *state) {
-  uint8_t buf[32];
-  generate_rfc6979(buf, state);
-  bn_read_be(buf, k);
-  memzero(buf, sizeof(buf));
-}
-
 // msg is a data to be signed
 // msg_len is the message length
 int ecdsa_sign(const ecdsa_curve *curve, HasherType hasher_sign,
                const uint8_t *priv_key, const uint8_t *msg, uint32_t msg_len,
                uint8_t *sig, uint8_t *pby,
                int (*is_canonical)(uint8_t by, uint8_t sig[64])) {
-  uint8_t hash[32];
+  uint8_t hash[32] = {0};
   hasher_Raw(hasher_sign, msg, msg_len, hash);
   int res = ecdsa_sign_digest(curve, priv_key, hash, sig, pby, is_canonical);
   memzero(hash, sizeof(hash));
@@ -725,18 +679,25 @@ int ecdsa_sign(const ecdsa_curve *curve, HasherType hasher_sign,
 int ecdsa_sign_digest(const ecdsa_curve *curve, const uint8_t *priv_key,
                       const uint8_t *digest, uint8_t *sig, uint8_t *pby,
                       int (*is_canonical)(uint8_t by, uint8_t sig[64])) {
-  int i;
-  curve_point R;
-  bignum256 k, z, randk;
+  int i = 0;
+  curve_point R = {0};
+  bignum256 k = {0}, z = {0}, randk = {0};
   bignum256 *s = &R.y;
   uint8_t by;  // signature recovery byte
 
 #if USE_RFC6979
-  rfc6979_state rng;
-  init_rfc6979(priv_key, digest, &rng);
+  rfc6979_state rng = {0};
+  init_rfc6979(priv_key, digest, curve, &rng);
 #endif
 
   bn_read_be(digest, &z);
+  if (bn_is_zero(&z)) {
+    // The probability of the digest being all-zero by chance is infinitesimal,
+    // so this is most likely an indication of a bug. Furthermore, the signature
+    // has no value, because in this case it can be easily forged for any public
+    // key, see ecdsa_verify_digest().
+    return 1;
+  }
 
   for (i = 0; i < 10000; i++) {
 #if USE_RFC6979
@@ -764,11 +725,16 @@ int ecdsa_sign_digest(const ecdsa_curve *curve, const uint8_t *priv_key,
       continue;
     }
 
+    bn_read_be(priv_key, s);
+    if (bn_is_zero(s) || !bn_is_less(s, &curve->order)) {
+      // Invalid private key.
+      return 2;
+    }
+
     // randomize operations to counter side-channel attacks
     generate_k_random(&randk, &curve->order);
     bn_multiply(&randk, &k, &curve->order);  // k*rand
     bn_inverse(&k, &curve->order);           // (k*rand)^-1
-    bn_read_be(priv_key, s);                 // priv
     bn_multiply(&R.x, s, &curve->order);     // R.x*priv
     bn_add(s, &z);                           // R.x*priv + z
     bn_multiply(&k, s, &curve->order);       // (k*rand)^-1 (R.x*priv + z)
@@ -815,38 +781,60 @@ int ecdsa_sign_digest(const ecdsa_curve *curve, const uint8_t *priv_key,
   return -1;
 }
 
-void ecdsa_get_public_key33(const ecdsa_curve *curve, const uint8_t *priv_key,
-                            uint8_t *pub_key) {
-  curve_point R;
-  bignum256 k;
+// returns 0 on success
+int ecdsa_get_public_key33(const ecdsa_curve *curve, const uint8_t *priv_key,
+                           uint8_t *pub_key) {
+  curve_point R = {0};
+  bignum256 k = {0};
 
   bn_read_be(priv_key, &k);
+  if (bn_is_zero(&k) || !bn_is_less(&k, &curve->order)) {
+    // Invalid private key.
+    memzero(pub_key, 33);
+    return -1;
+  }
+
   // compute k*G
-  scalar_multiply(curve, &k, &R);
+  if (scalar_multiply(curve, &k, &R) != 0) {
+    memzero(&k, sizeof(k));
+    return 1;
+  }
   pub_key[0] = 0x02 | (R.y.val[0] & 0x01);
   bn_write_be(&R.x, pub_key + 1);
   memzero(&R, sizeof(R));
   memzero(&k, sizeof(k));
+  return 0;
 }
 
-void ecdsa_get_public_key65(const ecdsa_curve *curve, const uint8_t *priv_key,
-                            uint8_t *pub_key) {
-  curve_point R;
-  bignum256 k;
+// returns 0 on success
+int ecdsa_get_public_key65(const ecdsa_curve *curve, const uint8_t *priv_key,
+                           uint8_t *pub_key) {
+  curve_point R = {0};
+  bignum256 k = {0};
 
   bn_read_be(priv_key, &k);
+  if (bn_is_zero(&k) || !bn_is_less(&k, &curve->order)) {
+    // Invalid private key.
+    memzero(pub_key, 65);
+    return -1;
+  }
+
   // compute k*G
-  scalar_multiply(curve, &k, &R);
+  if (scalar_multiply(curve, &k, &R) != 0) {
+    memzero(&k, sizeof(k));
+    return 1;
+  }
   pub_key[0] = 0x04;
   bn_write_be(&R.x, pub_key + 1);
   bn_write_be(&R.y, pub_key + 33);
   memzero(&R, sizeof(R));
   memzero(&k, sizeof(k));
+  return 0;
 }
 
 int ecdsa_uncompress_pubkey(const ecdsa_curve *curve, const uint8_t *pub_key,
                             uint8_t *uncompressed) {
-  curve_point pub;
+  curve_point pub = {0};
 
   if (!ecdsa_read_pubkey(curve, pub_key, &pub)) {
     return 0;
@@ -861,7 +849,7 @@ int ecdsa_uncompress_pubkey(const ecdsa_curve *curve, const uint8_t *pub_key,
 
 void ecdsa_get_pubkeyhash(const uint8_t *pub_key, HasherType hasher_pubkey,
                           uint8_t *pubkeyhash) {
-  uint8_t h[HASHER_DIGEST_LENGTH];
+  uint8_t h[HASHER_DIGEST_LENGTH] = {0};
   if (pub_key[0] == 0x04) {  // uncompressed format
     hasher_Raw(hasher_pubkey, pub_key, 65, h);
   } else if (pub_key[0] == 0x00) {  // point at infinity
@@ -883,7 +871,7 @@ void ecdsa_get_address_raw(const uint8_t *pub_key, uint32_t version,
 void ecdsa_get_address(const uint8_t *pub_key, uint32_t version,
                        HasherType hasher_pubkey, HasherType hasher_base58,
                        char *addr, int addrsize) {
-  uint8_t raw[MAX_ADDR_RAW_SIZE];
+  uint8_t raw[MAX_ADDR_RAW_SIZE] = {0};
   size_t prefix_len = address_prefix_bytes_len(version);
   ecdsa_get_address_raw(pub_key, version, hasher_pubkey, raw);
   base58_encode_check(raw, 20 + prefix_len, hasher_base58, addr, addrsize);
@@ -894,7 +882,7 @@ void ecdsa_get_address(const uint8_t *pub_key, uint32_t version,
 void ecdsa_get_address_segwit_p2sh_raw(const uint8_t *pub_key, uint32_t version,
                                        HasherType hasher_pubkey,
                                        uint8_t *addr_raw) {
-  uint8_t buf[32 + 2];
+  uint8_t buf[32 + 2] = {0};
   buf[0] = 0;   // version byte
   buf[1] = 20;  // push 20 bytes
   ecdsa_get_pubkeyhash(pub_key, hasher_pubkey, buf + 2);
@@ -907,7 +895,7 @@ void ecdsa_get_address_segwit_p2sh(const uint8_t *pub_key, uint32_t version,
                                    HasherType hasher_pubkey,
                                    HasherType hasher_base58, char *addr,
                                    int addrsize) {
-  uint8_t raw[MAX_ADDR_RAW_SIZE];
+  uint8_t raw[MAX_ADDR_RAW_SIZE] = {0};
   size_t prefix_len = address_prefix_bytes_len(version);
   ecdsa_get_address_segwit_p2sh_raw(pub_key, version, hasher_pubkey, raw);
   base58_encode_check(raw, prefix_len + 20, hasher_base58, addr, addrsize);
@@ -916,7 +904,7 @@ void ecdsa_get_address_segwit_p2sh(const uint8_t *pub_key, uint32_t version,
 
 void ecdsa_get_wif(const uint8_t *priv_key, uint32_t version,
                    HasherType hasher_base58, char *wif, int wifsize) {
-  uint8_t wif_raw[MAX_WIF_RAW_SIZE];
+  uint8_t wif_raw[MAX_WIF_RAW_SIZE] = {0};
   size_t prefix_len = address_prefix_bytes_len(version);
   address_write_prefix_bytes(version, wif_raw);
   memcpy(wif_raw + prefix_len, priv_key, 32);
@@ -978,9 +966,10 @@ int ecdsa_read_pubkey(const ecdsa_curve *curve, const uint8_t *pub_key,
 //   - pub is not the point at infinity.
 //   - pub->x and pub->y are in range [0,p-1].
 //   - pub is on the curve.
-
+// We assume that all curves using this code have cofactor 1, so there is no
+// need to verify that pub is a scalar multiple of G.
 int ecdsa_validate_pubkey(const ecdsa_curve *curve, const curve_point *pub) {
-  bignum256 y_2, x3_ax_b;
+  bignum256 y_2 = {0}, x3_ax_b = {0};
 
   if (point_is_infinity(pub)) {
     return 0;
@@ -1021,7 +1010,7 @@ int ecdsa_validate_pubkey(const ecdsa_curve *curve, const curve_point *pub) {
 int ecdsa_verify(const ecdsa_curve *curve, HasherType hasher_sign,
                  const uint8_t *pub_key, const uint8_t *sig, const uint8_t *msg,
                  uint32_t msg_len) {
-  uint8_t hash[32];
+  uint8_t hash[32] = {0};
   hasher_Raw(hasher_sign, msg, msg_len, hash);
   int res = ecdsa_verify_digest(curve, pub_key, sig, hash);
   memzero(hash, sizeof(hash));
@@ -1033,8 +1022,8 @@ int ecdsa_verify(const ecdsa_curve *curve, HasherType hasher_sign,
 int ecdsa_recover_pub_from_sig(const ecdsa_curve *curve, uint8_t *pub_key,
                                const uint8_t *sig, const uint8_t *digest,
                                int recid) {
-  bignum256 r, s, e;
-  curve_point cp, cp2;
+  bignum256 r = {0}, s = {0}, e = {0};
+  curve_point cp = {0}, cp2 = {0};
 
   // read r and s
   bn_read_be(sig, &r);
@@ -1060,19 +1049,26 @@ int ecdsa_recover_pub_from_sig(const ecdsa_curve *curve, uint8_t *pub_key,
   }
   // e = -digest
   bn_read_be(digest, &e);
-  bn_subtractmod(&curve->order, &e, &e, &curve->order);
-  bn_fast_mod(&e, &curve->order);
   bn_mod(&e, &curve->order);
-  // r := r^-1
+  bn_subtract(&curve->order, &e, &e);
+  // r = r^-1
   bn_inverse(&r, &curve->order);
-  // cp := s * R = s * k *G
+  // e = -digest * r^-1
+  bn_multiply(&r, &e, &curve->order);
+  bn_mod(&e, &curve->order);
+  // s = s * r^-1
+  bn_multiply(&r, &s, &curve->order);
+  bn_mod(&s, &curve->order);
+  // cp = s * r^-1 * k * G
   point_multiply(curve, &s, &cp, &cp);
-  // cp2 := -digest * G
+  // cp2 = -digest * r^-1 * G
   scalar_multiply(curve, &e, &cp2);
-  // cp := (s * k - digest) * G = (r*priv) * G = r * Pub
+  // cp = (s * r^-1 * k - digest * r^-1) * G = Pub
   point_add(curve, &cp2, &cp);
-  // cp := r^{-1} * r * Pub = Pub
-  point_multiply(curve, &r, &cp, &cp);
+  // The point at infinity is not considered to be a valid public key.
+  if (point_is_infinity(&cp)) {
+    return 1;
+  }
   pub_key[0] = 0x04;
   bn_write_be(&cp.x, pub_key + 1);
   bn_write_be(&cp.y, pub_key + 33);
@@ -1082,45 +1078,56 @@ int ecdsa_recover_pub_from_sig(const ecdsa_curve *curve, uint8_t *pub_key,
 // returns 0 if verification succeeded
 int ecdsa_verify_digest(const ecdsa_curve *curve, const uint8_t *pub_key,
                         const uint8_t *sig, const uint8_t *digest) {
-  curve_point pub, res;
-  bignum256 r, s, z;
+  curve_point pub = {0}, res = {0};
+  bignum256 r = {0}, s = {0}, z = {0};
+  int result = 0;
 
   if (!ecdsa_read_pubkey(curve, pub_key, &pub)) {
-    return 1;
-  }
-
-  bn_read_be(sig, &r);
-  bn_read_be(sig + 32, &s);
-
-  bn_read_be(digest, &z);
-
-  if (bn_is_zero(&r) || bn_is_zero(&s) || (!bn_is_less(&r, &curve->order)) ||
-      (!bn_is_less(&s, &curve->order)))
-    return 2;
-
-  bn_inverse(&s, &curve->order);       // s^-1
-  bn_multiply(&s, &z, &curve->order);  // z*s^-1
-  bn_mod(&z, &curve->order);
-  bn_multiply(&r, &s, &curve->order);  // r*s^-1
-  bn_mod(&s, &curve->order);
-
-  int result = 0;
-  if (bn_is_zero(&z)) {
-    // our message hashes to zero
-    // I don't expect this to happen any time soon
-    result = 3;
-  } else {
-    scalar_multiply(curve, &z, &res);
+    result = 1;
   }
 
   if (result == 0) {
-    // both pub and res can be infinity, can have y = 0 OR can be equal -> false
-    // negative
-    point_multiply(curve, &s, &pub, &pub);
-    point_add(curve, &pub, &res);
+    bn_read_be(sig, &r);
+    bn_read_be(sig + 32, &s);
+    bn_read_be(digest, &z);
+    if (bn_is_zero(&r) || bn_is_zero(&s) || (!bn_is_less(&r, &curve->order)) ||
+        (!bn_is_less(&s, &curve->order))) {
+      result = 2;
+    }
+    if (bn_is_zero(&z)) {
+      // The digest was all-zero. The probability of this happening by chance is
+      // infinitesimal, but it could be induced by a fault injection. In this
+      // case the signature (r,s) can be forged by taking r := (t * Q).x mod n
+      // and s := r * t^-1 mod n for any t in [1, n-1]. We fail verification,
+      // because there is no guarantee that the signature was created by the
+      // owner of the private key.
+      result = 3;
+    }
+  }
+
+  if (result == 0) {
+    bn_inverse(&s, &curve->order);       // s = s^-1
+    bn_multiply(&s, &z, &curve->order);  // z = z * s  [u1 = z * s^-1 mod n]
+    bn_mod(&z, &curve->order);
+  }
+
+  if (result == 0) {
+    bn_multiply(&r, &s, &curve->order);  // s = r * s  [u2 = r * s^-1 mod n]
+    bn_mod(&s, &curve->order);
+    scalar_multiply(curve, &z, &res);       // res = z * G    [= u1 * G]
+    point_multiply(curve, &s, &pub, &pub);  // pub = s * pub  [= u2 * Q]
+    point_add(curve, &pub, &res);  // res = pub + res  [R = u1 * G + u2 * Q]
+    if (point_is_infinity(&res)) {
+      // R == Infinity
+      result = 4;
+    }
+  }
+
+  if (result == 0) {
     bn_mod(&(res.x), &curve->order);
-    // signature does not match
     if (!bn_is_equal(&res.x, &r)) {
+      // R.x != r
+      // signature does not match
       result = 5;
     }
   }
@@ -1136,8 +1143,8 @@ int ecdsa_verify_digest(const ecdsa_curve *curve, const uint8_t *pub_key,
 }
 
 int ecdsa_sig_to_der(const uint8_t *sig, uint8_t *der) {
-  int i;
-  uint8_t *p = der, *len, *len1, *len2;
+  int i = 0;
+  uint8_t *p = der, *len = NULL, *len1 = NULL, *len2 = NULL;
   *p = 0x30;
   p++;  // sequence
   *p = 0x00;
@@ -1152,7 +1159,7 @@ int ecdsa_sig_to_der(const uint8_t *sig, uint8_t *der) {
 
   // process R
   i = 0;
-  while (sig[i] == 0 && i < 32) {
+  while (i < 31 && sig[i] == 0) {
     i++;
   }                      // skip leading zeroes
   if (sig[i] >= 0x80) {  // put zero in output if MSB set
@@ -1175,7 +1182,7 @@ int ecdsa_sig_to_der(const uint8_t *sig, uint8_t *der) {
 
   // process S
   i = 32;
-  while (sig[i] == 0 && i < 64) {
+  while (i < 63 && sig[i] == 0) {
     i++;
   }                      // skip leading zeroes
   if (sig[i] >= 0x80) {  // put zero in output if MSB set
@@ -1192,4 +1199,53 @@ int ecdsa_sig_to_der(const uint8_t *sig, uint8_t *der) {
 
   *len = *len1 + *len2 + 4;
   return *len + 2;
+}
+
+// Parse a DER-encoded signature. We don't check whether the encoded integers
+// satisfy DER requirements regarding leading zeros.
+int ecdsa_sig_from_der(const uint8_t *der, size_t der_len, uint8_t sig[64]) {
+  memzero(sig, 64);
+
+  // Check sequence header.
+  if (der_len < 2 || der_len > 72 || der[0] != 0x30 || der[1] != der_len - 2) {
+    return 1;
+  }
+
+  // Read two DER-encoded integers.
+  size_t pos = 2;
+  for (int i = 0; i < 2; ++i) {
+    // Check integer header.
+    if (der_len < pos + 2 || der[pos] != 0x02) {
+      return 1;
+    }
+
+    // Locate the integer.
+    size_t int_len = der[pos + 1];
+    pos += 2;
+    if (pos + int_len > der_len) {
+      return 1;
+    }
+
+    // Skip a possible leading zero.
+    if (int_len != 0 && der[pos] == 0) {
+      int_len--;
+      pos++;
+    }
+
+    // Copy the integer to the output, making sure it fits.
+    if (int_len > 32) {
+      return 1;
+    }
+    memcpy(sig + 32 * (i + 1) - int_len, der + pos, int_len);
+
+    // Move on to the next one.
+    pos += int_len;
+  }
+
+  // Check that there are no trailing elements in the sequence.
+  if (pos != der_len) {
+    return 1;
+  }
+
+  return 0;
 }
