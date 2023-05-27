@@ -1,6 +1,9 @@
 #include "checks.h"
 #include "log.h"
 #include "no_rollback.h"
+#include "squareup/subzero/internal.pb.h"
+
+#include <stdbool.h>
 
 int verify_no_rollback(void) {
   char verify_file[] = "selfcheck01";

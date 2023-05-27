@@ -1,25 +1,29 @@
 #include "sign.h"
 
 #include "bip32.h"
+#include "config.h"
 #include "conv.h"
+#include "curves.h"
+#include "ecdsa.h"
 #include "hash.h"
+#include "hasher.h"
 #include "log.h"
 #include "memzero.h"
-#include "rpc.h"
+#include "options.h"
+#include "pb.h"
+#include "print.h"
+#include "protection.h"
+#include "ripemd160.h"
 #include "script.h"
+#include "sha2.h"
+#include "squareup/subzero/common.pb.h"
+#include "squareup/subzero/internal.pb.h"
 
 #include <assert.h>
-#include <base58.h>
-#include <bip32.h>
-#include <bip39.h>
-#include <config.h>
-#include <curves.h>
-#include <print.h>
-#include <protection.h>
-#include <ripemd160.h>
-#include <squareup/subzero/internal.pb.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 static void compute_prevout_hash(const TxInput* const inputs,
                                  pb_size_t inputs_count,

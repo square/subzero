@@ -1,9 +1,10 @@
 #pragma once
 
-#include <sha2.h>
-#include <squareup/subzero/internal.pb.h>
-
 #include "config.h"
+#include "squareup/subzero/common.pb.h"
+#include "squareup/subzero/internal.pb.h"
+
+#include <stdint.h>
 
 /**
  * Encrypt xpub with the pubkey encryption key.

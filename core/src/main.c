@@ -4,21 +4,19 @@
 
 #include "checks.h"
 #include "config.h"
-#include "hash.h"
 #include "init.h"
 #include "log.h"
 #include "memzero.h"
 #include "nanopb_stream.h"
 #include "no_rollback.h"
+#include "pb.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
-#include "print.h"
 #include "rpc.h"
+#include "squareup/subzero/internal.pb.h"
 
-#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>

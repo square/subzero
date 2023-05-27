@@ -1,8 +1,10 @@
 #pragma once
 
-#include <squareup/subzero/internal.pb.h>
-
 #include "config.h"
+#include "squareup/subzero/internal.pb.h"
+
+#include <stdbool.h>
+#include <stdint.h>
 
 Result no_rollback(void);
 Result no_rollback_check(const char* filename, bool allow_upgrade, uint32_t expected_magic, uint32_t expected_version);

@@ -1,5 +1,7 @@
 #include "hash.h"
 
+#include "hasher.h"
+
 // hash_uint hashes in little-endian order (least-significant byte first)
 static void hash_uint(Hasher *hasher, uint64_t value, uint8_t bytes) {
   for (int i = 0; i < bytes; i++) {

@@ -3,11 +3,10 @@
 #include "aes_gcm_dev.h"
 #include "log.h"
 #include "memzero.h"
-#include "rand.h"
+#include "squareup/subzero/internal.pb.h"
 
 #include <assert.h>
-#include <squareup/subzero/common.pb.h>
-#include <squareup/subzero/internal.pb.h>
+#include <stdio.h>
 
 // Protection: developer edition.
 

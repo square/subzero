@@ -1,6 +1,8 @@
 #pragma once
 
-#include <squareup/subzero/internal.pb.h>
+#include "squareup/subzero/internal.pb.h"
+
+#include <stdbool.h>
 
 Result handle_sign_tx(
     const InternalCommandRequest_SignTxRequest* const request,

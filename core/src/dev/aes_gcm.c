@@ -4,9 +4,10 @@
 #include "log.h"
 #include "memzero.h"
 #include "rand.h"
+#include "squareup/subzero/internal.pb.h" // For error codes
 
-#include <squareup/subzero/internal.pb.h> // For error codes
 #include <stdint.h>
+#include <string.h>
 
 #define IV_SIZE_IN_BYTES AES_GCM_IV_SIZE_IN_BYTES
 #define TAG_SIZE_IN_BYTES AES_GCM_TAG_SIZE_IN_BYTES

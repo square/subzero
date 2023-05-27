@@ -1,16 +1,12 @@
 #include "qrsignatures.h"
 
 #include "config.h"
-#include "curves.h"
 #include "ecdsa.h"
+#include "hasher.h"
 #include "log.h"
-#include "memzero.h"
 #include "nist256p1.h"
 
 #include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
 
 static const uint8_t QR_PUBKEY[65] = _QR_PUBKEY;
 bool check_qrsignature(const uint8_t * const data, size_t data_len, const uint8_t * const signature){

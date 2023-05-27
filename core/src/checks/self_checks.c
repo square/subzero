@@ -1,6 +1,7 @@
 #include "checks.h"
 #include "log.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 

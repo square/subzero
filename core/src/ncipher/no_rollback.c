@@ -4,12 +4,7 @@
 #include "log.h"
 #include "transact.h"
 
-#include <assert.h>
 #include <nfastapp.h>
-#include <seelib.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 extern NFast_AppHandle app;

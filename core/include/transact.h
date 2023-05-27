@@ -1,8 +1,8 @@
 #pragma once
 
-#include <seelib.h>
+#include "squareup/subzero/internal.pb.h"
 
-#include <squareup/subzero/internal.pb.h>
+#include <seelib.h>
 
 Result transact(M_Command *command, M_Reply *reply);
 

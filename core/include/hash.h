@@ -1,6 +1,8 @@
 #pragma once
 
 #include <hasher.h>
+#include <stddef.h>
+#include <stdint.h>
 
 void hash_uint8(Hasher *hasher, uint8_t value);
 void hash_uint16(Hasher *hasher, uint16_t value);

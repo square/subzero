@@ -3,7 +3,11 @@
 #include "config.h"
 #include "log.h"
 #include "protection.h"
+#include "squareup/subzero/common.pb.h"
+#include "squareup/subzero/internal.pb.h"
 #include "strlcpy.h"
+
+#include <string.h>
 
 int verify_protect_pubkey(void) {
   EncryptedPubKey temp = EncryptedPubKey_init_default;

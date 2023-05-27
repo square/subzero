@@ -2,6 +2,7 @@
 #include "log.h"
 
 #include <sha2.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 int verify_byte_order(void) {

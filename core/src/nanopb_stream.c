@@ -4,10 +4,14 @@
 
 #include "nanopb_stream.h"
 
-#include <pb_decode.h>
-#include <pb_encode.h>
+#include "pb.h"
+#include "pb_decode.h"
+#include "pb_encode.h"
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <sys/socket.h>
-#include <sys/types.h>
 
 static bool write_callback(pb_ostream_t *stream, const uint8_t *buf,
                            size_t count) {

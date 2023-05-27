@@ -2,7 +2,6 @@
 
 #include "log.h"
 
-#include <stdint.h>
 #include <stdio.h>
 
 // TODO: this file and hash.c have a lot of code in common. We should
