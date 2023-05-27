@@ -26,10 +26,19 @@ Result no_rollback_read(const char* filename, char buf[static VERSION_SIZE]) {
     ERROR("%s failed", __func__);
     return Result_NO_ROLLBACK_FILE_NOT_FOUND;
   }
+  if (buf[VERSION_SIZE - 1] != '\0') {
+    ERROR("%s: rollback file contents not NULL-terminated", __func__);
+    return Result_NO_ROLLBACK_INVALID_FORMAT;
+  }
   return Result_SUCCESS;
 }
 
 Result no_rollback_write(const char* filename, char buf[static VERSION_SIZE]) {
+  if (buf[VERSION_SIZE - 1] != '\0') {
+    ERROR("%s: input buf is not NULL-terminated", __func__);
+    return Result_NO_ROLLBACK_INVALID_FORMAT;
+  }
+
   char tmp_file[100];
   snprintf(tmp_file, sizeof(tmp_file), "/tmp/%s", filename);
 

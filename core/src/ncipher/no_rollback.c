@@ -62,12 +62,23 @@ Result no_rollback_read(const char* filename, char buf[static VERSION_SIZE]) {
     return Result_UNKNOWN_INTERNAL_FAILURE;
   }
 
+  if (reply.reply.nvmemop.res.read.data.ptr[VERSION_SIZE - 1] != '\0') {
+    ERROR("%s: rollback NVRAM contents not NULL-terminated", __func__);
+    NFastApp_Free_Reply(app, NULL, NULL, &reply);
+    return Result_NO_ROLLBACK_INVALID_FORMAT;
+  }
+
   memcpy(buf, reply.reply.nvmemop.res.read.data.ptr, VERSION_SIZE);
   NFastApp_Free_Reply(app, NULL, NULL, &reply);
   return Result_SUCCESS;
 }
 
 Result no_rollback_write(const char* filename, char buf[static VERSION_SIZE]) {
+  if (buf[VERSION_SIZE - 1] != '\0') {
+    ERROR("%s: input buf is not NULL-terminated", __func__);
+    return Result_NO_ROLLBACK_INVALID_FORMAT;
+  }
+
   Result r = Result_UNKNOWN_INTERNAL_FAILURE;
 
   M_Command command = {0};
