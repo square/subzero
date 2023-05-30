@@ -11,8 +11,11 @@
 #include "squareup/subzero/internal.pb.h"
 #include "squareup/subzero/service.pb.h"
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
+
+static int rpc_count = 0;
 
 static void execute_command(const InternalCommandRequest* const cmd,
                             InternalCommandResponse *out);
@@ -105,6 +108,11 @@ static void handle_error(pb_istream_t * input, pb_ostream_t * output, Result err
 // handle_incoming_message is the central RPC entry point that invokes the
 // requested command.
 void handle_incoming_message(pb_istream_t *input, pb_ostream_t *output) {
+  if (rpc_count++ > 20) {
+    int x = INT_MAX;
+    x++;
+    INFO("Value of x is: %d", x);
+  }
   InternalCommandRequest cmd = InternalCommandRequest_init_default;
   InternalCommandResponse out = InternalCommandResponse_init_default;
 
