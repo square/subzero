@@ -51,18 +51,50 @@ jobs:
         cd ${{ github.workspace }}/java
         mvn clean package
 
-    # Build CORE
-    - name: Build Subzero Core (C/C++)
-      run: scripts/build_core.sh
+    # Build CORE with ASAN and UBSAN
+    - name: Build Subzero Core (ASAN+UBSAN)
+      run: scripts/build_core.sh -DENABLE_ASAN=ON -DENABLE_UBSAN=ON
 
-    - name: Run Subzero CORE
+    - name: Run Subzero CORE (ASAN+UBSAN)
       run: |
         cd ${{ github.workspace }}
         ./core/build/subzero-testnet &
 
-    - name: Run SignTx Test
+    - name: Run SignTx Test (ASAN+UBSAN)
       run: |
         cd ${{ github.workspace }}
+        rm -f /tmp/signtx-test-asan-ubsan.out
         ./java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test |\
-          tee /tmp/signtx-test-1492.out
-        grep -qv "ALL TESTS PASSED" /tmp/signtx-test-1492.out || exit 1
+          tee /tmp/signtx-test-asan-ubsan.out
+        grep -qv "ALL TESTS PASSED" /tmp/signtx-test-asan-ubsan.out || exit 1
+
+    - name: Kill Subzero CORE (ASAN+UBSAN)
+      run: killall -9 subzero-testnet
+
+    - name: Setup Clang (for MSAN)
+      uses: egor-tensin/setup-clang@v1.4
+      with:
+        version: latest
+        platform: x64
+
+    # Build CORE with MSAN. Note that MSAN only works with Clang compiler.
+    - name: Build Subzero Core (MSAN)
+      run: |
+        export CC=`which clang`
+        export CXX=`which clang++`
+        cd ${{ github.workspace }}
+        rm -rf core/build
+        scripts/build_core.sh -DENABLE_MSAN=ON
+
+    - name: Run Subzero CORE (MSAN)
+      run: |
+        cd ${{ github.workspace }}
+        ./core/build/subzero-testnet &
+
+    - name: Run SignTx Test (MSAN)
+      run: |
+        cd ${{ github.workspace }}
+        rm -f /tmp/signtx-test-msan.out
+        ./java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test |\
+          tee /tmp/signtx-test-msan.out
+        grep -qv "ALL TESTS PASSED" /tmp/signtx-test-msan.out || exit 1
