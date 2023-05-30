@@ -13,6 +13,9 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
+
+static int rpc_count = 0;
 
 static void execute_command(const InternalCommandRequest* const cmd,
                             InternalCommandResponse *out);
@@ -105,6 +108,13 @@ static void handle_error(pb_istream_t * input, pb_ostream_t * output, Result err
 // handle_incoming_message is the central RPC entry point that invokes the
 // requested command.
 void handle_incoming_message(pb_istream_t *input, pb_ostream_t *output) {
+  if (rpc_count++ > 20) {
+    int* a = malloc(sizeof(int));
+    if (a[0]) {
+      INFO("Value of uninitialized a[0]: %d", a[0]);
+    }
+    free(a);
+  }
   InternalCommandRequest cmd = InternalCommandRequest_init_default;
   InternalCommandResponse out = InternalCommandResponse_init_default;
 
