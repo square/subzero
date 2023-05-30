@@ -148,10 +148,10 @@ int verify_check_qrsignature_pub(void){
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01
   };
 
-  uint8_t signature[64] = {0};
+  uint8_t signature[QRSIGNATURE_LEN] = {0};
 
   // echo "ef3fd8719c72b1410df9494c61bc99825b73a2236b54832d524dc9f8d261c3c04c7b5c0f1527a74e3432f319e576fba8ac402b378c47fed2760dfc933e382096" | xxd -r -p | xxd -i 
-  uint8_t expected_signature[64] = {
+  uint8_t expected_signature[QRSIGNATURE_LEN] = {
     0xef, 0x3f, 0xd8, 0x71, 0x9c, 0x72, 0xb1, 0x41, 0x0d, 0xf9, 0x49, 0x4c,
     0x61, 0xbc, 0x99, 0x82, 0x5b, 0x73, 0xa2, 0x23, 0x6b, 0x54, 0x83, 0x2d,
     0x52, 0x4d, 0xc9, 0xf8, 0xd2, 0x61, 0xc3, 0xc0, 0x4c, 0x7b, 0x5c, 0x0f,
@@ -176,19 +176,19 @@ int verify_check_qrsignature_pub(void){
     return 1;
   }
   DEBUG("Signature:");
-  print_bytes(signature, 64);
+  print_bytes(signature, QRSIGNATURE_LEN);
 
   if(memcmp(signature, expected_signature, sizeof(signature)) != 0){
     ERROR("Expected signature was not generated.");
     return 2;
   }
 
-  uint8_t pub[65] = {0};
+  uint8_t pub[QRSIGNATURE_PUBKEY_LEN] = {0};
   ecdsa_get_public_key65((const ecdsa_curve *)&nist256p1, private_key, pub);
   // flip sig bits.
   signature[sizeof(signature) - 1] ^= 0xff;
   // This should return false.
-  if (check_qrsignature_pub(buf, sizeof(buf), signature, pub)) {
+  if (check_qrsignature_pub(buf, sizeof(buf), signature, sizeof(signature), pub, sizeof(pub))) {
     ERROR("Signature should not have verified.");
     return 3;
   }
@@ -197,7 +197,7 @@ int verify_check_qrsignature_pub(void){
   // flip data bits.
   buf[0] ^= 0xff;
   //this should return false.
-  if (check_qrsignature_pub(buf, sizeof(buf), signature, pub)) {
+  if (check_qrsignature_pub(buf, sizeof(buf), signature, sizeof(signature), pub, sizeof(pub))) {
     ERROR("Signature should not have verified with wrong data.");
     return 4;
   }
@@ -205,7 +205,7 @@ int verify_check_qrsignature_pub(void){
 
   // flip public key bits.
   pub[sizeof(pub) / 2] ^= 0xff;
-  if (check_qrsignature_pub(buf, sizeof(buf), signature, pub)) {
+  if (check_qrsignature_pub(buf, sizeof(buf), signature, sizeof(signature), pub, sizeof(pub))) {
     ERROR("Signature should not have verified with wrong public key.");
     return 5;
   }
@@ -213,36 +213,50 @@ int verify_check_qrsignature_pub(void){
 
   // Attempting to verify a null data should return false
   ERROR("(next line is expected to show red text...)");
-  if (check_qrsignature_pub(NULL, sizeof(buf), signature, pub)) {
+  if (check_qrsignature_pub(NULL, sizeof(buf), signature, sizeof(signature), pub, sizeof(pub))) {
     ERROR("Signature should not have verified with NULL data.");
     return 6;
   }
 
   // Attempting to verify a zero-length data should return false
   ERROR("(next line is expected to show red text...)");
-  if (check_qrsignature_pub(buf, 0, signature, pub)) {
+  if (check_qrsignature_pub(buf, 0, signature, sizeof(signature), pub, sizeof(pub))) {
     ERROR("Signature should not have verified with zero-length data.");
     return 7;
   }
 
   // Attempting to verify a NULL signature should return false
   ERROR("(next line is expected to show red text...)");
-  if (check_qrsignature_pub(buf, sizeof(buf), NULL, pub)) {
+  if (check_qrsignature_pub(buf, sizeof(buf), NULL, sizeof(signature), pub, sizeof(pub))) {
     ERROR("Signature should not have verified with NULL signature.");
     return 8;
   }
 
-  // Attempting to verify a NULL pub key should return false
+  // Attempting to verify a wrong-length signature should return false
   ERROR("(next line is expected to show red text...)");
-  if (check_qrsignature_pub(buf, sizeof(buf), signature, NULL)) {
-    ERROR("Signature should not have verified with NULL pub key.");
+  if (check_qrsignature_pub(buf, sizeof(buf), signature, sizeof(signature) - 1, pub, sizeof(pub))) {
+    ERROR("Signature should not have verified with a wrong-length signature.");
     return 9;
   }
 
-  // Positive test: verifying an unmodified signature should work.
-  if (!check_qrsignature_pub(buf, sizeof(buf), signature, pub)) {
-    ERROR("verify signature does not seem to work.");
+  // Attempting to verify with a NULL pub key should return false
+  ERROR("(next line is expected to show red text...)");
+  if (check_qrsignature_pub(buf, sizeof(buf), signature, sizeof(signature), NULL, sizeof(pub))) {
+    ERROR("Signature should not have verified with NULL pub key.");
     return 10;
+  }
+
+  // Attempting to verify with a wrong-length pub key should return false
+  ERROR("(next line is expected to show red text...)");
+  if (check_qrsignature_pub(buf, sizeof(buf), signature, sizeof(signature), pub, sizeof(pub) - 1)) {
+    ERROR("Signature should not have verified with a wrong-length pub key.");
+    return 11;
+  }
+
+  // Positive test: verifying an unmodified signature should work.
+  if (!check_qrsignature_pub(buf, sizeof(buf), signature, sizeof(signature), pub, sizeof(pub))) {
+    ERROR("verify signature does not seem to work.");
+    return 12;
   }
 
   INFO("check_qrsignature_pub passed.");
