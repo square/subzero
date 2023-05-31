@@ -34,6 +34,10 @@ Result no_rollback_check(const char* filename, bool allow_upgrade, uint32_t expe
     return r;
   }
 
+  // Note: there's a subtle bug here, because 'unsigned long' and 'uint32_t' may or may not be different types.
+  // But the C standard library doesn't seem to provide a version of strtoul() which parses into a fixed-width type,
+  // and sscanf() has undefined behavior if the value being parsed overflows, so it's pretty tricky to write this
+  // code in a correct and portable way while using standard library functions. Sigh.
   unsigned long magic = 0; // 0 is not a valid magic number
   unsigned long version = 0; // 0 is not a valid version number
   int matches = 0;
@@ -91,6 +95,8 @@ Result no_rollback_write_version(const char* filename, uint32_t magic, uint32_t 
 
   char buf[VERSION_SIZE];
   memset(buf, 0, VERSION_SIZE);
+  // Note: there's a subtle bug here, "%d" is signed int, not uint32_t. It happens to work
+  // with the values we use in practice, for now.
   snprintf(buf, sizeof(buf), "%d-%d", magic, version);
   return no_rollback_write(filename, buf);
 }
