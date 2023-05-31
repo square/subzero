@@ -71,3 +71,26 @@ int verify_no_rollback(void) {
   INFO("verify_no_rollback: ok");
   return 0;
 }
+
+/**
+ * This hard-coded test case verifies that no_rollback_write_to_buf() produces a known output from the current
+ * VERSION_MAGIC and VERSION constants. It needs to be updated when the VERSION is incremented.
+ */
+int verify_no_rollback_write_to_buf(void) {
+  char buf[VERSION_SIZE];
+  char expected_buf[VERSION_SIZE] = { 0 };
+  static_assert(sizeof(buf) == sizeof(expected_buf), "buf and expected_buf should have the same size");
+
+  no_rollback_write_to_buf(VERSION_MAGIC, VERSION, buf);
+
+  // Note: the VERSION string is at the end. Update it when updating the VERSION constant.
+  const char* expected_string = "8414-210";
+  memcpy(expected_buf, expected_string, strlen(expected_string));
+
+  int res = memcmp(buf, expected_buf, sizeof(buf));
+  if (0 != res) {
+    ERROR("%s: buffers were not equal: buf == %s, expected_buf == %s", __func__, buf, expected_buf);
+  }
+  INFO("%s: ok", __func__);
+  return res;
+}

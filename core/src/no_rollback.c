@@ -94,9 +94,13 @@ Result no_rollback_write_version(const char* filename, uint32_t magic, uint32_t 
   DEBUG("in no_rollback_write");
 
   char buf[VERSION_SIZE];
+  no_rollback_write_to_buf(magic, version, buf);
+  return no_rollback_write(filename, buf);
+}
+
+void no_rollback_write_to_buf(const uint32_t magic, const uint32_t version, char buf[static VERSION_SIZE]) {
   memset(buf, 0, VERSION_SIZE);
   // Note: there's a subtle bug here, "%d" is signed int, not uint32_t. It happens to work
   // with the values we use in practice, for now.
-  snprintf(buf, sizeof(buf), "%d-%d", magic, version);
-  return no_rollback_write(filename, buf);
+  snprintf(buf, VERSION_SIZE, "%d-%d", magic, version);
 }
