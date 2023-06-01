@@ -89,7 +89,5 @@ int verify_bip32(void) {
   }
   ASSERT_STR_EQUAL(str, BIP32_TEST_CHILD_PUBKEY, "unexpected child public key.");
 
-  INFO("verify_bip32 ok");
-
   return 0;
 }

@@ -94,6 +94,8 @@ int run_self_checks(void) {
     if (t != 0) {
       r = -1;
       ERROR("self check failure: %s failed. rc = %d", self_checks[i].name, t);
+    } else {
+      INFO("%s: ok", self_checks[i].name);
     }
   }
 

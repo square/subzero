@@ -59,6 +59,5 @@ int verify_no_rollback(void) {
     return -1;
   }
 
-  INFO("verify_no_rollback: ok");
   return 0;
 }

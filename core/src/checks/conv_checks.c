@@ -41,6 +41,5 @@ int verify_conv_btc_to_satoshi(void) {
     return -1;
   }
 
-  INFO("verify_conv_btc_to_satoshi: ok");
   return 0;
 }

@@ -88,6 +88,5 @@ int verify_protect_pubkey(void) {
     return -1;
   }
 
-  INFO("verify_protect_pubkey: ok");
   return 0;
 }

@@ -123,9 +123,5 @@ int verify_validate_fees(void) {
            "negative.");
   }
 
-  if (r == 0) {
-    INFO("verify_validate_fees: ok");
-  }
-
   return r;
 }

@@ -125,9 +125,9 @@ int verify_sign_tx(void) {
     return -1;
   }
   
-  INFO("sign_tx passed");
   return 0;
 }
+
 /**
  * This function does not make an effort to zeroize
  * anything as all of the values are test values.
@@ -259,7 +259,5 @@ int verify_check_qrsignature_pub(void){
     return 12;
   }
 
-  INFO("check_qrsignature_pub passed.");
-  return 0; 
-
+  return 0;
 }
