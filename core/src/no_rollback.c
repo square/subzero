@@ -11,7 +11,7 @@
 /**
  * Prevents running an older version of core after a newer version has been seen. The goal is to limit the attack
  * surface to only the current version (vs any version which ever existed).
-  *
+ *
  * The code in this file is dev/ncipher agnostic. We prevent rollback by persisting a magic number and a version number.
  * The magic number prevents accidentally mixing rollback protection code from another application. The version is
  * a high water mark and gets automatically bumped if needed when the application starts.
@@ -34,13 +34,13 @@ Result no_rollback_check(const char* filename, bool allow_upgrade, uint32_t expe
     return r;
   }
 
-  unsigned long magic = 0; // 0 is not a valid magic number
-  unsigned long version = 0; // 0 is not a valid version number
+  unsigned long magic_ul = 0;   // 0 is not a valid magic number
+  unsigned long version_ul = 0; // 0 is not a valid version number
   int matches = 0;
-  char *endptr = NULL;
+  char* endptr = NULL;
 
-  magic = strtoul(buf, &endptr, 10);
-  if (magic == 0) {
+  magic_ul = strtoul(buf, &endptr, 10);
+  if (magic_ul == 0 || magic_ul > UINT32_MAX) {
     ERROR("%s: invalid magic failure", __func__);
     return Result_NO_ROLLBACK_INVALID_FORMAT;
   }
@@ -52,8 +52,8 @@ Result no_rollback_check(const char* filename, bool allow_upgrade, uint32_t expe
   }
 
   endptr++;
-  version = strtoul(endptr, NULL, 10);
-  if (version == 0 || version > UINT32_MAX) {
+  version_ul = strtoul(endptr, NULL, 10);
+  if (version_ul == 0 || version_ul > UINT32_MAX) {
     ERROR("%s: invalid version failure", __func__);
     return Result_NO_ROLLBACK_INVALID_FORMAT;
   }
@@ -64,13 +64,19 @@ Result no_rollback_check(const char* filename, bool allow_upgrade, uint32_t expe
     ERROR("no_rollback_check: invalid format failure");
     return Result_NO_ROLLBACK_INVALID_FORMAT;
   }
+  // Since 'unsigned long' and 'uint32_t' are not always the same type (it depends on the architecture and compiler),
+  // convert the values we parsed to uint32_t types. We've already done the bounds checks above so we know
+  // there is no truncation happening.
+  const uint32_t magic = (uint32_t) magic_ul;
+  const uint32_t version = (uint32_t) version_ul;
+
   if (magic != expected_magic) {
     ERROR("no_rollback_check: invalid magic failure");
     return Result_NO_ROLLBACK_INVALID_MAGIC;
   }
 
   if (allow_upgrade && (version < expected_version)) {
-    INFO("no_rollback_check: bumping version from %"PRIu32" to %"PRIu32, (uint32_t) version, expected_version);
+    INFO("no_rollback_check: bumping version from %" PRIu32 " to %" PRIu32, version, expected_version);
     r = no_rollback_write_version(filename, expected_magic, expected_version);
     if (r != Result_SUCCESS) {
       return r;
@@ -90,7 +96,11 @@ Result no_rollback_write_version(const char* filename, uint32_t magic, uint32_t 
   DEBUG("in no_rollback_write");
 
   char buf[VERSION_SIZE];
-  memset(buf, 0, VERSION_SIZE);
-  snprintf(buf, sizeof(buf), "%d-%d", magic, version);
+  no_rollback_write_to_buf(magic, version, buf);
   return no_rollback_write(filename, buf);
+}
+
+void no_rollback_write_to_buf(const uint32_t magic, const uint32_t version, char buf[static VERSION_SIZE]) {
+  memset(buf, 0, VERSION_SIZE * sizeof(char));
+  snprintf(buf, VERSION_SIZE * sizeof(char), "%" PRIu32 "-%" PRIu32, magic, version);
 }
