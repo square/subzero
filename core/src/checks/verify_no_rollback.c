@@ -90,6 +90,5 @@ int verify_no_rollback_write_to_buf(void) {
   if (0 != res) {
     ERROR("%s: buffers were not equal: buf == %s, expected_buf == %s", __func__, buf, expected_buf);
   }
-  INFO("%s: ok", __func__);
   return res;
 }
