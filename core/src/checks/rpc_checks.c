@@ -275,8 +275,5 @@ out:
   memzero(request_buffer, sizeof(request_buffer));
   memzero(response_buffer, sizeof(response_buffer));
 
-  if (result == 0) {
-    INFO("%s: ok", __func__);
-  }
   return result;
 }

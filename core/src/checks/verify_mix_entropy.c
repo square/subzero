@@ -57,6 +57,5 @@ int verify_mix_entropy(void) {
     return -1;
   }
 
-  INFO("verify_mix_entropy: ok");
   return 0;
 }

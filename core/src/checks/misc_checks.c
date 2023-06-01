@@ -23,6 +23,5 @@ int verify_byte_order(void) {
     return -1;
   }
 #endif
-  INFO("%s: ok", __func__);
   return 0;
 }
