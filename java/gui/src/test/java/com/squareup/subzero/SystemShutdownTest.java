@@ -1,30 +1,17 @@
 package com.squareup.subzero;
 import org.junit.Test;
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class SystemShutdownTest {
     @Test
-    public void testSystemShutdown(){
+    public void testSystemShutdownCommand(){
+        String shutdownCommand = SystemShutdown.getShutdownCommand();
         if (System.getProperty("os.name").contains("Linux")) {
-            try {
-                SystemShutdown.systemShutdown();
-                assertThat(false);
-            } catch (Exception e) {
-                //should throw exception as shutdown now as non root user on Linux should fail.
-                assertThat(true);
-
-            }
-
+            // On linux, we expect to issue a shutdown command
+            assertEquals("shutdown now", shutdownCommand);
         } else {
-            try {
-                //NOP
-                SystemShutdown.systemShutdown();
-                assertThat(true);
-            } catch (Exception e){
-                //should not throw an exception.
-                assertThat(false);
-            }
+            // On non-linux, SystemShutdown is a NOP
+            assertEquals("", shutdownCommand);
         }
-
     }
 }
