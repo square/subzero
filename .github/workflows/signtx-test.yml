@@ -63,6 +63,7 @@ jobs:
     - name: Run SignTx Test (ASAN+UBSAN)
       run: |
         cd ${{ github.workspace }}
+        sleep 10
         rm -f /tmp/signtx-test-asan-ubsan.out
         ./java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test |\
           tee /tmp/signtx-test-asan-ubsan.out
@@ -93,6 +94,7 @@ jobs:
 
     - name: Run SignTx Test (MSAN)
       run: |
+        sleep 10
         cd ${{ github.workspace }}
         rm -f /tmp/signtx-test-msan.out
         ./java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test |\
