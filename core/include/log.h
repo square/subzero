@@ -6,10 +6,10 @@
 #define __FILENAME__ (&__FILE__[SOURCE_PATH_SIZE])
 
 #ifdef BTC_TESTNET
-  // Print DEBUG to stdout in green
+  // Print DEBUG to stdout in cyan
   #define DEBUG(...)                                                           \
     do {                                                                       \
-      printf("\033[0;32m");                                                    \
+      printf("\033[0;36m");                                                    \
       printf("[DEBUG] %s:%d ", __FILENAME__, __LINE__);                        \
       printf(__VA_ARGS__);                                                     \
       printf("\033[0m\n");                                                     \
@@ -17,7 +17,7 @@
 
   #define DEBUG_(...)                                                          \
     do {                                                                       \
-      printf("\033[0;32m");                                                    \
+      printf("\033[0;36m");                                                    \
       printf(__VA_ARGS__);                                                     \
       printf("\033[0m");                                                       \
     } while (0)
@@ -27,10 +27,10 @@
   #define DEBUG_(...) do {snprintf(NULL, 0, __VA_ARGS__);} while(0)
 #endif
 
-// Print INFO to stdout in red
+// Print INFO to stdout in green
 #define INFO(...)                                                              \
   do {                                                                         \
-    printf("\033[0;33m");                                                      \
+    printf("\033[0;32m");                                                      \
     printf("[INFO] %s:%d ", __FILENAME__, __LINE__);                           \
     printf(__VA_ARGS__);                                                       \
     printf("\033[0m\n");                                                       \
