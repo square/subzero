@@ -42,6 +42,9 @@ jobs:
       run: |
         python -c "import sys; print(sys.version)"
 
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+
     - name: Install dependencies
       run: scripts/ubuntu_install_protobuf.sh
 
@@ -49,7 +52,7 @@ jobs:
     - name: Build Java
       run: |
         cd ${{ github.workspace }}/java
-        mvn clean package
+        ./gradlew clean build --info
 
     # Build CORE with ASAN and UBSAN
     - name: Build Subzero Core (ASAN+UBSAN)
@@ -65,7 +68,7 @@ jobs:
         cd ${{ github.workspace }}
         sleep 10
         rm -f /tmp/signtx-test-asan-ubsan.out
-        ./java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test |\
+        java -jar ./java/gui/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test |\
           tee /tmp/signtx-test-asan-ubsan.out
         grep -qv "ALL TESTS PASSED" /tmp/signtx-test-asan-ubsan.out || exit 1
 
@@ -97,6 +100,6 @@ jobs:
         sleep 10
         cd ${{ github.workspace }}
         rm -f /tmp/signtx-test-msan.out
-        ./java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test |\
+        java -jar ./java/gui/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test |\
           tee /tmp/signtx-test-msan.out
         grep -qv "ALL TESTS PASSED" /tmp/signtx-test-msan.out || exit 1
