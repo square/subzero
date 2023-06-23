@@ -50,12 +50,13 @@ if [ -f "/usr/local/bin/.isotype_dev" ]; then
   rm /usr/bin/python
   ln -s /usr/bin/python2 /usr/bin/python
 
-  # centos 7 repos have the latest version of maven as 3.0.5. 
-  # Current master on subzero does not build with that version.
-  echo "install latest version of maven"
+  # Install OpenJDK 19.0.2. This is needed for subzero/java/gradlew to work correctly
+  # when building the Java code.
+  echo "install OpenJDK 19.0.2"
   cd /root
-  tar -xf /data/apache-maven-3.8.4-bin.tar.gz
-  echo 'PATH=/root/apache-maven-3.8.4/bin:$PATH' >> /root/.bash_profile
-  rm /data/apache-maven-3.8.4-bin.tar.gz
+  tar zxf /data/openjdk-19.0.2_linux-x64_bin.tar.gz
+  echo 'export JAVA_HOME=/root/jdk-19.0.2' >> /root/.bash_profile
+  echo 'export PATH=/root/jdk-19.0.2/bin:$PATH' >> /root/.bash_profile
+  rm /data/openjdk-19.0.2_linux-x64_bin.tar.gz
 fi
 

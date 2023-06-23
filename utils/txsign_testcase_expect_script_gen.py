@@ -130,7 +130,7 @@ def generate_expect_script(qr_requests):
   set subzero_jar [lindex $argv 0]
   log_file expect_subzero.log
   set timeout -1
-  spawn "$subzero_jar"
+  spawn "java -jar $subzero_jar"
   """
 
   expect_template = """
