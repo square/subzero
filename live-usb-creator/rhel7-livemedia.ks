@@ -347,9 +347,8 @@ syslinux
 grub2-efi-*-cdboot
 grub2-efi-ia32
 
-# Java 8
+# Java 8 Runtime - no need for a full JDK in the release image
 java-1.8.0-openjdk
-java-1.8.0-openjdk-devel
 
 # nCipher stuff
 gcc
