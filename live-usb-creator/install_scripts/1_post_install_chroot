@@ -58,5 +58,12 @@ if [ -f "/usr/local/bin/.isotype_dev" ]; then
   echo 'export JAVA_HOME=/root/jdk-19.0.2' >> /root/.bash_profile
   echo 'export PATH=/root/jdk-19.0.2/bin:$PATH' >> /root/.bash_profile
   rm /data/openjdk-19.0.2_linux-x64_bin.tar.gz
+
+  # Install CMake 3.26.4, needed to build subzero/core with up-to-date nanopb.
+  echo "install CMake 3.26.4"
+  cd /root
+  tar zxf /data/cmake-3.26.4-linux-x86_64.tar.gz
+  echo 'export PATH=/root/cmake-3.26.4-linux-x86_64/bin:$PATH' >> /root/.bash_profile
+  rm /data/cmake-3.26.4-linux-x86_64.tar.gz
 fi
 

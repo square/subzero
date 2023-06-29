@@ -18,6 +18,7 @@ Set the following files in place in the same directory as the `Vagrantfile`.
 * protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl (1MB): `curl -O -L https://files.pythonhosted.org/packages/fe/fd/247ef25f5ec5f9acecfbc98ca3c6aaf66716cf52509aca9a93583d410493/protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl`
 * Pillow-8.3.2-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl (3.0 MB): `curl -O -L  https://files.pythonhosted.org/packages/6f/2b/7c242e58b1b332a123b4a7bf358e2cc7fa7d904b3576b87defc9528e2bfd/Pillow-8.3.2-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl`
 * openjdk-19.0.2_linux-x64_bin.tar.gz: `curl -O -L https://download.java.net/java/GA/jdk19.0.2/fdb695a9d9064ad6b064dc6df578380c/7/GPL/openjdk-19.0.2_linux-x64_bin.tar.gz`
+* cmake-3.26.4-linux-x86_64.tar.gz: `curl -O -L https://github.com/Kitware/CMake/releases/download/v3.26.4/cmake-3.26.4-linux-x86_64.tar.gz`
 
 Verify the shasums programmatically(checksum file is the output of the manual command below):
 
@@ -42,6 +43,7 @@ a2900100ef9cda17d9c0bbf6a3c3592e809f9842f2d9f0d50e3fba7f3fc864f0  protoc-3.14.0-
 ecc33531a213eee22ad60e0e2aaea6c8ba0021f0cce35dbf0ab03dee6e2a23a1  protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl
 8f284dc1695caf71a74f24993b7c7473d77bc760be45f776a2c2f4e04c170550  Pillow-8.3.2-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
 34cf8d095cc071e9e10165f5c45023f96ec68397fdaabf6c64bfec1ffeee6198  openjdk-19.0.2_linux-x64_bin.tar.gz
+ba1e0dcc710e2f92be6263f9617510b3660fa9dc409ad2fb8190299563f952a0  cmake-3.26.4-linux-x86_64.tar.gz
 ```
 
 The CentOS's GPG signature can also be verified to confirm the image has been signed by the CentOS team.

@@ -359,7 +359,6 @@ binutils
 git
 autoconf
 automake
-cmake
 libtool
 make
 vim
