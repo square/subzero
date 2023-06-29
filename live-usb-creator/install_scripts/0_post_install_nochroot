@@ -58,7 +58,7 @@ cp /vagrant/syslinux-splash.png /mnt/sysimage/usr/share/anaconda/boot/syslinux-s
 ###############################################################################
 
 mkdir -p /mnt/sysimage/data/app/subzero
-cp /vagrant/data_app_subzero/subzero-cli.sh /mnt/sysimage/data/app/subzero/subzero-cli.sh
+cp -r /vagrant/data_app_subzero/* /mnt/sysimage/data/app/subzero/
 
 # Copy development tools as well as dependencies only for the Dev flavored ISO
 if [ -f "/vagrant/live_scripts/.isotype_dev" ]; then
@@ -70,8 +70,4 @@ if [ -f "/vagrant/live_scripts/.isotype_dev" ]; then
   cp /vagrant/Pillow-8.3.2-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl /mnt/sysimage/data/app/subzero
   # copy OpenJDK 19.0.2, needed to run the gradle wrapper which builds the Java GUI
   cp /vagrant/openjdk-19.0.2_linux-x64_bin.tar.gz /mnt/sysimage/data/
-  # custom sshd_config
-  cp /vagrant/data_app_subzero/sshd_config /mnt/sysimage/data/app/subzero
-  # custom utility
-  cp -r /vagrant/data_app_subzero/tools /mnt/sysimage/data/app/subzero
 fi
