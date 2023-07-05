@@ -97,7 +97,7 @@ if (ENABLE_COVERAGE)
     # In terminal 1:
     #   LLVM_PROFILE_FILE="subzero.profraw%c" ./subzero
     # In terminal 2:
-    #   run the GUI test (e.g. java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test)
+    #   run the GUI test (e.g. java -jar java/gui/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test)
     # Can also run additional tests in terminal 2, e.g. for wallet creation.
     # Back to terminal 1:
     #   ctrl-C to kill the subzero process

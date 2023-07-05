@@ -24,7 +24,7 @@ instructed in [subzero documentation](./running_without_hsm.md).
 
 ```bash
 # under subzero repository directory root
-./java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test
+java -jar ./java/gui/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test
 ```
 
 ## How to create test vectors
@@ -52,7 +52,7 @@ Put the following content in `/data/app/subzero/wallets/subzero-1492.wallet`
 
 ```bash
 # under subzero repository directory root
-./java/server/target/server-1.0.0-SNAPSHOT.jar server
+java -jar ./java/server/build/libs/server-1.0.0-SNAPSHOT.jar server
 ```
 
 - Run python script `txsign_testcase_expect_scrypt_gen.py` to generate an
@@ -90,7 +90,7 @@ rm expect_subzero.log
 # Note: The below expects X server to be running. If you are running this
 #       on the dev iso(No X server) then prefix it with xvfb-run <command>. 
 #       That will make awt happy and let the command pass through peacefully!
-/tmp/subzero_expect.sh ./java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar
+/tmp/subzero_expect.sh ./java/gui/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar
 # 'expect_subzero.log' should show up below
 ls -l expect_subzero.log
 ```

@@ -6,7 +6,7 @@ not encrypted — Subzero's security model assumes you are using a HSM in your p
 The instructions in this page work with Mac OS X. Linux users can simply skip irrelevant parts. Windows users are
 advised to use a virtualization layer (e.g. Ubuntu inside VirtualBox).
 
-The Core is compiled using _cmake_ and _gcc_. The web server and GUI are built using _maven_ and run with Java.
+The Core is compiled using _cmake_ and _gcc_. The web server and GUI are built using _gradle_ and run with Java.
 Since we don't have a HSM, we'll be using stub classes (included with Subzero) to successfully compile the
 code — HSM-specific steps will then be skipped.
 
@@ -27,9 +27,6 @@ provide additional docker files for running the GUI and web server).
     brew update
     brew cask install java
 
-    # install Maven
-    brew install maven
-
     # note: if Mac OS X gives you a warning about unverified developers, you can go to the
     # Security & Privacy settings and allow the action to take place.
 
@@ -47,7 +44,7 @@ provide additional docker files for running the GUI and web server).
 
     # build the Java code
     cd java
-    mvn package
+    ./gradlew build
 
     # build the C code, using testnet transactions.
     cd ../core
@@ -70,13 +67,13 @@ See also [sample output](core_sample_output.md).
     ./subzero/core/build/subzero
 
     # in a fresh Terminal tab, start the dev/demo server (listens on port 8080)
-    ./subzero/java/server/target/server-1.0.0-SNAPSHOT.jar server
+    java -jar ./subzero/java/server/build/libs/server-1.0.0-SNAPSHOT.jar server
 
     # in a fresh Terminal tab, open http://localhost:8080/.
     open http://localhost:8080/
 
     # start the GUI
-    ./subzero/java/gui/target/gui-1.0.0-SNAPSHOT-shaded.jar
+    java -jar ./subzero/java/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar
 
 Your environment should look as following (from top left, going clockwise): the GUI, a web browser, and a Terminal.
 

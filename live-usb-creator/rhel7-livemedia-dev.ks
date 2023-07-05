@@ -347,10 +347,6 @@ syslinux
 grub2-efi-*-cdboot
 grub2-efi-ia32
 
-# Java 8
-java-1.8.0-openjdk
-java-1.8.0-openjdk-devel
-
 # nCipher stuff
 gcc
 kernel-devel
@@ -361,7 +357,6 @@ pciutils
 gcc-c++
 binutils
 git
-maven
 autoconf
 automake
 cmake

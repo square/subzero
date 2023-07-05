@@ -17,7 +17,7 @@ Set the following files in place in the same directory as the `Vagrantfile`.
 * six-1.15.0-py2.py3-none-any.whl (11.0kB): `curl -L -O https://files.pythonhosted.org/packages/ee/ff/48bde5c0f013094d729fe4b0316ba2a24774b3ff1c52d924a8a4cb04078a/six-1.15.0-py2.py3-none-any.whl`
 * protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl (1MB): `curl -O -L https://files.pythonhosted.org/packages/fe/fd/247ef25f5ec5f9acecfbc98ca3c6aaf66716cf52509aca9a93583d410493/protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl`
 * Pillow-8.3.2-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl (3.0 MB): `curl -O -L  https://files.pythonhosted.org/packages/6f/2b/7c242e58b1b332a123b4a7bf358e2cc7fa7d904b3576b87defc9528e2bfd/Pillow-8.3.2-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl`
-* apache-maven-3.8.4-bin.tar.gz: `curl -O -L https://archive.apache.org/dist/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.tar.gz`
+* openjdk-19.0.2_linux-x64_bin.tar.gz: `curl -O -L https://download.java.net/java/GA/jdk19.0.2/fdb695a9d9064ad6b064dc6df578380c/7/GPL/openjdk-19.0.2_linux-x64_bin.tar.gz`
 
 Verify the shasums programmatically(checksum file is the output of the manual command below):
 
@@ -32,7 +32,7 @@ $ shasum -a 256 CodeSafe-linux64-dev-12.50.2.iso Codesafe_Lin64-12.63.0.iso Cent
 kernel-devel-3.10.0-957.12.2.el7.x86_64.rpm protoc-3.14.0-linux-x86_64.zip \
 six-1.15.0-py2.py3-none-any.whl protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl \
 Pillow-8.3.2-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl \
-apache-maven-3.8.4-bin.tar.gz
+openjdk-19.0.2_linux-x64_bin.tar.gz
 23ca2c5fc2476887926409bc69f19b772c99191b1e0cce1a3bace8d1e4488528  CodeSafe-linux64-dev-12.50.2.iso
 df928054888f466c263ef1d7de37877bdcf27c632b34c6934b6eee4e8697a6de  Codesafe_Lin64-12.63.0.iso
 bd5e6ca18386e8a8e0b5a9e906297b5610095e375e4d02342f07f32022b13acf  CentOS-7-x86_64-Everything-1908.iso
@@ -41,28 +41,36 @@ a2900100ef9cda17d9c0bbf6a3c3592e809f9842f2d9f0d50e3fba7f3fc864f0  protoc-3.14.0-
 8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced  six-1.15.0-py2.py3-none-any.whl
 ecc33531a213eee22ad60e0e2aaea6c8ba0021f0cce35dbf0ab03dee6e2a23a1  protobuf-3.14.0-cp36-cp36m-manylinux1_x86_64.whl
 8f284dc1695caf71a74f24993b7c7473d77bc760be45f776a2c2f4e04c170550  Pillow-8.3.2-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
-2cdc9c519427bb20fdc25bef5a9063b790e4abd930e7b14b4e9f4863d6f9f13c  apache-maven-3.8.4-bin.tar.gz
+34cf8d095cc071e9e10165f5c45023f96ec68397fdaabf6c64bfec1ffeee6198  openjdk-19.0.2_linux-x64_bin.tar.gz
 ```
 
 The CentOS's GPG signature can also be verified to confirm the image has been signed by the CentOS team.
 
 This workflow uses the tool [Vagrant](https://www.vagrantup.com/) to orchestrate the creation and provisioning of a VirtualBox VM from a CentOS-provided base VM.
 
+Note that VirtualBox DOES NOT work on Apple Silicon Macs - you need an x86_86 Mac or Linux machine.
+
 Build the image in a CentOS VM guest as follows:
 
-* Install the toolchain:
+* Install the toolchain (Mac OS, x86_64 only):
 
   ```bash
   # install virtualbox using brew cask if virtualbox is not installed
   # Post install, make sure you click "allow" in settings->security and privacy for virtualbox.
   # That is required for virtual box to work properly.
   # After enabling that you will have to reboot your machine.
-  brew cask install virtualbox
+  brew install virtualbox --cask
   # install vagrant using brew cask if vagrant is not installed
-  brew cask install vagrant
+  brew install vagrant --cask
   # install vagrant-vbguest if vagrant-vbguest is not installed
   vagrant plugin install vagrant-vbguest
   ```
+
+* Install the toolchain (Linux, x86_64 only):
+    - Go to https://www.virtualbox.org/wiki/Linux_Downloads and follow the instructions to download and install VirtualBox for your linux distro.
+    - Go to https://www.virtualbox.org/wiki/Downloads and download and install the "VirtualBox Extension Pack".
+    - Go to https://developer.hashicorp.com/vagrant/downloads and follow the instructions to download and install Vagrant for your Linux distro.
+    - Run `vagrant plugin install vagrant-vbguest` in a terminal.
 
 * Build the ISO:
 
@@ -71,7 +79,7 @@ Build the image in a CentOS VM guest as follows:
   vagrant box remove -f centos/7
   # install centos 7 vagrant box version 1905.1 (checksum via https://cloud.centos.org/centos/7/vagrant/x86_64/images/sha256sum.txt.asc)
   vagrant box add --checksum-type sha256 --checksum de768cf0180d712a6eac1944bd78870c060999a8b6617f8f9af98ddbb9f2d271 --provider virtualbox --box-version 1905.1 centos/7
-  # boot up a virtualbox VM to run the install in
+  # boot up a virtualbox VM to run the install in (Note: this takes a while)
   vagrant up
   # enter the VM
   vagrant ssh
