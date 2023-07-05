@@ -17,7 +17,7 @@ dependencies {
         exclude("com.google.protobuf", "protobuf-javalite")
     }
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.assertj:assertj-core:3.23.1")
+    testImplementation("org.assertj:assertj-core:3.24.2")
 }
 
 description = "shared"
