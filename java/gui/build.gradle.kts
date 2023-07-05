@@ -13,7 +13,7 @@ plugins {
 dependencies {
     implementation(project(":proto"))
     implementation(project(":shared"))
-    implementation("com.google.zxing:javase:3.5.0")
+    implementation("com.google.zxing:javase:3.5.1")
     implementation("org.yaml:snakeyaml:1.33")
     implementation("com.google.protobuf:protobuf-java-util:3.21.7")
     implementation("com.google.protobuf:protobuf-java:3.21.5")
