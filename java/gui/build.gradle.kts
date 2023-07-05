@@ -16,7 +16,7 @@ dependencies {
     implementation("com.google.zxing:javase:3.5.0")
     implementation("org.yaml:snakeyaml:1.33")
     implementation("com.google.protobuf:protobuf-java-util:3.21.7")
-    implementation("com.google.protobuf:protobuf-java:3.21.5")
+    implementation("com.google.protobuf:protobuf-java:3.23.3")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.23.1")
     testImplementation("org.mockito:mockito-junit-jupiter:4.8.0")
