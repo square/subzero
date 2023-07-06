@@ -70,4 +70,6 @@ if [ -f "/vagrant/live_scripts/.isotype_dev" ]; then
   cp /vagrant/Pillow-8.3.2-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl /mnt/sysimage/data/app/subzero
   # copy OpenJDK 19.0.2, needed to run the gradle wrapper which builds the Java GUI
   cp /vagrant/openjdk-19.0.2_linux-x64_bin.tar.gz /mnt/sysimage/data/
+  # Copy CMake 3.26.4, the version in CentOS 7 is very old
+  cp /vagrant/cmake-3.26.4-linux-x86_64.tar.gz /mnt/sysimage/data/
 fi
