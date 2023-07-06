@@ -14,8 +14,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static com.google.protobuf.ByteString.copyFromUtf8;
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 public class WalletLoaderTest {
   private Wallet wallet;
@@ -44,18 +46,17 @@ public class WalletLoaderTest {
 
     // Should fail with empty directory
     WalletLoader walletLoader = new WalletLoader(tempDir.toPath());
-    assertThatThrownBy(() -> walletLoader.ensureDoesNotExist(1234))
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessageContaining("marker file not found");
+
+    IllegalStateException e1 = assertThrows(IllegalStateException.class, () -> walletLoader.ensureDoesNotExist(1234));
+    assertTrue(e1.getMessage().contains("marker file not found"));
 
     // Should pass with empty directory + marker file + wallet file
     writeMarkerFile(tempDir);
 
     walletLoader.save(1234, Wallet.newBuilder().build());
 
-    assertThatThrownBy(() -> walletLoader.ensureDoesNotExist(1234))
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessageContaining("already exists");
+    IllegalStateException e2 = assertThrows(IllegalStateException.class, () -> walletLoader.ensureDoesNotExist(1234));
+    assertTrue(e2.getMessage().contains("already exists"));
 
     // Should pass with empty directory + marker file
     walletLoader.ensureDoesNotExist(9999);
@@ -68,9 +69,8 @@ public class WalletLoaderTest {
 
     WalletLoader walletLoader = new WalletLoader(tempDir.toPath());
     // Saving should fail because there's no marker file
-    assertThatThrownBy(() -> walletLoader.save(1234, wallet))
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessageContaining("marker file not found");
+    IllegalStateException e = assertThrows(IllegalStateException.class, () -> walletLoader.save(1234, wallet));
+    assertTrue(e.getMessage().contains("marker file not found"));
 
     // Add marker file
     writeMarkerFile(tempDir);
@@ -83,7 +83,7 @@ public class WalletLoaderTest {
 
     System.out.println(new String(bytes));
 
-    assertThat(bytes).isEqualTo(expected);
+    assertArrayEquals(expected, bytes);
   }
 
   @Test
@@ -93,9 +93,8 @@ public class WalletLoaderTest {
     WalletLoader walletLoader = new WalletLoader(tempDir.toPath());
 
     // Loading should fail because there's no marker file
-    assertThatThrownBy(() -> walletLoader.load(1234))
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessageContaining("marker file not found");
+    IllegalStateException e = assertThrows(IllegalStateException.class, () -> walletLoader.load(1234));
+    assertTrue(e.getMessage().contains("marker file not found"));
 
     writeMarkerFile(tempDir);
 
@@ -103,13 +102,12 @@ public class WalletLoaderTest {
     walletLoader.save(1234, wallet);
     Wallet roundtrip = walletLoader.load(1234);
 
-    assertThat(roundtrip).isEqualTo(wallet);
+    assertEquals(wallet, roundtrip);
   }
 
   @Test
   public void walletLoaderBadDirectory() throws Exception {
-    assertThatThrownBy(() -> new WalletLoader("\0"))
-        .isInstanceOf(IllegalArgumentException.class);
+    assertThrows(IllegalArgumentException.class, () -> new WalletLoader("\0"));
   }
 
   @Test
@@ -117,9 +115,8 @@ public class WalletLoaderTest {
     WalletLoader walletLoader = new WalletLoader("/abc");
 
     // Loading should fail because the directory does not exist and subsequently no marker file.
-    assertThatThrownBy(() -> walletLoader.load(1234))
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessageContaining("marker file not found");
+    IllegalStateException e = assertThrows(IllegalStateException.class, () -> walletLoader.load(1234));
+    assertTrue(e.getMessage().contains("marker file not found"));
   }
 
   @Test
@@ -133,9 +130,8 @@ public class WalletLoaderTest {
     WalletLoader walletLoader = new WalletLoader(f);
 
     // Loading should fail because the path points to a file and subsequently no marker file.
-    assertThatThrownBy(() -> walletLoader.load(1234))
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessageContaining("marker file not found");
+    IllegalStateException e = assertThrows(IllegalStateException.class, () -> walletLoader.load(1234));
+    assertTrue(e.getMessage().contains("marker file not found"));
   }
 
 

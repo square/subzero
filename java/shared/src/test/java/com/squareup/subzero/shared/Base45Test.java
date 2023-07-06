@@ -3,18 +3,19 @@ package com.squareup.subzero.shared;
 import java.util.Random;
 import org.junit.Test;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class Base45Test {
   @Test
   public void testCharset() {
-    assertThat(Base45.CHARSET.length()).isEqualTo(45);
+    assertEquals(45, Base45.CHARSET.length());
   }
 
   @Test
   public void testEmptyArray() {
     byte[] buf1 = new byte[] {};
-    assertThat(Base45.fromBase45(Base45.toBase45(buf1))).isEqualTo(buf1);
+    assertArrayEquals(buf1, Base45.fromBase45(Base45.toBase45(buf1)));
   }
 
   @Test
@@ -25,7 +26,7 @@ public class Base45Test {
       buf1[0] = (byte)i;
 
       byte[] buf2 = Base45.fromBase45(Base45.toBase45(buf1));
-      assertThat(buf2).isEqualTo(buf2);
+      assertArrayEquals(buf1, buf2);
     }
   }
 
@@ -39,7 +40,7 @@ public class Base45Test {
         buf1[1] = (byte)j;
 
         byte[] buf2 = Base45.fromBase45(Base45.toBase45(buf1));
-        assertThat(buf2).isEqualTo(buf2);
+        assertArrayEquals(buf1, buf2);
       }
     }
   }
@@ -56,7 +57,7 @@ public class Base45Test {
           buf1[2] = (byte)k;
 
           byte[] buf2 = Base45.fromBase45(Base45.toBase45(buf1));
-          assertThat(buf2).isEqualTo(buf2);
+          assertArrayEquals(buf1, buf2);
         }
       }
     }
@@ -71,7 +72,7 @@ public class Base45Test {
       new Random().nextBytes(buf1);
 
       byte[] buf2 = Base45.fromBase45(Base45.toBase45(buf1));
-      assertThat(buf2).isEqualTo(buf2);
+      assertArrayEquals(buf1, buf2);
     }
   }
 

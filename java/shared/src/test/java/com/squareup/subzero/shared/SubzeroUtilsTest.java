@@ -22,6 +22,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.spongycastle.util.encoders.Hex;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static com.squareup.subzero.shared.SubzeroUtils.ERROR_ENCRYPTED_MASTER_SEED_SIZE;
 import static com.squareup.subzero.shared.SubzeroUtils.ERROR_ENCRYPTED_PUB_KEYS_COUNT;
 import static com.squareup.subzero.shared.SubzeroUtils.ERROR_ENCRYPTED_PUB_KEY_SIZE;
@@ -36,8 +40,6 @@ import static com.squareup.subzero.shared.SubzeroUtils.ERROR_TXINPUT_PREV_HASH_S
 import static com.squareup.subzero.shared.SubzeroUtils.validateCommandRequest;
 import static com.squareup.subzero.shared.SubzeroUtils.validateFees;
 import static com.squareup.subzero.shared.SubzeroUtils.validateInternalCommandRequest;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 public class SubzeroUtilsTest {
@@ -97,7 +99,7 @@ public class SubzeroUtilsTest {
         .stream().map(pub -> DeterministicKey.deserializeB58(pub, TestNet3Params.get())).collect(Collectors.toList());
 
     Address address = SubzeroUtils.deriveP2SHP2WSH(TestNet3Params.get(), 2, addresses, path);
-    assertThat(address.toString()).isEqualTo("2MuAdStu2xZtRSyA5B6wRtj7SmaLjDyfm1H");
+    assertEquals("2MuAdStu2xZtRSyA5B6wRtj7SmaLjDyfm1H", address.toString());
   }
 
   @Test public void derivePublicKey() {
@@ -123,11 +125,11 @@ public class SubzeroUtilsTest {
 
     DeterministicKey childKey = SubzeroUtils.derivePublicKey(extendedPublicKey, SubzeroUtils.newPath(false, 42));
     byte[] expected = Hex.decode("0289ab6408ce23716bb5484ef31aae98d45013cea12920bd0d92c75ee318f84d28");
-    assertThat(childKey.getPubKey()).isEqualTo(expected);
+    assertArrayEquals(expected, childKey.getPubKey());
 
     childKey = SubzeroUtils.derivePublicKey(extendedPublicKey, SubzeroUtils.newPath(true, 62));
     expected = Hex.decode("03739f4d23146ab04e007809339b39eb0d5ea34ec79e518b4639b2b1bf2fd744dd");
-    assertThat(childKey.getPubKey()).isEqualTo(expected);
+    assertArrayEquals(expected, childKey.getPubKey());
   }
 
   @Test
@@ -162,8 +164,9 @@ public class SubzeroUtilsTest {
         .addInputs(testInput(10000000000L))
         .addOutputs(testOutput(8000000000L))
         .build();
-    assertThatThrownBy(()-> validateFees(signTxRequest4)).isInstanceOf(VerificationException.class)
-        .hasMessageContaining(feeExceedsLimitString);
+    
+    VerificationException e1 = assertThrows(VerificationException.class, () -> validateFees(signTxRequest4));
+    assertTrue(e1.getMessage().contains(feeExceedsLimitString));
 
     // test case where fee is over 1BTC and over 10% if you don't count the amount going to
     // the change address in the total (which is how it should be calculated)
@@ -176,8 +179,8 @@ public class SubzeroUtilsTest {
         .addOutputs(testOutput(8000000000L, Destination.GATEWAY))
         .addOutputs(testOutput(1150000000L, Destination.CHANGE))
         .build();
-    assertThatThrownBy(()-> validateFees(signTxRequest5)).isInstanceOf(VerificationException.class)
-        .hasMessageContaining(feeExceedsLimitString);
+    VerificationException e2 = assertThrows(VerificationException.class, () -> validateFees(signTxRequest5));
+    assertTrue(e2.getMessage().contains(feeExceedsLimitString));
 
     // test case where fee is negative
     CommandRequest.SignTxRequest signTxRequest6 = CommandRequest.SignTxRequest.newBuilder()
@@ -185,8 +188,8 @@ public class SubzeroUtilsTest {
         .addOutputs(testOutput(900, Destination.GATEWAY))
         .addOutputs(testOutput(200, Destination.CHANGE))
         .build();
-    assertThatThrownBy(()-> validateFees(signTxRequest6)).isInstanceOf(VerificationException.class)
-        .hasMessageContaining(feeNegativeString);
+    VerificationException e3 = assertThrows(VerificationException.class, () -> validateFees(signTxRequest6));
+    assertTrue(e3.getMessage().contains(feeNegativeString));
   }
 
   @Test
@@ -211,9 +214,8 @@ public class SubzeroUtilsTest {
         .setInitWallet(InternalCommandRequest.InitWalletRequest.newBuilder()
             .setRandomBytes(shortByteString))
         .build();
-    assertThatThrownBy(() -> validateInternalCommandRequest(request2)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(
-        ERROR_MASTER_SEED_ENCRYPTION_KEY_TICKET_SIZE);
+    VerificationException e1 = assertThrows(VerificationException.class, () -> validateInternalCommandRequest(request2));
+    assertTrue(e1.getMessage().contains(ERROR_MASTER_SEED_ENCRYPTION_KEY_TICKET_SIZE));
 
     // should fail because the pub keys encryption key ticket is too big
     InternalCommandRequest request3 = InternalCommandRequest.newBuilder()
@@ -224,8 +226,8 @@ public class SubzeroUtilsTest {
         .setInitWallet(InternalCommandRequest.InitWalletRequest.newBuilder()
             .setRandomBytes(shortByteString))
         .build();
-    assertThatThrownBy(() -> validateInternalCommandRequest(request3)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(ERROR_PUB_KEY_ENCRYPTION_KEY_TICKET_SIZE);
+    VerificationException e2 = assertThrows(VerificationException.class, () -> validateInternalCommandRequest(request3));
+    assertTrue(e2.getMessage().contains(ERROR_PUB_KEY_ENCRYPTION_KEY_TICKET_SIZE));
 
     // should fail because the random bytes is too big
     InternalCommandRequest request4 = InternalCommandRequest.newBuilder()
@@ -236,8 +238,8 @@ public class SubzeroUtilsTest {
         .setInitWallet(InternalCommandRequest.InitWalletRequest.newBuilder()
             .setRandomBytes(longByteString))
         .build();
-    assertThatThrownBy(() -> validateInternalCommandRequest(request4)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(ERROR_RANDOM_BYTES_SIZE);
+    VerificationException e3 = assertThrows(VerificationException.class, () -> validateInternalCommandRequest(request4));
+    assertTrue(e3.getMessage().contains(ERROR_RANDOM_BYTES_SIZE));
   }
 
   @Test
@@ -260,9 +262,8 @@ public class SubzeroUtilsTest {
             .addAllEncryptedPubKeys(pubKeys)
             .setEncryptedMasterSeed(EncryptedMasterSeed.newBuilder().setEncryptedMasterSeed(longByteString)))
         .build();
-    assertThatThrownBy(() -> validateInternalCommandRequest(request2)).isInstanceOf
-        (VerificationException.class)
-        .hasMessageContaining(ERROR_ENCRYPTED_MASTER_SEED_SIZE);
+    VerificationException e1 = assertThrows(VerificationException.class, () -> validateInternalCommandRequest(request2));
+    assertTrue(e1.getMessage().contains(ERROR_ENCRYPTED_MASTER_SEED_SIZE));
 
     // should fail with longer key
     pubKeys.remove(3);
@@ -274,8 +275,8 @@ public class SubzeroUtilsTest {
             .addAllEncryptedPubKeys(pubKeys)
             .setEncryptedMasterSeed(EncryptedMasterSeed.newBuilder().setEncryptedMasterSeed(longByteString)))
       .build();
-    assertThatThrownBy(() -> validateInternalCommandRequest(request3)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(ERROR_ENCRYPTED_PUB_KEY_SIZE);
+    VerificationException e2 = assertThrows(VerificationException.class, () -> validateInternalCommandRequest(request3));
+    assertTrue(e2.getMessage().contains(ERROR_ENCRYPTED_PUB_KEY_SIZE));
 
     // adding an extra key should make this one fail
     pubKeys.remove(3);
@@ -288,8 +289,8 @@ public class SubzeroUtilsTest {
             .addAllEncryptedPubKeys(pubKeys)
             .setEncryptedMasterSeed(EncryptedMasterSeed.newBuilder().setEncryptedMasterSeed(shortByteString).build()))
         .build();
-    assertThatThrownBy(() -> validateInternalCommandRequest(request4)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(ERROR_ENCRYPTED_PUB_KEYS_COUNT);
+    VerificationException e3 = assertThrows(VerificationException.class, () -> validateInternalCommandRequest(request4));
+    assertTrue(e3.getMessage().contains(ERROR_ENCRYPTED_PUB_KEYS_COUNT));
   }
 
   @Test
@@ -318,9 +319,8 @@ public class SubzeroUtilsTest {
             .setEncryptedMasterSeed(EncryptedMasterSeed.newBuilder().setEncryptedMasterSeed(longByteString).build())
             .setLockTime(0))
             .build();
-    assertThatThrownBy(() -> validateInternalCommandRequest(request2)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(
-        ERROR_ENCRYPTED_MASTER_SEED_SIZE);
+    VerificationException e1 = assertThrows(VerificationException.class, () -> validateInternalCommandRequest(request2));
+    assertTrue(e1.getMessage().contains(ERROR_ENCRYPTED_MASTER_SEED_SIZE));
 
     // should fail because of prev hash in TxInput being too long
     InternalCommandRequest request3 = InternalCommandRequest.newBuilder()
@@ -333,8 +333,8 @@ public class SubzeroUtilsTest {
             .setEncryptedMasterSeed(EncryptedMasterSeed.newBuilder().setEncryptedMasterSeed(longByteString).build())
             .setLockTime(0))
         .build();
-    assertThatThrownBy(() -> validateInternalCommandRequest(request3)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(ERROR_TXINPUT_PREV_HASH_SIZE);
+    VerificationException e2 = assertThrows(VerificationException.class, () -> validateInternalCommandRequest(request3));
+    assertTrue(e2.getMessage().contains(ERROR_TXINPUT_PREV_HASH_SIZE));
 
     // this should fail due to having too many inputs
     List<TxInput> inputs = new ArrayList<>();
@@ -351,8 +351,8 @@ public class SubzeroUtilsTest {
             .setEncryptedMasterSeed(EncryptedMasterSeed.newBuilder().setEncryptedMasterSeed(shortByteString).build())
             .setLockTime(0))
         .build();
-    assertThatThrownBy(() -> validateInternalCommandRequest(request5)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(ERROR_INPUTS_COUNT);
+    VerificationException e3 = assertThrows(VerificationException.class, () -> validateInternalCommandRequest(request5));
+    assertTrue(e3.getMessage().contains(ERROR_INPUTS_COUNT));
 
     // this should fail due to having too many outputs
     List<TxOutput> outputs = new ArrayList<>();
@@ -369,8 +369,8 @@ public class SubzeroUtilsTest {
             .setEncryptedMasterSeed(EncryptedMasterSeed.newBuilder().setEncryptedMasterSeed(shortByteString).build())
             .setLockTime(0))
         .build();
-    assertThatThrownBy(() -> validateInternalCommandRequest(request6)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(ERROR_OUTPUTS_COUNT);
+    VerificationException e4 = assertThrows(VerificationException.class, () -> validateInternalCommandRequest(request6));
+    assertTrue(e4.getMessage().contains(ERROR_OUTPUTS_COUNT));
   }
 
   @Test
@@ -385,8 +385,8 @@ public class SubzeroUtilsTest {
                     .setIndex(2))
             ))
         .build();
-    assertThatThrownBy(() -> validateCommandRequest(request)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(ERROR_INVALID_DESTINATION);
+    VerificationException e = assertThrows(VerificationException.class, () -> validateCommandRequest(request));
+    assertTrue(e.getMessage().contains(ERROR_INVALID_DESTINATION));
   }
 
   @Test
@@ -401,8 +401,8 @@ public class SubzeroUtilsTest {
                     .setIndex(2))
             ))
         .build();
-    assertThatThrownBy(() -> validateCommandRequest(request1)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(ERROR_INCONSISTENT_IS_CHANGE);
+    VerificationException e1 = assertThrows(VerificationException.class, () -> validateCommandRequest(request1));
+    assertTrue(e1.getMessage().contains(ERROR_INCONSISTENT_IS_CHANGE));
 
     CommandRequest request2 = CommandRequest.newBuilder()
         .setSignTx(CommandRequest.SignTxRequest.newBuilder()
@@ -414,8 +414,8 @@ public class SubzeroUtilsTest {
                     .setIndex(2))
             ))
         .build();
-    assertThatThrownBy(() -> validateCommandRequest(request2)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(ERROR_INCONSISTENT_IS_CHANGE);
+    VerificationException e2 = assertThrows(VerificationException.class, () -> validateCommandRequest(request2));
+    assertTrue(e2.getMessage().contains(ERROR_INCONSISTENT_IS_CHANGE));
   }
 
   @Test
@@ -433,8 +433,8 @@ public class SubzeroUtilsTest {
         .setFinalizeWallet(CommandRequest.FinalizeWalletRequest.newBuilder()
             .addAllEncryptedPubKeys(pubKeys))
             .build();
-    assertThatThrownBy(() -> validateCommandRequest(request2)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(ERROR_ENCRYPTED_PUB_KEYS_COUNT);
+    VerificationException e1 = assertThrows(VerificationException.class, () -> validateCommandRequest(request2));
+    assertTrue(e1.getMessage().contains(ERROR_ENCRYPTED_PUB_KEYS_COUNT));
 
     // should fail with longer key
     pubKeys.remove(4);
@@ -444,8 +444,8 @@ public class SubzeroUtilsTest {
         .setFinalizeWallet(CommandRequest.FinalizeWalletRequest.newBuilder()
             .addAllEncryptedPubKeys(pubKeys))
         .build();
-    assertThatThrownBy(() -> validateCommandRequest(request3)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(ERROR_ENCRYPTED_PUB_KEY_SIZE);
+    VerificationException e2 = assertThrows(VerificationException.class, () -> validateCommandRequest(request3));
+    assertTrue(e2.getMessage().contains(ERROR_ENCRYPTED_PUB_KEY_SIZE));
   }
 
   @Test
@@ -464,8 +464,8 @@ public class SubzeroUtilsTest {
           .addInputs(testInput(100000, longByteString))
           .addOutputs(testOutput()))
         .build();
-    assertThatThrownBy(() -> validateCommandRequest(request2)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(ERROR_TXINPUT_PREV_HASH_SIZE);
+    VerificationException e1 = assertThrows(VerificationException.class, () -> validateCommandRequest(request2));
+    assertTrue(e1.getMessage().contains(ERROR_TXINPUT_PREV_HASH_SIZE));
 
     // this should fail due to having too many inputs
     List<TxInput> inputs = new ArrayList<>();
@@ -477,8 +477,8 @@ public class SubzeroUtilsTest {
           .addAllInputs(inputs)
           .addOutputs(testOutput()))
         .build();
-    assertThatThrownBy(() -> validateCommandRequest(request4)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(ERROR_INPUTS_COUNT);
+    VerificationException e2 = assertThrows(VerificationException.class, () -> validateCommandRequest(request4));
+    assertTrue(e2.getMessage().contains(ERROR_INPUTS_COUNT));
 
     // this should fail due to having too many outputs
     List<TxOutput> outputs = new ArrayList<>();
@@ -490,8 +490,8 @@ public class SubzeroUtilsTest {
           .addInputs(testInput())
           .addAllOutputs(outputs))
         .build();
-    assertThatThrownBy(() -> validateCommandRequest(request5)).isInstanceOf
-        (VerificationException.class).hasMessageContaining(ERROR_OUTPUTS_COUNT);
+    VerificationException e3 = assertThrows(VerificationException.class, () -> validateCommandRequest(request5));
+    assertTrue(e3.getMessage().contains(ERROR_OUTPUTS_COUNT));
   }
 
   private TxInput testInput() {

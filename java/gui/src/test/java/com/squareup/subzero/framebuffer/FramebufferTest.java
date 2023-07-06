@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FramebufferTest {
@@ -18,10 +18,10 @@ public class FramebufferTest {
 
   private void assertColor(File file, Color color, int pixels) throws IOException {
     byte[] data = Files.readAllBytes(file.toPath());
-    for(int i = 0; i < 80*60; i++) {
-      assertThat(data[(i * 4)]).isEqualTo((byte)color.getBlue());
-      assertThat(data[(i * 4) + 1]).isEqualTo((byte)color.getGreen());
-      assertThat(data[(i * 4) + 2]).isEqualTo((byte)color.getRed());
+    for(int i = 0; i < 80 * 60; i++) {
+      assertEquals((byte) color.getBlue(), data[(i * 4)]);
+      assertEquals((byte) color.getGreen(), data[(i * 4) + 1]);
+      assertEquals((byte) color.getRed(), data[(i * 4) + 2]);
       // ignore alpha at (i * 4) + 3
     }
   }
