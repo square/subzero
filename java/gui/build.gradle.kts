@@ -18,7 +18,7 @@ dependencies {
     implementation("com.google.protobuf:protobuf-java-util:3.21.7")
     implementation("com.google.protobuf:protobuf-java:3.21.5")
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.mockito:mockito-junit-jupiter:4.8.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.4.0")
     compileOnly(project(":fake_ncipher"))
 }
 
