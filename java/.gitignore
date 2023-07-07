@@ -21,3 +21,6 @@ gradle-app.setting
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+# Maven output directory. For some reason our gradle build still puts a few things there.
+**/target/
