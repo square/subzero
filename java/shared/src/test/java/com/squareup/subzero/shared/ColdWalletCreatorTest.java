@@ -5,12 +5,19 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.squareup.subzero.proto.service.Common.EncryptedPubKey;
 import com.squareup.subzero.proto.service.Service.CommandRequest;
 import com.squareup.subzero.proto.service.Service.CommandResponse;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.Test;
+import org.spongycastle.util.encoders.Hex;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static java.util.Arrays.asList;
 
 /**
  * These tests exercise the lifecycle of creating a cold wallet.
@@ -25,9 +32,9 @@ public class ColdWalletCreatorTest {
 
     CommandRequest request = ColdWalletCreator.init(token, walletId);
 
-    assertThat(request.getWalletId()).isEqualTo(walletId);
-    assertThat(request.getToken()).isEqualTo(token);
-    assertThat(request.hasInitWallet()).isTrue();
+    assertEquals(walletId, request.getWalletId());
+    assertEquals(token, request.getToken());
+    assertTrue(request.hasInitWallet());
   }
 
   /**
@@ -41,6 +48,11 @@ public class ColdWalletCreatorTest {
             .setEncryptedPubKey(
                 EncryptedPubKey.newBuilder().setEncryptedPubKey(ByteString.copyFromUtf8(pubkey))
             )).build();
+  }
+
+  private <T> List<T> sorted(List<T> list, Comparator<T> cmp) {
+    list.sort(cmp);
+    return list;
   }
 
   /**
@@ -69,13 +81,17 @@ public class ColdWalletCreatorTest {
     int walletId = 123;
 
     CommandRequest request = ColdWalletCreator.combine(map, tokenA, walletId);
-    assertThat(request.getToken()).isEqualTo(tokenA);
-    assertThat(request.getWalletId()).isEqualTo(walletId);
-    assertThat(request.getFinalizeWallet().getEncryptedPubKeysCount())
-        .isEqualTo(map.size());
-    assertThat(request.getFinalizeWallet().getEncryptedPubKeysList())
-        .containsExactlyInAnyOrder(encryptedPubKeyA, encryptedPubKeyB, encryptedPubKeyC,
-            encryptedPubKeyD);
+    assertEquals(tokenA, request.getToken());
+    assertEquals(walletId, request.getWalletId());
+    assertEquals(map.size(), request.getFinalizeWallet().getEncryptedPubKeysCount());
+    Comparator<EncryptedPubKey> cmp = (EncryptedPubKey a, EncryptedPubKey b) -> {
+        String aStr = a.hasEncryptedPubKey() ? Hex.toHexString(a.getEncryptedPubKey().toByteArray()) : "";
+        String bStr = b.hasEncryptedPubKey() ? Hex.toHexString(b.getEncryptedPubKey().toByteArray()) : "";
+        return aStr.compareTo(bStr);
+    };
+    List<EncryptedPubKey> expectedKeys = sorted(asList(new EncryptedPubKey[] {encryptedPubKeyA, encryptedPubKeyB, encryptedPubKeyC, encryptedPubKeyD}), cmp);
+    List<EncryptedPubKey> actualKeys = sorted(new ArrayList<EncryptedPubKey>(request.getFinalizeWallet().getEncryptedPubKeysList()), cmp);
+    assertEquals(expectedKeys, actualKeys);
   }
 
   /**
@@ -103,8 +119,7 @@ public class ColdWalletCreatorTest {
     map.put("token-d", encryptedPubKeyD);
     int walletId = 123;
 
-    assertThatThrownBy(() -> ColdWalletCreator.combine(map, tokenA, walletId))
-        .isInstanceOf(IllegalArgumentException.class);
+    assertThrows(IllegalArgumentException.class, () -> ColdWalletCreator.combine(map, tokenA, walletId));
   }
 
   /**
@@ -119,9 +134,8 @@ public class ColdWalletCreatorTest {
     String tokenA = "token-a";
     map.put(tokenA, encryptedPubKeyA);
     int walletId = 123;
-    assertThat(map.size()).isNotEqualTo(Constants.ENCRYPTED_PUB_KEYS_MAX_COUNT);
-    assertThatThrownBy(() -> ColdWalletCreator.combine(map, tokenA, walletId))
-        .isInstanceOf(IllegalArgumentException.class);
+    assertNotEquals(Constants.ENCRYPTED_PUB_KEYS_MAX_COUNT, map.size());
+    assertThrows(IllegalArgumentException.class, () -> ColdWalletCreator.combine(map, tokenA, walletId));
   }
 
   /**
@@ -140,8 +154,7 @@ public class ColdWalletCreatorTest {
     map.put("token-d", null);
     int walletId = 123;
 
-    assertThatThrownBy(() -> ColdWalletCreator.combine(map, tokenA, walletId))
-        .isInstanceOf(IllegalArgumentException.class);
+    assertThrows(IllegalArgumentException.class, () -> ColdWalletCreator.combine(map, tokenA, walletId));
   }
 
   /**
@@ -156,6 +169,6 @@ public class ColdWalletCreatorTest {
 
     String returned = ColdWalletCreator.finalize(fixture);
 
-    assertThat(returned).isEqualTo(pubkey);
+    assertEquals(pubkey, returned);
   }
 }

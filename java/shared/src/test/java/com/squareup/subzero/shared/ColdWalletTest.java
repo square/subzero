@@ -16,8 +16,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.spongycastle.util.encoders.Hex;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static java.lang.String.format;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class ColdWalletTest {
   private ColdWallet coldWallet;
@@ -69,7 +70,7 @@ public class ColdWalletTest {
 
     String token = "TokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenToken";
     CommandRequest request = coldWallet.startTransaction(inputs, outputs, token, null);
-    assertThat(request.getSerializedSize()).isLessThan(Constants.MAX_QR_PROTO_BYTES);
+    assertTrue(request.getSerializedSize() < Constants.MAX_QR_PROTO_BYTES);
 
     // The response consists of signatures.  We know bitcoin signatures are, in worst-case, 73 bytes
     // So we verify a CommandResponse.SignTxResponse with 73 byte signatures fits.
@@ -89,7 +90,7 @@ public class ColdWalletTest {
         .build();
 
     System.out.println(format("the serialized size is %d (of %d)", response.getSerializedSize(), Constants.MAX_QR_PROTO_BYTES));
-    assertThat(response.getSerializedSize()).isLessThan(Constants.MAX_QR_PROTO_BYTES);
+    assertTrue(response.getSerializedSize() < Constants.MAX_QR_PROTO_BYTES);
   }
 
   @Test public void testExchangeRate() {
@@ -124,6 +125,6 @@ public class ColdWalletTest {
     String token = "TokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenTokenToken";
     double localRate = 0.00123;
     CommandRequest request = coldWallet.startTransaction(inputs, outputs, token, localRate);
-    assertThat(request.getSignTx().getLocalRate()).isEqualTo(localRate);
+    assertEquals(localRate, request.getSignTx().getLocalRate(), 0.0);
   }
 }

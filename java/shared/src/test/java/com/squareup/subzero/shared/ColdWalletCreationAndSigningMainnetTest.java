@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.spongycastle.util.encoders.Base64;
 import org.spongycastle.util.encoders.Hex;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.spongycastle.util.encoders.Hex.toHexString;
 
 /**
@@ -35,7 +35,7 @@ public class ColdWalletCreationAndSigningMainnetTest {
     SubzeroUtils.validateCommandRequest(commandRequest);
 
     String initWalletRequest = Base64.toBase64String(commandRequest.toByteArray());
-    assertThat(initWalletRequest).isEqualTo("ELOn0AkaAA==");
+    assertEquals("ELOn0AkaAA==", initWalletRequest);
 
     // This QR code is scanned on each offline machine, and results in 4 responses:
     // initWalletResponse1, initWalletResponse2, initWalletResponse3, and initWalletResponse4
@@ -72,7 +72,9 @@ public class ColdWalletCreationAndSigningMainnetTest {
     SubzeroUtils.validateCommandRequest(commandRequest);
 
     String finalizeWalletRequest = Base64.toBase64String(commandRequest.toByteArray());
-    assertThat(finalizeWalletRequest).isEqualTo("ELOn0AkizAMKcQpv0trfyJyS+f3Y/szeyPCf/enBmPr+6MfH4pL8/M+TyO+Yx5PB7dPCy/vFnNmZ6M7eyeDkk8Lu6+vgntvBwduS8PvfwfjBxO/fx/DQzJnI+cLJycXnk86T5+vQzOiY4vuT78LYmJ3n3sT9zMPT+dvpCnEKb9La38icktLcncLwxcSf+8ObzOGTxNDk7+6c6/OZ297A7P7ww56YxNzo3MCTn5vzz5n5k/zp6N6f4sv/0v3b4f/AnM748P7Ew8XCyf/Em83f6/vHwOyd3ubk7PDM4fLgycH8zfP4/Nn86ODD+N/ImApxCm/S2t/InJObz8vt4P795+fmwcyZ4N3zm8Db7MuekuyS0N7h8Ovwz+Ho3ZvY0M78wMLn3Zj8z/zM4tz75tno4d/+xJvS/ZLh6+zBxf3pzNvO+/DT+5id3NDow+fM7MfAzt7L2MvM8p/E683vw/nAx/MKcQpv0trfyJySmMWb29vs7sPDzsOY0pzAnfrS8/7tn8/Z3dPSksDO29mfw8797cfg8+3h+NCZ0PiZyez+5N7Z0vz5+tnF4t7Onszrn//IyPrrne3HxJ6em8+Y4ezIw+b+2t2bxOz54pPFydjc4Obk693P");
+    assertEquals(
+        "ELOn0AkizAMKcQpv0trfyJyS+f3Y/szeyPCf/enBmPr+6MfH4pL8/M+TyO+Yx5PB7dPCy/vFnNmZ6M7eyeDkk8Lu6+vgntvBwduS8PvfwfjBxO/fx/DQzJnI+cLJycXnk86T5+vQzOiY4vuT78LYmJ3n3sT9zMPT+dvpCnEKb9La38icktLcncLwxcSf+8ObzOGTxNDk7+6c6/OZ297A7P7ww56YxNzo3MCTn5vzz5n5k/zp6N6f4sv/0v3b4f/AnM748P7Ew8XCyf/Em83f6/vHwOyd3ubk7PDM4fLgycH8zfP4/Nn86ODD+N/ImApxCm/S2t/InJObz8vt4P795+fmwcyZ4N3zm8Db7MuekuyS0N7h8Ovwz+Ho3ZvY0M78wMLn3Zj8z/zM4tz75tno4d/+xJvS/ZLh6+zBxf3pzNvO+/DT+5id3NDow+fM7MfAzt7L2MvM8p/E683vw/nAx/MKcQpv0trfyJySmMWb29vs7sPDzsOY0pzAnfrS8/7tn8/Z3dPSksDO29mfw8797cfg8+3h+NCZ0PiZyez+5N7Z0vz5+tnF4t7Onszrn//IyPrrne3HxJ6em8+Y4ezIw+b+2t2bxOz54pPFydjc4Obk693P",
+        finalizeWalletRequest);
 
     // This QR code is scanned on each offline machine, and results in 4 responses:
     // finalizeWalletResponse1, finalizeWalletResponse2, finalizeWalletResponse3, and finalizeWalletResponse4
@@ -105,10 +107,10 @@ public class ColdWalletCreationAndSigningMainnetTest {
         .getPubKey()
         .toStringUtf8();
 
-    assertThat(pubKey1).isEqualTo("xpub68SWrTftbZ5WCk2PTBmmH8VVe9bE2m9kGyhaQo6s3BdtcJN9hDAAJ4qkkq8ZQukRknEumZzf3bShccoM9d9MAzfB2HQ9Ehr27MtnWfiySqC");
-    assertThat(pubKey2).isEqualTo("xpub68xv7hZon5Qi1fK9nzNED6AY3qtjFTZi42nvBvj951Ye3S9VCBt5HaUxWqKUj6dRZTniohcUn1guAQmjF7tLNFZfKXJckVgYRVsVBJiRub2");
-    assertThat(pubKey3).isEqualTo("xpub691eaGJTWMMLkf3JwY1jqFa48F8ztKZAZeKBw1rzdVjhMw2VeVfHvQLsBKuTn1xW8KAFkoWCfqdQZyQ27vzBiMfFmjdtarafX5nAgEiSjmY");
-    assertThat(pubKey4).isEqualTo("xpub682o1qqFDiidi2x6j7PxYTG5eswyx8jdqs5idWGmJYGKRz3zR3cFTNtsxVSPsoHtd4fA5UbbPA7Gmn441e2KFbiLTpw1nFSH9ocrvJLNAwe");
+    assertEquals("xpub68SWrTftbZ5WCk2PTBmmH8VVe9bE2m9kGyhaQo6s3BdtcJN9hDAAJ4qkkq8ZQukRknEumZzf3bShccoM9d9MAzfB2HQ9Ehr27MtnWfiySqC", pubKey1);
+    assertEquals("xpub68xv7hZon5Qi1fK9nzNED6AY3qtjFTZi42nvBvj951Ye3S9VCBt5HaUxWqKUj6dRZTniohcUn1guAQmjF7tLNFZfKXJckVgYRVsVBJiRub2", pubKey2);
+    assertEquals("xpub691eaGJTWMMLkf3JwY1jqFa48F8ztKZAZeKBw1rzdVjhMw2VeVfHvQLsBKuTn1xW8KAFkoWCfqdQZyQ27vzBiMfFmjdtarafX5nAgEiSjmY", pubKey3);
+    assertEquals("xpub682o1qqFDiidi2x6j7PxYTG5eswyx8jdqs5idWGmJYGKRz3zR3cFTNtsxVSPsoHtd4fA5UbbPA7Gmn441e2KFbiLTpw1nFSH9ocrvJLNAwe", pubKey4);
 
     // Path was picked randomly. It's important to never reuse addresses!
     Path path = Path.newBuilder()
@@ -121,7 +123,7 @@ public class ColdWalletCreationAndSigningMainnetTest {
 
     ColdWallet coldWallet = new ColdWallet(MainNetParams.get(), walletId, addresses, gateway);
     String coldWalletAddress = coldWallet.address(path).toString();
-    assertThat(coldWalletAddress).isEqualTo("38j52zh1XCpjWEgAgEQXaEdfwHV1gSBSQY");
+    assertEquals("38j52zh1XCpjWEgAgEQXaEdfwHV1gSBSQY", coldWalletAddress);
 
     // You can see the transaction which funds this address here:
     // https://live.blockcypher.com/btc/tx/356ef5e00c897257e56c9bef9cadbe1858cac648faf3072caa471e4e8378b92d/
@@ -164,7 +166,7 @@ public class ColdWalletCreationAndSigningMainnetTest {
     SubzeroUtils.validateCommandRequest(commandRequest);
 
     String signTxRequest = Base64.toBase64String(commandRequest.toByteArray());
-    assertThat(signTxRequest).isEqualTo("ELOn0AkqQQovCiA1bvXgDIlyV+Vsm++crb4YWMrGSPrzByyqRx5Og3i5LRAAGKCNBiIFEAAY5BgSDAiQ2AUQAhoEEAAYABgA");
+    assertEquals("ELOn0AkqQQovCiA1bvXgDIlyV+Vsm++crb4YWMrGSPrzByyqRx5Og3i5LRAAGKCNBiIFEAAY5BgSDAiQ2AUQAhoEEAAYABgA", signTxRequest);
 
     // This QR code is scanned on two offline machine, and results in 2 responses:
     // signTxResponse1, and signTxResponse2
@@ -196,8 +198,9 @@ public class ColdWalletCreationAndSigningMainnetTest {
     String transaction =
         toHexString(coldWallet.createTransaction(signTxRequest.getSignTx().getInputsList(),
             signTxRequest.getSignTx().getOutputsList(), signatures));
-    assertThat(transaction).isEqualTo(
-        "010000000001012db978834e1e47aa2c07f3fa48c6ca5818bead9cef9b6ce55772890ce0f56e350000000023220020c35e8fbe611a5a157ddfe54d1c6e8d9cbe7edd76a9a9578fb39b0390a52b6e07feffffff01106c0100000000001976a914dd12ae4d57cfa4bcb78214f9669aaf9e6215664f88ac0400483045022100d45c18398b0acf64cfdc024b1d39e4bdcea73241862536e4412ee5a43391b5d80220246838df62f05f6e24efaf67c4f2b0a5bdaaab734c2fe016904e03e58597ce4a0147304402203cad5247373d1ed8a8e9c46a9783576b06f686abce8f18f60caf49eab1d54bf40220257d68ada121e484fa3ae6e6fe11fd2a04f74fe8aedc1b0fb3a79d14570690c5018b5221021fe5210be064b91d356a02a0e42cae57c9ceadcde5a500af2a2f44a525985587210254d20970c867d6abc582716731221a6fa9aa6e92621d28cda71d541939290594210379d0c27c46d6f9ea3b741ac7cfeef110f6e8849a827620e57d0ac5affe3c96412103b78cfc42d8285f73ea8e57a86d62e588f9833dd8a69f1d4da3e029aac922d1b054ae00000000");
+    assertEquals(
+        "010000000001012db978834e1e47aa2c07f3fa48c6ca5818bead9cef9b6ce55772890ce0f56e350000000023220020c35e8fbe611a5a157ddfe54d1c6e8d9cbe7edd76a9a9578fb39b0390a52b6e07feffffff01106c0100000000001976a914dd12ae4d57cfa4bcb78214f9669aaf9e6215664f88ac0400483045022100d45c18398b0acf64cfdc024b1d39e4bdcea73241862536e4412ee5a43391b5d80220246838df62f05f6e24efaf67c4f2b0a5bdaaab734c2fe016904e03e58597ce4a0147304402203cad5247373d1ed8a8e9c46a9783576b06f686abce8f18f60caf49eab1d54bf40220257d68ada121e484fa3ae6e6fe11fd2a04f74fe8aedc1b0fb3a79d14570690c5018b5221021fe5210be064b91d356a02a0e42cae57c9ceadcde5a500af2a2f44a525985587210254d20970c867d6abc582716731221a6fa9aa6e92621d28cda71d541939290594210379d0c27c46d6f9ea3b741ac7cfeef110f6e8849a827620e57d0ac5affe3c96412103b78cfc42d8285f73ea8e57a86d62e588f9833dd8a69f1d4da3e029aac922d1b054ae00000000",
+        transaction);
 
     // You can see this transaction here:
     // https://live.blockcypher.com/btc/tx/0283e8d4c2385ecd89beb7062581d32b990c3f2055a16ba1934221a872e22a9a/
