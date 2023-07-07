@@ -7,12 +7,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(MockitoJUnitRunner.class)
 public class FramebufferTest {
   private SubzeroConfig config = new SubzeroConfig();
 
