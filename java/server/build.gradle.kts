@@ -15,7 +15,7 @@ dependencies {
     implementation(project(":proto"))
     implementation("com.google.protobuf:protobuf-java-util:3.21.7")
     implementation(project(":shared"))
-    implementation("io.dropwizard:dropwizard-assets:2.1.1")
+    implementation("io.dropwizard:dropwizard-assets:4.0.1")
 }
 
 description = "server"
