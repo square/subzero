@@ -10,7 +10,7 @@ dependencies {
     api(project(":proto"))
     api("com.google.code.findbugs:jsr305:3.0.2")
     api("com.google.guava:guava:31.1-jre")
-    api("com.google.zxing:core:3.5.0")
+    api("com.google.zxing:core:3.5.1")
     api("com.madgag.spongycastle:core:1.58.0.0")
     api("org.bitcoinj:bitcoinj-core:0.16.1") {
         exclude("com.google.protobuf", "protobuf-javalite")
