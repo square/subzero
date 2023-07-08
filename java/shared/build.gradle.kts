@@ -12,7 +12,7 @@ dependencies {
     api("com.google.guava:guava:31.1-jre")
     api("com.google.zxing:core:3.5.0")
     api("com.madgag.spongycastle:core:1.58.0.0")
-    api("org.bitcoinj:bitcoinj-core:0.16.1") {
+    api("org.bitcoinj:bitcoinj-core:0.16.2") {
         exclude("com.google.protobuf", "protobuf-javalite")
     }
     testImplementation("junit:junit:4.13.2")
