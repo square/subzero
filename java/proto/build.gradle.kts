@@ -8,7 +8,7 @@ plugins {
 }
 
 dependencies {
-    api("com.google.protobuf:protobuf-java:3.21.5")
+    api("com.google.protobuf:protobuf-java:3.23.4")
 }
 
 description = "proto"
