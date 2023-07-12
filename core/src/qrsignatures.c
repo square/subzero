@@ -27,29 +27,30 @@ bool check_qrsignature_pub(
     const size_t signature_len,
     const uint8_t* const pubkey,
     const size_t pubkey_len) {
+  bool result = false;
   if (data_len == 0) {
     ERROR("Input length is zero.");
-    return false;
+    goto out;
   }
   if (data == NULL) {
     ERROR("Input data is null.");
-    return false;
+    goto out;
   }
   if (signature_len != QRSIGNATURE_LEN) {
     ERROR("%s: signature_len is: %zu, expected: %zu", __func__, signature_len, QRSIGNATURE_LEN);
-    return false;
+    goto out;
   }
   if (signature == NULL) {
     ERROR("Signature is null");
-    return false;
+    goto out;
   }
   if (pubkey_len != QRSIGNATURE_PUBKEY_LEN) {
     ERROR("%s: pubkey_len is: %zu, expected: %zu", __func__, pubkey_len, QRSIGNATURE_PUBKEY_LEN);
-    return false;
+    goto out;
   }
   if (pubkey == NULL) {
     ERROR("pub is null.");
-    return false;
+    goto out;
   }
 
   int result_verify = ecdsa_verify(
@@ -60,10 +61,17 @@ bool check_qrsignature_pub(
     data,
     (uint32_t)data_len);
 
-  if(result_verify == 0){
+  if (result_verify == 0) {
+      result = true;
       DEBUG("QR signature verification successful.");
   } else {
       DEBUG("QR signature verification failed.");
   }
-  return (result_verify == 0)? true: false;
+
+out:
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+  // When fuzzing, accept all invalid QR signatures
+  result = true;
+#endif
+  return result;
 }

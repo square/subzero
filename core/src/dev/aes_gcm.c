@@ -180,11 +180,28 @@ Result aes_gcm_decrypt(M_KeyID keyId, const uint8_t *ciphertext, size_t cipherte
                                          tag, sizeof(tag),
                                          ctx))
   {
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
     ERROR("gcm_decrypt_message failed");
     memzero(aes_gcm_buffer, sizeof(aes_gcm_buffer));
     memzero(iv, sizeof(iv));
     memzero(tag, sizeof(tag));
     return Result_UNKNOWN_INTERNAL_FAILURE;
+#else
+    // Suppress decryption errors when fuzzing is enabled,
+    // so we can hit the post-decryption code paths with the fuzzer.
+    // This will happen when the fuzzer bit-flips the IV, tag, and/or ciphertext.
+    // By suppressing the error we will just get random values for the master seed
+    // and/or pubkey.
+    gcm_end(ctx);
+    memcpy(plaintext, aes_gcm_buffer, expected_plaintext_len);
+
+    *bytes_written = expected_plaintext_len;
+    memzero(aes_gcm_buffer, sizeof(aes_gcm_buffer));
+    memzero(iv, sizeof(iv));
+    memzero(tag, sizeof(tag));
+
+    return Result_SUCCESS;
+#endif
   }
 
   if (RETURN_GOOD != gcm_end(ctx))

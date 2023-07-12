@@ -5,3 +5,4 @@
 cmake-build-*
 build/**
 venv/**
+fuzzing_corpus
