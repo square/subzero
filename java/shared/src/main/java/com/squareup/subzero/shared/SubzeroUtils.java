@@ -52,6 +52,9 @@ import static org.bitcoinj.crypto.DeterministicKey.deserializeB58;
  *       i.e. the correctness of this code is critical!
  */
 public class SubzeroUtils {
+  /** Everything in this class is static, so don't allow construction. */
+  private SubzeroUtils() {}
+
   static final String ERROR_ENCRYPTED_MASTER_SEED_SIZE = "EncryptedMasterSeed size exceeds limit";
   static final String ERROR_ENCRYPTED_PUB_KEYS_COUNT = "encrypted_pub_keys count exceeds limit";
   static final String ERROR_ENCRYPTED_PUB_KEY_SIZE = "EncryptedPubKey size exceeds limit";
@@ -64,6 +67,15 @@ public class SubzeroUtils {
   static final String ERROR_INVALID_DESTINATION = "Invalid destination in output";
   static final String ERROR_INCONSISTENT_IS_CHANGE = "Inconsistent isChange in output";
 
+  /**
+   * Derives a P2SH-P2WSH address.
+   * @param network org.bitcoinj.params.TestNet3Params or org.bitcoinj.params.MainNetParams
+   * @param threshold Number of signatures needed to authorize a transaction.
+   * @param publicRootKeys The public keys from wallet initialization.
+   * @param path The HD wallet Path.
+   * @return The derived address.
+   * @throws IllegalArgumentException on invalid input.
+   */
   public static Address deriveP2SHP2WSH(NetworkParameters network, int threshold, List<DeterministicKey> publicRootKeys, Path path) {
     // Constraints imposed by the Bitcoin protocol
     if (threshold <= 1) {
@@ -104,9 +116,16 @@ public class SubzeroUtils {
     return redeemScriptHash.getToAddress(network);
   }
 
-  // This validates that the two signatures are valid for two different pubkeys, and returns
-  // them in the same order that the pubkeys are sorted into.
-  // The hash is the value the signatures are over.
+  /**
+   * This validates that the two signatures are valid for two different pubkeys, and returns
+   * them in the same order that the pubkeys are sorted into.
+   * The hash is the value the signatures are over.
+   * @param pubkeys the public keys to use to validate the signatures.
+   * @param hash the signed message
+   * @param signatures the list of signatures to validate
+   * @return the sorted list of signatures, if they are valid
+   * @throws RuntimeException if any of the signatures are invalid.
+   */
   protected static List<byte[]> validateAndSort(List<ECKey> pubkeys, byte[] hash, List<Signature> signatures) {
     // This needs to be the same sort that ScriptBuilder.createRedeemScript does.
     pubkeys.sort(ECKey.PUBKEY_COMPARATOR);
@@ -150,13 +169,22 @@ public class SubzeroUtils {
     return sortedSigs;
   }
 
-
+  /**
+   * Updates the given MessageDigest by hashing the given val as a little-endian 32-bit int.
+   * @param val the value to update the digest with. Interpreted as a 32-bit little-endian integer.
+   * @param digest the message digest to update.
+   */
   protected static void hashUint32LE(long val, MessageDigest digest) {
     byte[] buf = new byte[4];
     Utils.uint32ToByteArrayLE(val, buf, 0);
     digest.update(buf);
   }
 
+  /**
+   * Updates the given MessageDigest by hashing the given val as a little-endian 64-bit int.
+   * @param val the value to update the digest with. Interpreted as a 64-bit little-endian integer.
+   * @param digest the message digest to update.
+   */
   protected static void hashUint64LE(long val, MessageDigest digest) {
     byte[] buf = new byte[8];
     Utils.int64ToByteArrayLE(val, buf, 0);
@@ -164,7 +192,18 @@ public class SubzeroUtils {
   }
 
   /**
-   * This calculates the hash for a transaction
+   * This calculates the BIP-143 hash for a transaction, see
+   * <a href=https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki>bip-143</a> for the
+   * details.
+   * @param hashPrevouts the hashPrevouts param, a 32-byte hash.
+   * @param hashSequence the hashSequence param, a 32-byte hash.
+   * @param hashOutputs the hashOutputs param, a 32-byte hash.
+   * @param input the TxInput object describing the transaction input. Describes the outpoint and
+   *              value params.
+   * @param script the scriptCode of the input.
+   * @param sequence the nSequence param.
+   * @param locktime the nLocktime param.
+   * @return the BIP-143 hash of the transaction.
    */
   protected static byte[] bip0143hash(
       byte[] hashPrevouts,
@@ -214,11 +253,26 @@ public class SubzeroUtils {
     return hash.digest(hash.digest());
   }
 
-  // A helper constructor, because proto builders are verbose
+  /**
+   * A helper constructor for making new Path objects, because proto builders are verbose.
+   * @param ischange If true, the change component of the Path will be 1, otherwise it will be 0.
+   * @param index The index component of the Path.
+   * @return the new Path object.
+   */
   public static Path newPath(boolean ischange, int index) {
     return Path.newBuilder().setIsChange(ischange).setIndex(index).build();
   }
 
+  /**
+   * Derives an HD-wallet subkey from the given key, using the given path. When path.is_change is
+   * false, the subkey will be derived as key/0/index. When path.is_change is true, the subkey
+   * will be derived as key/1/index.
+   *
+   * @param key the parent key to derive subkey from.
+   * @param path the Path object describing is_change and index parameters.
+   * @return the derived subkey.
+   * @throws IllegalStateException on invalid input.
+   */
   protected static DeterministicKey derivePublicKey(DeterministicKey key, Path path) {
     if (path.getIndex() < 0) {
       throw new IllegalStateException("index should be between 0 and 2^31-1");
@@ -238,6 +292,11 @@ public class SubzeroUtils {
     return key;
   }
 
+  /**
+   * Prints the QR code to standard output.
+   * @param contents the encoded QR code.
+   * @throws Exception on error.
+   */
   public static void printQrCode(String contents) throws Exception {
     QRCodeWriter qrCodeWriter = new QRCodeWriter();
     BitMatrix matrix = qrCodeWriter.encode(contents, BarcodeFormat.QR_CODE, 1, 1);
@@ -256,9 +315,10 @@ public class SubzeroUtils {
 
   /**
    * Verifies that the fee is less than 1 BTC or less than 10% of funds going to gateway address
-   * The rules for fees are identical to those implemented in the codesafe module
-   * This code allows us to catch any errors earlier
-   * @param signTxRequest request to verify fee for
+   * The rules for fees are identical to those implemented in the codesafe module.
+   * This code allows us to catch any errors earlier.
+   * @param signTxRequest request to verify fee for.
+   * @throws VerificationException If the fee doesn't match the constraints described above.
    */
   protected static void validateFees(CommandRequest.SignTxRequest signTxRequest)
       throws VerificationException {
@@ -286,12 +346,12 @@ public class SubzeroUtils {
   }
 
   /**
-   * Verifies size/count limits for CommandRequest proto fields
+   * Verifies size/count limits for CommandRequest proto fields.
    *
-   * @param request CommandRequest to validate
-   * @return the provided request to allow chaining
-   * @throws VerificationException if limits are exceeded
-   * @throws IllegalArgumentException if CommandRequest doesn't contain matching message
+   * @param request CommandRequest to validate.
+   * @return the provided request to allow chaining.
+   * @throws VerificationException if limits are exceeded.
+   * @throws IllegalArgumentException if CommandRequest doesn't contain matching message.
    */
   public static CommandRequest validateCommandRequest(CommandRequest request)
       throws VerificationException, IllegalArgumentException {
@@ -314,10 +374,10 @@ public class SubzeroUtils {
   }
 
   /**
-   * Verifies size/count limits for InternalCommandRequest proto fields
-   * @param request InternalCommandRequest to validate
-   * @throws VerificationException if limits are exceeded
-   * @throws IllegalArgumentException if InternalCommandRequest doesn't contain matching message
+   * Verifies size/count limits for InternalCommandRequest proto fields.
+   * @param request InternalCommandRequest to validate.
+   * @throws VerificationException if limits are exceeded.
+   * @throws IllegalArgumentException if InternalCommandRequest doesn't contain matching message.
    */
   public static void validateInternalCommandRequest(InternalCommandRequest request)
       throws VerificationException, IllegalArgumentException {
@@ -336,6 +396,13 @@ public class SubzeroUtils {
     }
   }
 
+  /**
+   * Attempts to determne if the given Base58-encoded address belongs to BTC testnet or mainnet.
+   * @param base58address The Base58-encoded bitcoin address.
+   * @return the NetworkParameters of the BTC network the address belongs to.
+   * @throws IllegalArgumentException if the address is invalid, or doesn't belong to either BTC
+   *         testnet or mainnet.
+   */
   public static NetworkParameters inferNetworkParameters(String base58address) {
     NetworkParameters params = null;
     for (NetworkParameters network : Networks.get()) {
@@ -349,6 +416,14 @@ public class SubzeroUtils {
     throw new IllegalArgumentException(format("Failed to infer network parameters from %s", base58address));
   }
 
+  /**
+   * Converts the list of finalize wallet responses to a list of "xpub..." public keys.
+   * @param finalizeResponses the list of base64-encoded finalize wallet responses.
+   * @return a list of BIP-32 "xpub..." public keys.
+   * @throws InvalidProtocolBufferException if any of the finalize wallet responses fail protobuf parsing.
+   * @throws IllegalArgumentException if the number of responses != Constants.MULTISIG_PARTICIPANTS, or
+   *         if any of the responses are not valid Base64.
+   */
   public static List<String> finalizeResponsesToAddresses(List<String> finalizeResponses)
       throws InvalidProtocolBufferException {
     if (finalizeResponses.size() != Constants.MULTISIG_PARTICIPANTS) {
@@ -366,11 +441,11 @@ public class SubzeroUtils {
   }
 
   /**
-   * Verifies size/count limits for FinalizeWallet request proto fields
-   * These checks are done to align with limits set in the Codesafe module
-   * This version is for external protos
-   * @param request FinalizeWalletRequest to be checked
-   * @throws VerificationException in the event of a field exceeding a required limit
+   * Verifies size/count limits for FinalizeWallet request proto fields.
+   * These checks are done to align with limits set in the Codesafe module.
+   * This version is for external protos.
+   * @param request FinalizeWalletRequest to be checked.
+   * @throws VerificationException in the event of a field exceeding a required limit.
    */
   private static void validateFinalizeWalletCommandRequest(CommandRequest.FinalizeWalletRequest
       request) throws VerificationException {
@@ -378,11 +453,11 @@ public class SubzeroUtils {
   }
 
   /**
-   * Verifies size/count limits for SignTx request proto fields
-   * These checks are done to align with limits set in the Codesafe module
-   * This version is for external protos
-   * @param request SignTxRequest to validate
-   * @throws VerificationException in the event of a field exceeding a required limit
+   * Verifies size/count limits for SignTx request proto fields.
+   * These checks are done to align with limits set in the Codesafe module.
+   * This version is for external protos.
+   * @param request SignTxRequest to validate.
+   * @throws VerificationException in the event of a field exceeding a required limit.
    */
   private static void validateSignTxCommandRequest(CommandRequest.SignTxRequest request)
       throws VerificationException {
@@ -412,11 +487,11 @@ public class SubzeroUtils {
   }
 
   /**
-   * Verifies size/count limits for InitWallet request proto fields
-   * These checks are done to align with limits set in the Codesafe module
-   * This method is for internal protos
-   * @param request InitWalletRequest to validate
-   * @throws VerificationException in the event of a field exceeding a required limit
+   * Verifies size/count limits for InitWallet request proto fields.
+   * These checks are done to align with limits set in the Codesafe module.
+   * This method is for internal protos.
+   * @param request InitWalletRequest to validate.
+   * @throws VerificationException in the event of a field exceeding a required limit.
    */
   private static void validateInitWalletInternalCommandRequest(
       InternalCommandRequest request) throws VerificationException {
@@ -433,11 +508,11 @@ public class SubzeroUtils {
   }
 
   /**
-   * Verifies size/count limits for FinalizeWallet request proto fields
-   * These checks are done to align with limits set in the Codesafe module
-   * This version is for internal protos
-   * @param request FinalizeWalletRequest to be checked
-   * @throws VerificationException in the event of a field exceeding a required limit
+   * Verifies size/count limits for FinalizeWallet request proto fields.
+   * These checks are done to align with limits set in the Codesafe module.
+   * This version is for internal protos.
+   * @param request FinalizeWalletRequest to be checked.
+   * @throws VerificationException in the event of a field exceeding a required limit.
    */
   private static void validateFinalizeWalletInternalCommandRequest(
       InternalCommandRequest.FinalizeWalletRequest request) throws VerificationException {
@@ -449,11 +524,11 @@ public class SubzeroUtils {
   }
 
   /**
-   * Verifies size/count limits for SignTx request proto fields
-   * These checks are done to align with limits set in the Codesafe module
-   * This version is for internal protos
-   * @param request SignTxRequest to validate
-   * @throws VerificationException in the event of a field exceeding a required limit
+   * Verifies size/count limits for SignTx request proto fields.
+   * These checks are done to align with limits set in the Codesafe module.
+   * This version is for internal protos.
+   * @param request SignTxRequest to validate.
+   * @throws VerificationException in the event of a field exceeding a required limit.
    */
   private static void validateSignTxInternalCommandRequest(
       InternalCommandRequest.SignTxRequest request) throws VerificationException {
@@ -469,9 +544,9 @@ public class SubzeroUtils {
 
   /**
    * As TxInputs are shared between internal and external SignTx requests, this method is
-   * intended to perform checks on the inputs for either version
-   * @param inputs List of TxInput objects to validate
-   * @throws VerificationException in the event of a field exceeding a required limit
+   * intended to perform checks on the inputs for either version.
+   * @param inputs List of TxInput objects to validate.
+   * @throws VerificationException in the event of a field exceeding a required limit.
    */
   private static void validateTxInputs(List<TxInput> inputs) throws VerificationException {
     if (inputs.size() > Constants.INPUTS_COUNT_MAX) {
@@ -486,9 +561,9 @@ public class SubzeroUtils {
 
   /**
    * As EncPubKeys are shared between internal/external FinalizeWalletRequests, and internal
-   * SignTxRequests, this method is intended to perform checks on the keys for all of those
-   * @param pubKeys List of ByteString objects to validate
-   * @throws VerificationException in the event of a field exceeding a required limit
+   * SignTxRequests, this method is intended to perform checks on the keys for all of those.
+   * @param pubKeys List of ByteString objects to validate.
+   * @throws VerificationException in the event of a field exceeding a required limit.
    */
   private static void validateEncPubKeys(List<EncryptedPubKey> pubKeys) throws VerificationException {
     if (pubKeys.size() > Constants.ENCRYPTED_PUB_KEYS_MAX_COUNT) {

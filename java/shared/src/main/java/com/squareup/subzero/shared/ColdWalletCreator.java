@@ -11,13 +11,17 @@ import java.util.Map;
  * handled by three static functions here.
  */
 public class ColdWalletCreator {
+
+  /** Everything in this class is static, so don't allow construction. */
+  private ColdWalletCreator() {}
+
   /**
    * Create a new wallet.  Call this multiple times, if you want to use multiple tokens.
    *
    * @param token A token for tracking this request.
-   * @param walletId An arbitrary wallet ID number,  used to identify the wallet in all requests to
-   * subzero.  A Subzero instance will reject this request if a wallet with that ID already exists.
-   * @return The request to send to Subzero
+   * @param walletId An arbitrary wallet ID number, used to identify the wallet in all requests to
+   * subzero. A Subzero instance will reject this request if a wallet with that ID already exists.
+   * @return The request to send to Subzero.
    */
   public static CommandRequest init(String token, int walletId) {
     return CommandRequest.newBuilder()
@@ -33,8 +37,8 @@ public class ColdWalletCreator {
    *
    * @param tokenToEncryptedPubKeyMap map of Persephone element tokens to those element's encrypted public key.
    * @param elementToken token of element who's request we want to construct.
-   * @param walletId id of cold wallet in Subzero that will be finalized with this request
-   * @return FinalizeWallet CommandRequests for Subzero to execute. Will return
+   * @param walletId id of cold wallet in Subzero that will be finalized with this request.
+   * @return FinalizeWallet CommandRequests for Subzero to execute.
    */
   public static CommandRequest combine(
       Map<String, EncryptedPubKey> tokenToEncryptedPubKeyMap, String elementToken, int walletId) {
@@ -64,7 +68,7 @@ public class ColdWalletCreator {
    * Get the "xpub..." public key, which you can pass to the ColdWallet constructor.
    *
    * @param finalizeWalletResponses The response from Subzero, completing wallet setup.
-   * @return A public key string suitable for passing to DeterministicKey.deserializeB58
+   * @return A public key string suitable for passing to DeterministicKey.deserializeB58().
    */
   public static String finalize(CommandResponse finalizeWalletResponses) {
     // TODO: In the future, we should have a way of validating some kind of signature

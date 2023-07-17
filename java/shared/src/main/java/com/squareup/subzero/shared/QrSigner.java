@@ -38,13 +38,14 @@ public class QrSigner implements Destroyable {
     // equivalent of NISTP256 in the trezor crypto library on the HSM.
     //https://tools.ietf.org/search/rfc4492#appendix-A
     private String curve_name = "secp256r1";
+    /** The path to the private key secret file. */
     public static String secret_path = "/tmp/secret";
 
     /**
      * Zeroize what can be done.
      * TODO: BigInteger is still there somewhere and it needs to be handled.
      *
-     * @throws DestroyFailedException
+     * @throws DestroyFailedException never actually thrown, forced by parent interface.
      */
     @Override
     public void destroy() throws DestroyFailedException {
@@ -52,6 +53,10 @@ public class QrSigner implements Destroyable {
         this.is_destroyed = true;
     }
 
+    /**
+     * Getter for the private is_destroyed field.
+     * @return true if and only if destroy() has been called.
+     */
     @Override
     public boolean isDestroyed() {
         return is_destroyed;
@@ -77,18 +82,25 @@ public class QrSigner implements Destroyable {
     }
 
     /**
+     * Sets the private static secret_path field.
      * @param path a String representing the absolute path.
      */
     public static void setSecretPath(String path) {
         QrSigner.secret_path = path;
     }
 
+    /**
+     * Creates a QrSigner which loads the key from the file referenced by the private static
+     * secret_path field.
+     */
     public QrSigner() {
         this(QrSigner.readSecret());
     }
 
     /**
+     * Constructs a new QrSigner which signs with the given secret key.
      * @param key bytes for the secret scalar. Big Endian.
+     * @throws RuntimeException if key.length != 32.
      */
     public QrSigner(byte[] key) {
         if (key.length != 32) {
@@ -106,7 +118,7 @@ public class QrSigner implements Destroyable {
      * Input bytes should not be pre hashed.
      * Signing is deterministic. No random k.
      *
-     * @param data bytes to sign
+     * @param data bytes to sign.
      * @return raw signature bytes. Always of length 64.
      */
     public byte[] sign(byte[] data) {
@@ -122,7 +134,11 @@ public class QrSigner implements Destroyable {
         return ret.toByteArray();
     }
 
-    // Only added to demonstrate error
+    /**
+     * Only added to demonstrate error.
+     * @param data the bytes to sign incorrectly.
+     * @return the incorrect signature.
+     */
     public byte[] incorrectSignTest(byte[] data) {
         ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
         // BigInteger is signed. This is wrong. Just for Test.
@@ -137,9 +153,12 @@ public class QrSigner implements Destroyable {
     }
 
     /**
+     * Verifies the given signature over the given byte array, using the key this QrSigner was
+     * constructed with.
      * @param signature raw signature bytes as obtained from `sign`.
      * @param data      bytes to verify the signature against.
-     * @return
+     * @return true if and only if the signature is valid.
+     * @throws RuntimeException if signature.length != 64.
      */
     public boolean verify(byte[] signature, byte[] data) {
         if (signature.length != 64) {
@@ -153,6 +172,10 @@ public class QrSigner implements Destroyable {
         return signer.verifySignature(hashed_data, BigIntegers.fromUnsignedByteArray(signature, 0, 32), BigIntegers.fromUnsignedByteArray(signature, 32, 32));
     }
 
+    /**
+     * Gets the public key as a raw byte array.
+     * @return the raw public key bytes.
+     */
     public byte[] dumpPublicKey() {
         ECPoint base = this.domain.getG();
         //BigIntegers.fromUnsignedByteArray is the way to do it.
@@ -160,7 +183,11 @@ public class QrSigner implements Destroyable {
         return pub.getEncoded(false);
 
     }
-    // Only added to demonstrate and test for a prior Bug.
+
+    /**
+     * Only added to demonstrate and test for a prior Bug.
+     * @return the public key, encoded incorrectly.
+     */
     public byte[] dumpIncorrectPublicKeyTest() {
         ECPoint base = this.domain.getG();
         // BigInteger is signed. This is wrong. Just for Test.
