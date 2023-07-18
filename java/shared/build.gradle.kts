@@ -33,4 +33,5 @@ publishing {
 
 java {
     withSourcesJar()
+    withJavadocJar()
 }
