@@ -1,5 +1,6 @@
 package com.squareup.subzero.shared;
 
+import org.bitcoinj.core.Sha256Hash;
 import org.spongycastle.crypto.params.ECPublicKeyParameters;
 import org.spongycastle.math.ec.ECPoint;
 import org.spongycastle.asn1.sec.SECNamedCurves;
@@ -19,7 +20,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyFactory;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.spec.InvalidKeySpecException;
@@ -102,20 +102,6 @@ public class QrSigner implements Destroyable {
     }
 
     /**
-     * @param data helper to hash bytes.
-     * @return sha256 digest.
-     */
-    private byte[] sha256(byte[] data) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(data);
-            return md.digest();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
      * Sign the input bytes using the ECDSA algorithm for the NIST 256 CURVE.
      * Input bytes should not be pre hashed.
      * Signing is deterministic. No random k.
@@ -127,7 +113,7 @@ public class QrSigner implements Destroyable {
         ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
         //BigIntegers.fromUnsignedByteArray is the way to do it.
         signer.init(true, new ECPrivateKeyParameters(BigIntegers.fromUnsignedByteArray(this.key, 0, 32), this.domain));
-        byte[] hashed_data = this.sha256(data);
+        byte[] hashed_data = Sha256Hash.hash(data);
 
         BigInteger[] signature = signer.generateSignature(hashed_data);
         ByteArrayOutputStream ret = new ByteArrayOutputStream();
@@ -141,7 +127,7 @@ public class QrSigner implements Destroyable {
         ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
         // BigInteger is signed. This is wrong. Just for Test.
         signer.init(true, new ECPrivateKeyParameters(new BigInteger(this.key), this.domain));
-        byte[] hashed_data = this.sha256(data);
+        byte[] hashed_data = Sha256Hash.hash(data);
 
         BigInteger[] signature = signer.generateSignature(hashed_data);
         ByteArrayOutputStream ret = new ByteArrayOutputStream();
@@ -162,7 +148,7 @@ public class QrSigner implements Destroyable {
         ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
         signer.init(false, new ECPublicKeyParameters(this.domain.getG().multiply(BigIntegers.fromUnsignedByteArray(this.key, 0 ,32)), this.domain));
 
-        byte[] hashed_data = sha256(data);
+        byte[] hashed_data = Sha256Hash.hash(data);
 
         return signer.verifySignature(hashed_data, BigIntegers.fromUnsignedByteArray(signature, 0, 32), BigIntegers.fromUnsignedByteArray(signature, 32, 32));
     }
