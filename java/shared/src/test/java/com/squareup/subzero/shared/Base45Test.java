@@ -80,4 +80,10 @@ public class Base45Test {
   public void testInvalidBase45() {
     Base45.fromBase45("foobar");
   }
+
+  @Test
+  public void testKnownValue() {
+    byte[] buf = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    assertEquals("0010BK0M*0YD10W", Base45.toBase45(buf));
+  }
 }
