@@ -21,12 +21,20 @@ import static java.lang.String.format;
  * to manually type the code (for dev/debugging purpose or as a fallback).
  */
 public final class Base45 {
+  /** The ordered set of valid Base45 characters as a String. */
   protected static final String CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
   private final static Object lock = new Object();
+  /** The reverse-lookup map from Base45 character to Integer value. */
   protected static ImmutableMap<Character, Integer> REVERSE_CHARSET = null;
+
+  /** Everything in this class is static, so don't allow construction. */
+  private Base45() {}
 
   /**
    * Fast reverse lookup using ImmutableMap.
+   * @param c the Base45 character to look up.
+   * @return the Integer value of the character, in the range [0, 44], or null if the character is
+   *         not a member of the Base45 charset.
    */
   protected static Integer indexOf(char c) {
     // The map needs to be initialized in a thread-safe way.
@@ -44,6 +52,8 @@ public final class Base45 {
 
   /**
    * Encodes a byte array to a Base45-encoded String.
+   * @param input the bytes to encode.
+   * @return the input encoded as a Base45 string.
    */
   public static String toBase45(byte[] input) {
     // input expands by approximately a factor of 1.5 (1.5 comes from log(256) / log(45))
@@ -92,8 +102,9 @@ public final class Base45 {
 
   /**
    * Decodes a Base45-encoded String back to a byte array.
-   *
-   * Throws IllegalArgumentException if the input contains invalid characters.
+   * @param input the Base45-encoded string.
+   * @return the decoded byte array.
+   * @throws IllegalArgumentException if the input contains invalid characters.
    */
   public static byte[] fromBase45(String input) {
     // input shrinks by a factor 1.5

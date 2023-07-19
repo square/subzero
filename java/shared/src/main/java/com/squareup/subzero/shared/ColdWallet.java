@@ -31,6 +31,10 @@ import static com.squareup.subzero.shared.SubzeroUtils.derivePublicKey;
 import static java.lang.String.format;
 import static org.bitcoinj.crypto.DeterministicKey.deserializeB58;
 
+/**
+ * This class represents a subzero cold wallet and provides methods for transferring funds out of
+ * the cold wallet into the gateway.
+ */
 public class ColdWallet {
   private NetworkParameters params;
   private int walletId;
@@ -40,9 +44,11 @@ public class ColdWallet {
   /**
    * Constructor for ColdWallet object, used to interact with a cold wallet.
    *
-   * @param params org.bitcoinj.params.TestNet3Params or org.bitcoinj.params.MainNetParams
-   * @param walletId A walletId used by Subzero to identify which wallet to use
-   * @param publicRootKeys The public keys from wallet initialization
+   * @param params One of {@link org.bitcoinj.params.TestNet3Params} or
+   *               {@link org.bitcoinj.params.MainNetParams}.
+   * @param walletId A walletId used by Subzero to identify which wallet to use.
+   * @param publicRootKeys The Base58-encoded public keys from wallet initialization.
+   * @param gateway The Base58-encoded gateway xpub address.
    */
   public ColdWallet(NetworkParameters params, int walletId, List<String> publicRootKeys,
       String gateway) {
@@ -54,6 +60,14 @@ public class ColdWallet {
     this.gateway = deserializeB58(gateway, params);
   }
 
+  /**
+   * Constructor for ColdWallet object, used to interact with a cold wallet.
+   * @param params One of {@link org.bitcoinj.params.TestNet3Params} or
+   *    *               {@link org.bitcoinj.params.MainNetParams}.
+   * @param walletId A walletId used by Subzero to identify which wallet to use.
+   * @param publicRootKeys The public keys from wallet initialization.
+   * @param gateway The gateway public key.
+   */
   public ColdWallet(NetworkParameters params, int walletId, List<DeterministicKey> publicRootKeys,
       DeterministicKey gateway) {
     this.params = params;
@@ -63,10 +77,10 @@ public class ColdWallet {
   }
 
   /**
-   * Get an address to send to, for a given derivation path
+   * Get an address to send to, for a given derivation path.
    *
-   * @param path The derivation path to use
-   * @return Address that you can send bitcoin to cold storage with
+   * @param path The derivation path to use.
+   * @return Address that you can send bitcoin to cold storage with.
    */
   public Address address(Path path) {
     return SubzeroUtils.deriveP2SHP2WSH(params, Constants.MULTISIG_THRESHOLD, publicRootKeys, path);
@@ -106,12 +120,13 @@ public class ColdWallet {
 
   /**
    * createTransaction takes the responses from all participants and returns a transaction suitable
-   * for broadcasting to the network.  You must call it with the same inputs and outputs used to
+   * for broadcasting to the network. You must call it with the same inputs and outputs used to
    * call startTransaction.  An exception will be thrown if they don't match.
    *
-   * @param inputs This needs to match the inputs passed to startTransaction
-   * @param outputs This needs to match the inputs passed to startTransaction
-   * @param signatures The signatures from the Subzero responses to the startTransaction CommandRequests
+   * @param inputs This needs to match the inputs passed to startTransaction.
+   * @param outputs This needs to match the inputs passed to startTransaction.
+   * @param signatures The signatures from the Subzero responses to the startTransaction CommandRequests.
+   * @return the transaction serialized to a byte array.
    */
   public byte[] createTransaction(List<TxInput> inputs, List<TxOutput> outputs,
       List<List<Signature>> signatures) {
@@ -157,6 +172,15 @@ public class ColdWallet {
    * corresponding public keys were placed in the scriptPubKey or redeemScript. If all signatures
    * are valid, 1 is returned, 0 otherwise. Due to a bug, one extra unused value is removed from
    * the stack."
+   * @param publicRootKeys The public keys from wallet initialization.
+   * @param inputs List of transaction inputs.
+   * @param outputs List of transaction outputs.
+   * @param gateway The gateway address to send the funds to.
+   * @param signatures The list of signatures authorizing the transaction.
+   * @param lock_time The bitcoin lock time.
+   * @param sequence The sequence number.
+   * @return The serialized transaction.
+   * @throws RuntimeException on invalid input.
    */
   public byte[] createWrappedSegwitMultisigTransaction(
       List<DeterministicKey> publicRootKeys,
