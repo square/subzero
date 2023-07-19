@@ -23,9 +23,20 @@ import static java.lang.String.format;
 public final class Base45 {
   /** The ordered set of valid Base45 characters as a String. */
   protected static final String CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
-  private final static Object lock = new Object();
   /** The reverse-lookup map from Base45 character to Integer value. */
-  protected static ImmutableMap<Character, Integer> REVERSE_CHARSET = null;
+  protected static final ImmutableMap<Character, Integer> REVERSE_CHARSET = makeReverseCharset();
+
+  /**
+   * Constructs the reverse-lookup character-to-integer map.
+   * @return the reverse-lookup character-to-integer map.
+   */
+  private static ImmutableMap<Character, Integer> makeReverseCharset() {
+    HashMap<Character, Integer> map = new HashMap<>(CHARSET.length());
+    for (int i = 0; i < CHARSET.length(); i++) {
+      map.put(CHARSET.charAt(i), i);
+    }
+    return ImmutableMap.copyOf(map);
+  }
 
   /** Everything in this class is static, so don't allow construction. */
   private Base45() {}
@@ -37,16 +48,6 @@ public final class Base45 {
    *         not a member of the Base45 charset.
    */
   protected static Integer indexOf(char c) {
-    // The map needs to be initialized in a thread-safe way.
-    synchronized (lock) {
-      if (REVERSE_CHARSET == null) {
-        HashMap<Character, Integer> map = new HashMap<>(45);
-        for (int i = 0; i < 45; i++) {
-          map.put(CHARSET.charAt(i), i);
-        }
-        REVERSE_CHARSET = ImmutableMap.copyOf(map);
-      }
-    }
     return REVERSE_CHARSET.get(c);
   }
 
