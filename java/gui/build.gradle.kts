@@ -4,6 +4,7 @@
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowExtension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import subzero.Dependencies
 
 plugins {
     id("com.squareup.subzero.java-conventions")
@@ -13,11 +14,11 @@ plugins {
 dependencies {
     implementation(project(":proto"))
     implementation(project(":shared"))
-    implementation("com.google.zxing:javase:3.5.0")
-    implementation("org.yaml:snakeyaml:1.33")
-    implementation("com.google.protobuf:protobuf-java-util:3.21.7")
-    implementation("com.google.protobuf:protobuf-java:3.21.5")
-    testImplementation("junit:junit:4.13.2")
+    implementation(Dependencies.comGoogleZxing_Javase)
+    implementation(Dependencies.orgYaml_Snakeyaml)
+    implementation(Dependencies.comGoogleProtobuf_ProtobufJavaUtil)
+    implementation(Dependencies.comGoogleProtobuf_ProtobufJava)
+    testImplementation(Dependencies.junit_Junit)
     compileOnly(project(":fake_ncipher"))
 }
 
