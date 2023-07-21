@@ -11,6 +11,7 @@ option(ENABLE_ASAN "Enable Address Sanitizer" OFF) # enable with -DENABLE_ASAN=O
 option(ENABLE_MSAN "Enable Uninitialized Memory Sanitizer" OFF) # enable with -DENABLE_MSAN=ON
 option(ENABLE_UBSAN "Enable Undefined Behavior Sanitizer" OFF) # enable with -DENABLE_UBSAN=ON
 option(ENABLE_COVERAGE "Enable code coverage" OFF) # enable with -DENABLE_COVERAGE=ON
+option(ENABLE_FUZZER "Enable fuzzer via LLVM's libfuzzer" OFF) # enable with -DENABLE_FUZZER=ON
 
 if ($ENV{TARGET} MATCHES "nCipher")
   message("Building for nCipher(powerpc32) architecture.")
@@ -21,7 +22,7 @@ if ($ENV{TARGET} MATCHES "nCipher")
   endif ()
 elseif($ENV{TARGET} MATCHES "dev")
   message("Building for the host architecture")
-else()
+else ()
   message(FATAL_ERROR "Unsupported TARGET value.")
 endif ()
 
@@ -53,8 +54,33 @@ if (ENABLE_UBSAN)
   list(APPEND FSANITIZE "undefined")
   list(APPEND EXTRA_SANITIZER_FLAGS "-fno-sanitize-recover=undefined")
 endif ()
- 
-if (ENABLE_ASAN OR ENABLE_MSAN OR ENABLE_UBSAN)
+
+if (ENABLE_FUZZER)
+  # Note that Apple does NOT ship a full Clang toolchain on MacOS (tested on 13.4.1)!
+  # In order to get libfuzzer to link properly, you need to install the full LLVM toolchain
+  # with homebrew, then switch your environment to use the homebrew versions of clang for
+  # building and re-run cmake. It's not recommended to do this globally, as using a 3rd party
+  # clang for everything can break your system, so just do it in a single shell - consider
+  # writing a script which does this.
+  # On my machine this looks like:
+  #   export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+  #   export LDFLAGS="-L/opt/homebrew/opt/llvm/lib/c++ -Wl,-rpath,/opt/homebrew/opt/llvm/lib/c++ -L/opt/homebrew/opt/llvm/lib"
+  #   export CFLAGS="-I/opt/homebrew/opt/llvm/include"
+  #   export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
+  #   export CXXFLAGS="-I/opt/homebrew/opt/llvm/include"
+  #   export CC=`which clang`
+  #   export CXX=`which clang`
+  if (NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+    message(FATAL_ERROR "LLVM's libfuzzer requires Clang")
+  endif ()
+  message(STATUS "Enabling fuzzing via LLVM's libfuzzer")
+  list(APPEND FSANITIZE "fuzzer")
+  list(APPEND EXTRA_SANITIZER_FLAGS "-g") # fuzzing needs debug symbols
+  list(APPEND EXTRA_SANITIZER_FLAGS "-O1") # make fuzzer faster
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION")
+endif ()
+
+if (ENABLE_ASAN OR ENABLE_MSAN OR ENABLE_UBSAN OR ENABLE_FUZZER)
   string(REPLACE ";" "," FSANITIZE_STR "${FSANITIZE}")
   add_compile_options(-fsanitize=${FSANITIZE_STR} ${EXTRA_SANITIZER_FLAGS})
   add_link_options(-fsanitize=${FSANITIZE_STR})
@@ -81,7 +107,7 @@ if (ENABLE_COVERAGE)
     # globally, as using a 3rd party clang for everything can break your system, so just do
     # it in a single shell - consider writing a script which does this.
     # On my machine this looks like:
-    #   export PATH="/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/libiconv/bin:$PATH"
+    #   export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
     #   export LDFLAGS="-L/opt/homebrew/opt/llvm/lib/c++ -Wl,-rpath,/opt/homebrew/opt/llvm/lib/c++ -L/opt/homebrew/opt/llvm/lib"
     #   export CFLAGS="-I/opt/homebrew/opt/llvm/include"
     #   export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
@@ -233,16 +259,18 @@ else ()
 
 endif ()
 
-if ($ENV{TARGET} MATCHES "fuzz")
+if (ENABLE_FUZZER)
   list(APPEND main_SRC "src/fuzz.c")
+  set(BINARY_NAME subzero_fuzzer)
 else ()
   list(APPEND main_SRC "src/main.c")
+  set(BINARY_NAME subzero)
 endif ()
 
-add_executable(subzero ${main_SRC})
+add_executable(${BINARY_NAME} ${main_SRC})
 
 if ($ENV{TARGET} MATCHES "nCipher")
-  target_link_libraries(subzero TrezorCrypto SubzeroProtos)
+  target_link_libraries(${BINARY_NAME} TrezorCrypto SubzeroProtos)
 else()
-  target_link_libraries(subzero TrezorCrypto SubzeroProtos aes_gcm_dev GladmanGCM)
+  target_link_libraries(${BINARY_NAME} TrezorCrypto SubzeroProtos aes_gcm_dev GladmanGCM)
 endif ()

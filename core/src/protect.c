@@ -12,7 +12,9 @@ Result protect_pubkey(char xpub[static XPUB_SIZE],
                       EncryptedPubKey *encrypted_pub_key) {
   // Insert magic string for binary static analysis.
   // This is extremely hacky, but works. ¯\_(ツ)_/¯
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
   printf(MAGIC);
+#endif
 
   if (NULL == encrypted_pub_key) {
     ERROR("%s: null encrypted_pub_key input", __func__);

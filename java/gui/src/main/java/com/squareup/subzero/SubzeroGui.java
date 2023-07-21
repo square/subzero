@@ -7,6 +7,9 @@ import com.google.protobuf.TextFormat;
 import com.squareup.subzero.framebuffer.Framebuffer;
 import com.squareup.subzero.framebuffer.Screens;
 import com.squareup.subzero.ncipher.NCipher;
+import com.squareup.subzero.observers.CreateFuzzerCorpusObserver;
+import com.squareup.subzero.observers.InternalCommandRequestObserver;
+import com.squareup.subzero.observers.NoopObserver;
 import com.squareup.subzero.proto.service.Common;
 import com.squareup.subzero.proto.service.Service;
 import com.squareup.subzero.proto.service.Service.CommandRequest;
@@ -67,6 +70,10 @@ public class SubzeroGui {
   // Sign using wallet.
   @Parameter(names = "--sign-using-wallet-files-test") public Boolean signUsingWalletFilesTest = false;
 
+  @Parameter(names = "--generate-fuzzing-corpus") public Boolean generateFuzzingCorpus = false;
+
+  @Parameter(names = "--fuzzing-corpus-output-dir") public String fuzzingCorpusOutputDir = "fuzzing_corpus";
+
   public SubzeroConfig config;
   private Screens screens;
 
@@ -123,8 +130,7 @@ public class SubzeroGui {
     byte[] rawCmd = base64().decode(debug);
     CommandRequest commandRequest = CommandRequest.parseFrom(rawCmd);
 
-    InternalCommandConnector conn = new
-        InternalCommandConnector(hostname, port);
+    InternalCommandConnector conn = makeInternalCommandConnector();
     CommandResponse commandResponse = CommandHandler.dispatch(this, conn, commandRequest);
     String response = base64().encode(commandResponse.toByteArray());
 
@@ -158,8 +164,7 @@ public class SubzeroGui {
         CommandRequest commandRequest = CommandRequest.parseFrom(proto);
 
         CommandResponse response =
-            CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port),
-                commandRequest);
+            CommandHandler.dispatch(this, makeInternalCommandConnector(), commandRequest);
         System.out.println(response.toString());
 
         String encoded = base64().encode(response.toByteArray());
@@ -231,10 +236,10 @@ public class SubzeroGui {
     }
   }
   private void generateWallet() throws Exception {
+    screens = new Screens(new Framebuffer(config), config.teamName);
+
     WalletLoader  loader  = new WalletLoader(walletDirectory);
     loader.ensureDoesNotExist(walletID);
-
-
 
     List<Common.EncryptedPubKey> encPubKeys = new ArrayList<Common.EncryptedPubKey>();
     for (int i = 0 ; i < 4 ; i++) {
@@ -242,7 +247,7 @@ public class SubzeroGui {
       builder.setWalletId(walletID);
       Service.CommandRequest.InitWalletRequest.Builder internalBuilder = Service.CommandRequest.InitWalletRequest.newBuilder();
       builder.setInitWallet(internalBuilder.build());
-      CommandResponse response = CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port), builder.build());
+      CommandResponse response = CommandHandler.dispatch(this, makeInternalCommandConnector(), builder.build());
       encPubKeys.add(response.getInitWallet().getEncryptedPubKey());
       WalletProto.Wallet w = loader.load(walletID);
       loader.saveNumbered(walletID, w, i+1, "initialized");
@@ -259,7 +264,7 @@ public class SubzeroGui {
       loader.save(walletID, loader.loadNumbered(walletID, i+1, "initialized"));
       builder.setFinalizeWallet(internalBuilder.build());
 
-      CommandResponse response = CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port), builder.build());
+      CommandResponse response = CommandHandler.dispatch(this, makeInternalCommandConnector(), builder.build());
       WalletProto.Wallet w = loader.load(walletID);
       loader.saveNumbered(walletID, w, i+1, "finalized");
       // clear up the default name for next iteration.
@@ -305,7 +310,7 @@ public class SubzeroGui {
       Files.deleteIfExists(loader.getWalletPath(walletID));
       //set the wallet file as per the hsm you are imitating in this iteration.
       loader.save(walletID, loader.loadNumbered(walletID,i+1, "finalized"));
-      CommandResponse response = CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port), builder.build());
+      CommandResponse response = CommandHandler.dispatch(this, makeInternalCommandConnector(), builder.build());
       System.out.println("Signature for hsm number " + (i+1) + ": " + Hex.toHexString( response.getSignTx().getSignatures(0).getDer().toByteArray()));
     }
 
@@ -366,8 +371,7 @@ public class SubzeroGui {
         if (filePathInJAR.contains("negative")) {
             try {
                 CommandResponse response =
-                        CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port),
-                                commandRequest);
+                        CommandHandler.dispatch(this, makeInternalCommandConnector(), commandRequest);
             } catch (Exception e) {
                 // A list of negative test cases can be added here.
                 if (
@@ -388,8 +392,7 @@ public class SubzeroGui {
 
         }
           CommandResponse response =
-            CommandHandler.dispatch(this, new InternalCommandConnector(hostname, port),
-                commandRequest);
+            CommandHandler.dispatch(this, makeInternalCommandConnector(), commandRequest);
 
         String encoded = base64().encode(response.toByteArray());
 
@@ -429,5 +432,12 @@ public class SubzeroGui {
     } else {
       System.out.println("SOME TESTS FAILED");
     }
+  }
+
+  private InternalCommandConnector makeInternalCommandConnector() {
+    final InternalCommandRequestObserver observer = this.generateFuzzingCorpus
+            ? new CreateFuzzerCorpusObserver(FileSystems.getDefault().getPath(this.fuzzingCorpusOutputDir))
+            : new NoopObserver();
+    return new InternalCommandConnector(this.hostname, this.port, observer);
   }
 }

@@ -24,3 +24,6 @@ gradle-app.setting
 
 # Maven output directory. For some reason our gradle build still puts a few things there.
 **/target/
+
+# Ignore fuzzing corpus output directory
+fuzzing_corpus
