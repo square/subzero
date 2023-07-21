@@ -164,18 +164,5 @@ Result expose_wallet(const EncryptedMasterSeed* const encrypted_master_seed,
     return Result_EXPOSE_WALLET_UNEXPECTED_MASTER_SEED_LEN_FAILURE;
   }
 
-  // __CAUTION__EXPOSE_MASTER_SEED needs to be deliberately defined at build
-  // time to output master seed. Note that although DEBUG_ is no-op when
-  // currency is not btc-testnet, and thus we should be safe without this check,
-  // adding the check makes it easier to reason about the code, and less prone
-  // to mistakes (e.g., when definition of DEBUG_ changes for whatever reason)
-#ifdef __CAUTION__EXPOSE_MASTER_SEED
-  DEBUG_("master_seed: ");
-  for (unsigned int i = 0; i < master_seed_len; i++) {
-    DEBUG_("%02x", master_seed[i]);
-  }
-  DEBUG_("\n");
-#endif
-
   return Result_SUCCESS;
 }
