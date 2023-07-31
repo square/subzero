@@ -15,7 +15,7 @@
 
 // Helper which returns the size of a buffer that would be needed to hold the serialized version of the given
 // protobuf structure, assuming that pb_encode_delimited() serialization will be used.
-static size_t get_serialized_proto_struct_size(const pb_field_t fields[], const void* const proto_struct) {
+static size_t get_serialized_proto_struct_size(const pb_msgdesc_t* const fields, const void* const proto_struct) {
   pb_ostream_t stream = PB_OSTREAM_SIZING;
   if (!pb_encode_delimited(&stream, fields, proto_struct)) {
     ERROR("%s: pb_encode_delimited() failed: %s", __func__, PB_GET_ERROR(&stream));
@@ -30,7 +30,7 @@ static size_t get_serialized_proto_struct_size(const pb_field_t fields[], const 
 static bool serialize_proto_struct_to_buffer(
     pb_byte_t* const buffer,
     const size_t buffer_size,
-    const pb_field_t fields[],
+    const pb_msgdesc_t* const fields,
     const void* const proto_struct) {
   pb_ostream_t ostream = pb_ostream_from_buffer(buffer, buffer_size);
   if (!pb_encode_delimited(&ostream, fields, proto_struct)) {
@@ -46,7 +46,7 @@ static bool serialize_proto_struct_to_buffer(
 static bool deserialize_proto_struct_from_buffer(
     const pb_byte_t* const buffer,
     const size_t buffer_size,
-    const pb_field_t fields[],
+    const pb_msgdesc_t* const fields,
     void* const proto_struct) {
   pb_istream_t istream = pb_istream_from_buffer(buffer, buffer_size);
   if (!pb_decode_delimited(&istream, fields, proto_struct)) {
@@ -88,7 +88,7 @@ int verify_rpc_oversized_message_rejected(void) {
   random_buffer(cmd.command.InitWallet.random_bytes.bytes, MASTER_SEED_SIZE);
 
   // Compute the size of the serialized struct.
-  size_t serialized_size = get_serialized_proto_struct_size(InternalCommandRequest_fields, &cmd);
+  size_t serialized_size = get_serialized_proto_struct_size(&InternalCommandRequest_msg, &cmd);
   if (serialized_size == 0) {
     ERROR("%s: error computing serialized request size", __func__);
     result = -1;
@@ -106,7 +106,7 @@ int verify_rpc_oversized_message_rejected(void) {
   }
 
   // Serialize the request struct into request_buffer.
-  if (!serialize_proto_struct_to_buffer(request_buffer, sizeof(request_buffer), InternalCommandRequest_fields, &cmd)) {
+  if (!serialize_proto_struct_to_buffer(request_buffer, sizeof(request_buffer), &InternalCommandRequest_msg, &cmd)) {
     ERROR("%s: serialize_proto_struct_to_buffer() failed", __func__);
     result = -1;
     goto out;
@@ -228,8 +228,7 @@ int verify_rpc_oversized_message_rejected(void) {
   // note: no need to initialize the response, static bool deserialize_proto_struct_from_buffer() does it via
   // pb_decode_delimited().
   InternalCommandResponse response;
-  if (!deserialize_proto_struct_from_buffer(
-          response_buffer, response_size, InternalCommandResponse_fields, &response)) {
+  if (!deserialize_proto_struct_from_buffer(response_buffer, response_size, &InternalCommandResponse_msg, &response)) {
     ERROR("%s: deserialize_proto_struct_from_buffer() failed", __func__);
     result = -1;
     goto out;
