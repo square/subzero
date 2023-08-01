@@ -1,5 +1,5 @@
 # Subzero regression test for transaction signing
-name: "SignTx Regression Test"
+name: "SignTx Regression Test with UBSAN"
 
 on:
   push:
@@ -12,8 +12,8 @@ on:
     - cron: '0 1 * * *'
 
 jobs:
-  signtx-test:
-    name: "SignTx Test"
+  signtx-test-ubsan:
+    name: "SignTx Test with UBSAN"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -54,19 +54,19 @@ jobs:
         cd ${{ github.workspace }}/java
         ./gradlew clean build --info
 
-    # Build CORE
-    - name: Build Subzero Core
-      run: scripts/build_core.sh
+    # Build CORE with UBSAN
+    - name: Build Subzero Core with UBSAN
+      run: scripts/build_core.sh -DENABLE_UBSAN=ON
 
-    - name: Run Subzero CORE
+    - name: Run Subzero CORE with UBSAN
       run: |
         cd ${{ github.workspace }}
         ./core/build/subzero-testnet &
 
-    - name: Run SignTx Test
+    - name: Run SignTx Test with UBSAN
       run: |
         cd ${{ github.workspace }}
         sleep 10
-        rm -f /tmp/signtx-test.out
-        java -jar ./java/gui/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test | tee /tmp/signtx-test.out
-        grep -qv "ALL TESTS PASSED" /tmp/signtx-test.out || exit 1
+        rm -f /tmp/signtx-test-ubsan.out
+        java -jar ./java/gui/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test | tee /tmp/signtx-test-ubsan.out
+        grep -qv "ALL TESTS PASSED" /tmp/signtx-test-ubsan.out || exit 1
