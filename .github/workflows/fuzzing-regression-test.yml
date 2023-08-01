@@ -1,0 +1,64 @@
+# Subzero regression test for bugs discovered with fuzz testing
+name: "Fuzzing Regression Test"
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [master]
+  schedule:
+    # Daily at 1am
+    - cron: '0 1 * * *'
+
+jobs:
+  fuzzing-regression-test:
+    name: "Fuzzing Regression Test"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -euxo pipefail {0}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.9]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        # We must fetch at least the immediate parents so that if this is
+        # a pull request then we can checkout the head.
+        fetch-depth: 2
+        submodules: 'recursive'
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Display Python version
+      run: |
+        python -c "import sys; print(sys.version)"
+
+    - name: Install dependencies
+      run: scripts/ubuntu_install_protobuf.sh
+
+    - name: Setup Clang
+      uses: egor-tensin/setup-clang@v1.4
+      with:
+        version: latest
+        platform: x64
+
+    # Build CORE with ASAN, UBSAN, and libfuzzer
+    - name: Build Subzero Core (ASAN+UBSAN+FUZZER)
+      run: |
+        export CC=`which clang`
+        export CXX=`which clang++`
+        scripts/build_core.sh -DENABLE_ASAN=ON -DENABLE_UBSAN=ON -DENABLE_FUZZER=ON
+
+    - name: Run Subzero CORE Fuzzing regression test
+      run: |
+        cd ${{ github.workspace }}
+        ./core/build/subzero_fuzzer-testnet ./core/fuzzing_regression_test_inputs/*
