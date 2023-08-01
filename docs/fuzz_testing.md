@@ -121,6 +121,9 @@ If a crash is found, it's probably a good idea to fix it and save the bad input 
 ## A note on logic changes when fuzz testing
 
 When you build the fuzz-test binary, there are a few logic changes from a production build:
+
 - All logging output is disabled
+
 - Invalid QR code signatures are ignored
+
 - AES-GCM decryption failures are ignored
