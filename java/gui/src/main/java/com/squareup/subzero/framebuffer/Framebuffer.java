@@ -283,6 +283,10 @@ public class Framebuffer {
    * @throws IOException From reading input
    */
   public String prompt(int size, int yOffset, boolean password) throws IOException {
+    if (password) {
+      this.flip(); // draw prompt to the framebuffer
+      return new String(System.console().readPassword());
+    }
     String input = "";
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     while(true) {
@@ -320,12 +324,7 @@ public class Framebuffer {
       }
 
       String output;
-      if (password) {
-        // Don't display passwords.  Stars instead.
-        output = Strings.repeat("*", input.length());
-      } else {
-        output = input;
-      }
+      output = input;
       if (output.length() > 100) {
         ltext("...".concat(output.substring(output.length() - 100)), size, yOffset);
       } else {
