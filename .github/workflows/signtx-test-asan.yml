@@ -1,5 +1,5 @@
 # Subzero regression test for transaction signing
-name: "SignTx Regression Test"
+name: "SignTx Regression Test with ASAN"
 
 on:
   push:
@@ -12,8 +12,8 @@ on:
     - cron: '0 1 * * *'
 
 jobs:
-  signtx-test:
-    name: "SignTx Test"
+  signtx-test-asan:
+    name: "SignTx Test with ASAN"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -54,19 +54,19 @@ jobs:
         cd ${{ github.workspace }}/java
         ./gradlew clean build --info
 
-    # Build CORE
-    - name: Build Subzero Core
-      run: scripts/build_core.sh
+    # Build CORE with ASAN
+    - name: Build Subzero Core with ASAN
+      run: scripts/build_core.sh -DENABLE_ASAN=ON
 
-    - name: Run Subzero CORE
+    - name: Run Subzero CORE with ASAN
       run: |
         cd ${{ github.workspace }}
         ./core/build/subzero-testnet &
 
-    - name: Run SignTx Test
+    - name: Run SignTx Test with ASAN
       run: |
         cd ${{ github.workspace }}
         sleep 10
-        rm -f /tmp/signtx-test.out
-        java -jar ./java/gui/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test | tee /tmp/signtx-test.out
-        grep -qv "ALL TESTS PASSED" /tmp/signtx-test.out || exit 1
+        rm -f /tmp/signtx-test-asan.out
+        java -jar ./java/gui/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test | tee /tmp/signtx-test-asan.out
+        grep -qv "ALL TESTS PASSED" /tmp/signtx-test-asan.out || exit 1

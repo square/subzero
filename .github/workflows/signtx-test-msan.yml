@@ -1,5 +1,5 @@
 # Subzero regression test for transaction signing
-name: "SignTx Regression Test"
+name: "SignTx Regression Test with MSAN"
 
 on:
   push:
@@ -12,8 +12,8 @@ on:
     - cron: '0 1 * * *'
 
 jobs:
-  signtx-test:
-    name: "SignTx Test"
+  signtx-test-msan:
+    name: "SignTx Test with MSAN"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -54,19 +54,28 @@ jobs:
         cd ${{ github.workspace }}/java
         ./gradlew clean build --info
 
-    # Build CORE
-    - name: Build Subzero Core
-      run: scripts/build_core.sh
+    - name: Setup Clang (for MSAN)
+      uses: egor-tensin/setup-clang@v1.4
+      with:
+        version: latest
+        platform: x64
 
-    - name: Run Subzero CORE
+    # Build CORE with MSAN
+    - name: Build Subzero Core with MSAN
+      run: |
+        export CC=`which clang`
+        export CXX=`which clang++`
+        scripts/build_core.sh -DENABLE_MSAN=ON
+
+    - name: Run Subzero CORE with MSAN
       run: |
         cd ${{ github.workspace }}
         ./core/build/subzero-testnet &
 
-    - name: Run SignTx Test
+    - name: Run SignTx Test with MSAN
       run: |
         cd ${{ github.workspace }}
         sleep 10
-        rm -f /tmp/signtx-test.out
-        java -jar ./java/gui/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test | tee /tmp/signtx-test.out
-        grep -qv "ALL TESTS PASSED" /tmp/signtx-test.out || exit 1
+        rm -f /tmp/signtx-test-msan.out
+        java -jar ./java/gui/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test | tee /tmp/signtx-test-msan.out
+        grep -qv "ALL TESTS PASSED" /tmp/signtx-test-msan.out || exit 1
