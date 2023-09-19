@@ -4,7 +4,7 @@
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowExtension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import subzero.Dependencies
+import subzero.DependencyVersions
 
 plugins {
     id("com.squareup.subzero.java-conventions")
@@ -12,11 +12,11 @@ plugins {
 }
 
 dependencies {
-    implementation(Dependencies.ioDropwizard_DropwizardCore)
+    implementation("io.dropwizard:dropwizard-core:${DependencyVersions.dropwizard}")
     implementation(project(":proto"))
-    implementation(Dependencies.comGoogleProtobuf_ProtobufJavaUtil)
+    implementation("com.google.protobuf:protobuf-java-util:${DependencyVersions.protobufJavaUtil}")
     implementation(project(":shared"))
-    implementation(Dependencies.ioDropwizard_DropwizardAssets)
+    implementation("io.dropwizard:dropwizard-assets:${DependencyVersions.dropwizard}")
 }
 
 description = "server"
