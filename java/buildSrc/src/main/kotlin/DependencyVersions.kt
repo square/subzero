@@ -2,7 +2,7 @@ package subzero
 
 object DependencyVersions {
   val bitcoinj = "0.16.1"
-  val dropwizard = "2.1.1"
+  val dropwizard = "2.1.7"
   val findbugs = "3.0.2"
   val guava = "31.1-jre"
   val junit = "4.13.2"

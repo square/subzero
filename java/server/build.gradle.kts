@@ -12,11 +12,18 @@ plugins {
 }
 
 dependencies {
-    implementation("io.dropwizard:dropwizard-core:${DependencyVersions.dropwizard}")
+    implementation("io.dropwizard:dropwizard-core:${DependencyVersions.dropwizard}") {
+        // exclude vulnerable snakeyaml version 1.31 and replace with 2.0 below
+        exclude("org.yaml", "snakeyaml")
+    }
     implementation(project(":proto"))
     implementation("com.google.protobuf:protobuf-java-util:${DependencyVersions.protobuf}")
     implementation(project(":shared"))
-    implementation("io.dropwizard:dropwizard-assets:${DependencyVersions.dropwizard}")
+    implementation("io.dropwizard:dropwizard-assets:${DependencyVersions.dropwizard}") {
+        // exclude vulnerable snakeyaml version 1.31 and replace with 2.0 below
+        exclude("org.yaml", "snakeyaml")
+    }
+    implementation("org.yaml:snakeyaml:${DependencyVersions.snakeyaml}")
 }
 
 description = "server"
