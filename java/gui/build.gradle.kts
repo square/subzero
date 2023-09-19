@@ -16,8 +16,8 @@ dependencies {
     implementation(project(":shared"))
     implementation("com.google.zxing:javase:${DependencyVersions.zxing}")
     implementation("org.yaml:snakeyaml:${DependencyVersions.snakeyaml}")
-    implementation("com.google.protobuf:protobuf-java-util:${DependencyVersions.protobufJavaUtil}")
-    implementation("com.google.protobuf:protobuf-java:${DependencyVersions.protobufJava}")
+    implementation("com.google.protobuf:protobuf-java-util:${DependencyVersions.protobuf}")
+    implementation("com.google.protobuf:protobuf-java:${DependencyVersions.protobuf}")
     testImplementation("junit:junit:${DependencyVersions.junit}")
     compileOnly(project(":fake_ncipher"))
 }
