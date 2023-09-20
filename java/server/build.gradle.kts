@@ -14,7 +14,7 @@ plugins {
 dependencies {
     implementation("io.dropwizard:dropwizard-core:${DependencyVersions.dropwizard}")
     implementation(project(":proto"))
-    implementation("com.google.protobuf:protobuf-java-util:${DependencyVersions.protobufJavaUtil}")
+    implementation("com.google.protobuf:protobuf-java-util:${DependencyVersions.protobuf}")
     implementation(project(":shared"))
     implementation("io.dropwizard:dropwizard-assets:${DependencyVersions.dropwizard}")
 }

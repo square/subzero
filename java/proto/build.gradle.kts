@@ -10,14 +10,14 @@ plugins {
 }
 
 dependencies {
-    api("com.google.protobuf:protobuf-java:${DependencyVersions.protobufJava}")
+    api("com.google.protobuf:protobuf-java:${DependencyVersions.protobuf}")
 }
 
 description = "proto"
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:${DependencyVersions.protocArtifact}"
+        artifact = "com.google.protobuf:protoc:${DependencyVersions.protobuf}"
     }
 }
 
