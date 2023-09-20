@@ -7,7 +7,7 @@ object DependencyVersions {
   val guava = "31.1-jre"
   val junit = "4.13.2"
   val protobuf = "3.21.7"
-  val snakeyaml = "1.33"
+  val snakeyaml = "2.0"
   val spongycastle = "1.58.0.0"
   val zxing = "3.5.0"
 }
