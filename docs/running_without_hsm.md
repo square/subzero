@@ -73,7 +73,7 @@ See also [sample output](core_sample_output.md).
     open http://localhost:8080/
 
     # start the GUI
-    java -jar ./subzero/java/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar
+    java -jar ./subzero/java/gui/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar
 
 Your environment should look as following (from top left, going clockwise): the GUI, a web browser, and a Terminal.
 
