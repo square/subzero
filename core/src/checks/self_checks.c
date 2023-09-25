@@ -20,15 +20,13 @@ static bool self_checks_registered = false;
 
 static void register_self_check(self_check_function func, const char* name) {
   if (NULL == func || NULL == name) {
-    ERROR("%s: func or name is NULL. Cannot continue.", __func__);
-    abort();
+    FATAL("%s: func or name is NULL. Cannot continue.", __func__);
   }
   if (self_checks_count >= MAX_SELF_CHECKS) {
-    ERROR(
+    FATAL(
         "%s: too many registered self checks. You probably registered a new self check "
         "and forgot to increment MAX_SELF_CHECKS. Do so now and recompile.",
         __func__);
-    abort();
   }
   self_checks[self_checks_count].func = func;
   self_checks[self_checks_count].name = name;
@@ -59,14 +57,13 @@ static void register_all_self_checks(void) {
   REGISTER_SELF_CHECK(verify_rpc_oversized_message_rejected);
 
   if (MAX_SELF_CHECKS != self_checks_count) {
-    ERROR(
+    FATAL(
         "%s: MAX_SELF_CHECKS (%zu) != self_checks_count (%zu). "
         "You probably removed a self check and forgot to decrement MAX_SELF_CHECKS. "
         "Do so now and recompile.",
         __func__,
         MAX_SELF_CHECKS,
         self_checks_count);
-    abort();
   }
 
   self_checks_registered = true;
