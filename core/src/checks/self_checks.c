@@ -12,7 +12,8 @@ typedef struct self_check_function_info {
   const char* name;
 } self_check_function_info;
 
-#define MAX_SELF_CHECKS ((size_t) 128)
+// For each new self check function added, this constant needs to be incremented by 1.
+#define MAX_SELF_CHECKS ((size_t) 12)
 static self_check_function_info self_checks[MAX_SELF_CHECKS] = { { 0 } };
 static size_t self_checks_count = 0;
 static bool self_checks_registered = false;
@@ -23,16 +24,16 @@ static void register_self_check(self_check_function func, const char* name) {
     abort();
   }
   if (self_checks_count >= MAX_SELF_CHECKS) {
-    ERROR("%s: too many registered self checks. Increase MAX_SELF_CHECKS and recompile", __func__);
+    ERROR(
+        "%s: too many registered self checks. You probably registered a new self check "
+        "and forgot to increment MAX_SELF_CHECKS. Do so now and recompile.",
+        __func__);
     abort();
   }
   self_checks[self_checks_count].func = func;
   self_checks[self_checks_count].name = name;
   self_checks_count++;
 }
-
-// For each new self check function added, this constant needs to be incremented by 1.
-#define EXPECTED_SELF_CHECKS_COUNT ((size_t) 12)
 
 #define REGISTER_SELF_CHECK(name) register_self_check(name, #name)
 
@@ -57,13 +58,13 @@ static void register_all_self_checks(void) {
   REGISTER_SELF_CHECK(verify_wycheproof);
   REGISTER_SELF_CHECK(verify_rpc_oversized_message_rejected);
 
-  if (EXPECTED_SELF_CHECKS_COUNT != self_checks_count) {
+  if (MAX_SELF_CHECKS != self_checks_count) {
     ERROR(
-        "%s: EXPECTED_SELF_CHECKS_COUNT (%zu) != self_checks_count (%zu). "
-        "You probably registered a new self check and forgot to increment EXPECTED_SELF_CHECKS_COUNT. "
+        "%s: MAX_SELF_CHECKS (%zu) != self_checks_count (%zu). "
+        "You probably removed a self check and forgot to decrement MAX_SELF_CHECKS. "
         "Do so now and recompile.",
         __func__,
-        EXPECTED_SELF_CHECKS_COUNT,
+        MAX_SELF_CHECKS,
         self_checks_count);
     abort();
   }
