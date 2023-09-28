@@ -8,6 +8,6 @@ object DependencyVersions {
   val junit = "4.13.2"
   val protobuf = "3.21.7"
   val snakeyaml = "2.0"
-  val spongycastle = "1.58.0.0"
+  val bouncycastle = "1.76"
   val zxing = "3.5.0"
 }

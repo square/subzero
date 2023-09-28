@@ -57,7 +57,7 @@ import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Arrays;
-import org.spongycastle.util.encoders.Hex;
+import org.bouncycastle.util.encoders.Hex;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.io.BaseEncoding.base64;

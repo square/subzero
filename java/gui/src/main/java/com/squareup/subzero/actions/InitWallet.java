@@ -12,7 +12,7 @@ import com.squareup.subzero.proto.service.Service.CommandRequest;
 import com.squareup.subzero.proto.service.Service.CommandResponse;
 import com.squareup.subzero.proto.wallet.WalletProto.Wallet;
 import java.security.SecureRandom;
-import org.spongycastle.util.encoders.Hex;
+import org.bouncycastle.util.encoders.Hex;
 
 import static java.lang.String.format;
 

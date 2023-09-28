@@ -9,22 +9,15 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
-import java.security.spec.ECParameterSpec;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.interfaces.ECPrivateKey;
-
-import org.spongycastle.util.BigIntegers;
-import org.spongycastle.util.encoders.Base64;
-import org.spongycastle.util.encoders.Hex;
-import org.spongycastle.util.io.pem.PemObject;
-import org.spongycastle.util.io.pem.PemReader;
-import org.spongycastle.util.io.pem.PemWriter;
+import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemWriter;
 import javax.security.auth.DestroyFailedException;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static java.util.Arrays.asList;
 
@@ -32,14 +25,6 @@ public class QrSignerTest {
 
     @Before
     public void setup() {
-        //private key with MSB 0.
-        /*
-        String file_content = "-----BEGIN PRIVATE KEY-----\n" +
-                "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgMZroVD6Hy2ql7wDQ\n" +
-                "DVVNPZuXUwrx2R4dgYyUmNiln+OhRANCAATK4eoZu+QwEI97Kjhm62cL+fd2XIR/\n" +
-                "QzFe9JqUiiW23rexw0HvNnpM3hXn89H6SCqQjJVN986Up9PP/MDd0gF9\n" +
-                "-----END PRIVATE KEY-----";
-        */
         //private key with MSB 1.
         String file_content = "-----BEGIN PRIVATE KEY-----\n" +
                 "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg65jRx/BQnYcR+A7Z\n" +
@@ -117,8 +102,14 @@ public class QrSignerTest {
         assertEquals(correct_pubkey, Hex.toHexString(signer_msb1.dumpPublicKey()));
         // just to check again.
         assertNotEquals(asList(signer_msb1.dumpPublicKey()), asList(signer_msb1.dumpIncorrectPublicKeyTest()));
-        //different signatures generated.
-        assertNotEquals(asList(signer_msb1.sign(bytes_to_sign)), asList(signer_msb1.incorrectSignTest(bytes_to_sign)));
+
+        // With the update to recent bouncycastle to replace 6-year-old spongycastle, incorrectSignTest() no longer
+        // works because the bug has been fixed in the bouncycastle library. Attempting to sign with an
+        // incorrectly-parsed key now throws an IllegalArgumentException.
+        assertThrows(
+                "Scalar is not in the interval [1, n - 1]",
+                IllegalArgumentException.class,
+                () -> { signer_msb1.incorrectSignTest(bytes_to_sign); });
 
         System.out.println("SignTestError: This Test Ran");
     }
