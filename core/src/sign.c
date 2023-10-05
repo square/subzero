@@ -204,6 +204,21 @@ static Result multisig_script(
   return Result_SUCCESS;
 }
 
+static inline bool is_valid_destination(const Destination destination) {
+  return destination == Destination_GATEWAY || destination == Destination_CHANGE;
+}
+
+/** Verifies that all output destinations are valid. */
+static bool validate_destinations(const InternalCommandRequest_SignTxRequest* const request) {
+  for (size_t i = 0; i < (size_t) request->outputs_count; ++i) {
+    if (!is_valid_destination(request->outputs[i].destination)) {
+      ERROR("%s: destination in output %zu is invalid", __func__, i);
+      return false;
+    }
+  }
+  return true;
+}
+
 /**
  * Verifies that the fee is less than 1 BTC or less than 10% of funds going to
  * gateway address The rules for fees are identical to those implemented in the
@@ -512,6 +527,18 @@ Result handle_sign_tx(const InternalCommandRequest_SignTxRequest* const request,
   memzero(&wallet, sizeof(HDNode));
   char CONFIDENTIAL xpub[MULTISIG_PARTS][XPUB_SIZE] = {{0}};
   uint8_t CONFIDENTIAL public_key[33] = {0};
+
+  if (0 == request->outputs_count) {
+    ERROR("%s: request specifies zero outputs", __func__);
+    r = Result_SIGNTX_ZERO_OUTPUTS;
+    goto cleanup;
+  }
+
+  if (!validate_destinations(request)) {
+    // No need to log an error, validate_destinations() already does it.
+    r = Result_SIGNTX_INVALID_DESTINATION;
+    goto cleanup;
+  }
 
   if (!validate_fees(request)) {
     ERROR("validate_fees failed");

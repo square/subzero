@@ -122,6 +122,9 @@ enum Result {
   COMMAND_SHOULD_BE_SIGNTX = 54;
   SERIALIZED_BYTES_SHOULD_BE_PRESENT = 55;
 
+  SIGNTX_ZERO_OUTPUTS = 56;
+  SIGNTX_INVALID_DESTINATION = 57;
+
   // any other error messages, such as INSERT_OCS, incorrect passphrase, etc.
   // 5xx represents failures which user input shouldn't be able to trigger
   UNKNOWN_INTERNAL_FAILURE = 500;
