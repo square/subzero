@@ -12,9 +12,9 @@ import com.squareup.subzero.proto.service.Service.CommandResponse;
 import java.util.ArrayList;
 import java.util.List;
 import org.bitcoinj.params.TestNet3Params;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
-import org.spongycastle.util.encoders.Hex;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

@@ -10,8 +10,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
-import org.spongycastle.util.encoders.Hex;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;

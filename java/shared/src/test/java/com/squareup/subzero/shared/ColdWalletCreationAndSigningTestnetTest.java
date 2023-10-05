@@ -13,12 +13,12 @@ import com.squareup.subzero.proto.service.Service.CommandResponse;
 import java.util.LinkedList;
 import java.util.List;
 import org.bitcoinj.params.TestNet3Params;
+import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
-import org.spongycastle.util.encoders.Base64;
-import org.spongycastle.util.encoders.Hex;
 
+import static org.bouncycastle.util.encoders.Hex.toHexString;
 import static org.junit.Assert.assertEquals;
-import static org.spongycastle.util.encoders.Hex.toHexString;
 
 /**
  * This tests show cases how to initialize, finalize and sign a transaction.

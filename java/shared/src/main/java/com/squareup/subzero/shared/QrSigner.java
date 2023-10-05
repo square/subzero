@@ -1,17 +1,17 @@
 package com.squareup.subzero.shared;
 
 import org.bitcoinj.core.Sha256Hash;
-import org.spongycastle.crypto.params.ECPublicKeyParameters;
-import org.spongycastle.math.ec.ECPoint;
-import org.spongycastle.asn1.sec.SECNamedCurves;
-import org.spongycastle.asn1.x9.X9ECParameters;
-import org.spongycastle.crypto.params.ECDomainParameters;
-import org.spongycastle.crypto.params.ECPrivateKeyParameters;
-import org.spongycastle.crypto.signers.ECDSASigner;
-import org.spongycastle.crypto.digests.SHA256Digest;
-import org.spongycastle.crypto.signers.HMacDSAKCalculator;
-import org.spongycastle.util.BigIntegers;
-import org.spongycastle.util.io.pem.PemReader;
+import org.bouncycastle.crypto.params.ECPublicKeyParameters;
+import org.bouncycastle.math.ec.ECPoint;
+import org.bouncycastle.asn1.sec.SECNamedCurves;
+import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.crypto.params.ECDomainParameters;
+import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
+import org.bouncycastle.crypto.signers.ECDSASigner;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
+import org.bouncycastle.util.BigIntegers;
+import org.bouncycastle.util.io.pem.PemReader;
 
 import javax.security.auth.DestroyFailedException;
 import javax.security.auth.Destroyable;

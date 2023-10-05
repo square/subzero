@@ -18,9 +18,9 @@ import org.bitcoinj.core.Address;
 import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.params.TestNet3Params;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
-import org.spongycastle.util.encoders.Hex;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
