@@ -470,18 +470,18 @@ compute_output_hash(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
   Hasher hasher;
   hasher_Init(&hasher, HASHER_SHA2D);
   for (int i = 0; i < outputs_count; i++) {
-    TxOutput out = outputs[i];
+    const TxOutput* out = &outputs[i];
 
-    hash_uint64(&hasher, out.amount);
+    hash_uint64(&hasher, out->amount);
 
-    if (out.destination == Destination_CHANGE) {
-      if (!out.path.is_change) {
+    if (out->destination == Destination_CHANGE) {
+      if (!out->path.is_change) {
         ERROR("Destination is change, but path isn't change");
         return Result_COMPUTE_OUTPUT_HASH_INVALID_DESTINATION_OR_PATH_FAILURE;
       }
-      hash_change_address(&hasher, xpub, &out.path);
+      hash_change_address(&hasher, xpub, &out->path);
     } else {
-      Result r = hash_p2pkh_address(&hasher, GATEWAY, &out.path);
+      Result r = hash_p2pkh_address(&hasher, GATEWAY, &out->path);
       if (r != Result_SUCCESS) {
         ERROR("hash_p2pkh_address failed: (%d).", r);
         return r;
@@ -548,7 +548,7 @@ Result handle_sign_tx(const InternalCommandRequest_SignTxRequest* const request,
   uint8_t seqHash[HASHER_DIGEST_LENGTH];
   // We assume all inputs have this fixed sequence. TODO: Do they? If not, they
   // need to be in the request.
-  uint32_t sequence = 0xfffffffe;
+  const uint32_t sequence = 0xfffffffe;
   compute_sequence_hash(sequence, request->inputs_count, seqHash);
   DEBUG("seqHash");
   print_bytes(seqHash, HASHER_DIGEST_LENGTH);
