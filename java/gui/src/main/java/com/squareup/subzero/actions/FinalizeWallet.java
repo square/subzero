@@ -12,6 +12,10 @@ import com.squareup.subzero.proto.service.Service.CommandRequest;
 import com.squareup.subzero.proto.service.Service.CommandResponse;
 import com.squareup.subzero.proto.wallet.WalletProto.Wallet;
 import com.squareup.subzero.wallet.WalletLoader;
+import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.params.MainNetParams;
+import org.bitcoinj.params.TestNet3Params;
+
 import java.io.IOException;
 
 import static java.lang.String.format;
@@ -63,7 +67,7 @@ public class FinalizeWallet {
 
     // Send Request
     internalRequest.setFinalizeWallet(finalizeWallet);
-    InternalCommandResponse.FinalizeWalletResponse iresp =
+    InternalCommandResponse.FinalizeWalletResponse response =
         conn.run(internalRequest.build()).getFinalizeWallet();
 
     if (subzero.nCipher) {
@@ -76,10 +80,28 @@ public class FinalizeWallet {
     // Save the encrypted pubkeys to the wallet
     Wallet newWallet = Wallet.newBuilder(wallet)
         .addAllEncryptedPubKeys(request.getFinalizeWallet().getEncryptedPubKeysList())
+        .setCurrency(getCurrencyFromFinalizeResponse(response))
         .build();
     walletLoader.save(request.getWalletId(), newWallet);
 
     // Build response
-    return CommandResponse.FinalizeWalletResponse.newBuilder().setPubKey(iresp.getPubKey()).build();
+    return CommandResponse.FinalizeWalletResponse.newBuilder().setPubKey(response.getPubKey()).build();
+  }
+
+  private static Wallet.Currency getCurrencyFromFinalizeResponse(
+      InternalCommandResponse.FinalizeWalletResponse response) {
+    String base58PublicKey = response.getPubKey().toStringUtf8();
+    try {
+      DeterministicKey.deserializeB58(base58PublicKey, MainNetParams.get());
+      return Wallet.Currency.MAIN_NET;
+    } catch (Exception e) {
+      // ignore the error, try again assuming test net
+    }
+    try {
+      DeterministicKey.deserializeB58(base58PublicKey, TestNet3Params.get());
+      return Wallet.Currency.TEST_NET;
+    } catch (Exception e) {
+      throw new RuntimeException("Public key " + base58PublicKey + " does not belong to either MAIN_NET or TEST_NET");
+    }
   }
 }
