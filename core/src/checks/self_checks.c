@@ -10,10 +10,12 @@ typedef int (*self_check_function)(void);
 typedef struct self_check_function_info {
   self_check_function func;
   const char* name;
+  int result;
+  bool attempted;
 } self_check_function_info;
 
 // For each new self check function added, this constant needs to be incremented by 1.
-#define MAX_SELF_CHECKS ((size_t) 12)
+#define MAX_SELF_CHECKS ((size_t) 14)
 static self_check_function_info self_checks[MAX_SELF_CHECKS] = { { 0 } };
 static size_t self_checks_count = 0;
 static bool self_checks_registered = false;
@@ -43,6 +45,7 @@ static void register_all_self_checks(void) {
     return;
   }
 
+  REGISTER_SELF_CHECK(pre_run_self_checks); // NOTE: this MUST always be registered first
   REGISTER_SELF_CHECK(verify_byte_order);
   REGISTER_SELF_CHECK(verify_mix_entropy);
   REGISTER_SELF_CHECK(verify_protect_pubkey);
@@ -55,6 +58,7 @@ static void register_all_self_checks(void) {
   REGISTER_SELF_CHECK(verify_conv_btc_to_satoshi);
   REGISTER_SELF_CHECK(verify_wycheproof);
   REGISTER_SELF_CHECK(verify_rpc_oversized_message_rejected);
+  REGISTER_SELF_CHECK(post_run_self_checks); // NOTE: this MUST always be registered last
 
   if (MAX_SELF_CHECKS != self_checks_count) {
     FATAL(
@@ -66,7 +70,32 @@ static void register_all_self_checks(void) {
         self_checks_count);
   }
 
+  if (self_checks[0].func != &pre_run_self_checks) {
+    FATAL("%s: first registered self check must be pre_run_self_checks", __func__);
+  }
+
+  if (self_checks[self_checks_count - 1].func != &post_run_self_checks) {
+    FATAL("%s: last registered self check must be post_run_self_checks", __func__);
+  }
+
   self_checks_registered = true;
+}
+
+static void print_self_check_results(void) {
+  INFO("===== SELF CHECKS SUMMARY =====");
+  for (size_t i = 0; i < self_checks_count; ++i) {
+    const struct self_check_function_info* info = &self_checks[i];
+    if (info->attempted) {
+      if (0 == info->result) {
+        INFO("%s: succeeded", info->name);
+      } else {
+        ERROR("%s: failed with result %d", info->name, info->result);
+      }
+    } else {
+      ERROR("%s: did not run", info->name);
+    }
+  }
+  INFO("===== END SELF CHECKS SUMMARY =====");
 }
 
 /**
@@ -78,32 +107,30 @@ static void register_all_self_checks(void) {
  * Returns -1 if any test failed.
  */
 int run_self_checks(void) {
-  int r = 0;
+  bool success = true;
 
   register_all_self_checks();
 
-  // environment specific initialization
-  r = pre_run_self_checks();
-  if (r != 0) {
-    ERROR("pre_run_self_checks failed.");
-    return r;
-  }
-
   for (size_t i = 0; i < self_checks_count; ++i) {
-    int t = self_checks[i].func();
-    if (t != 0) {
-      r = -1;
-      ERROR("self check failure: %s failed. rc = %d", self_checks[i].name, t);
+    struct self_check_function_info* info = &self_checks[i];
+    int check_result = info->func();
+    info->attempted = true;
+    info->result = check_result;
+    if (check_result != 0) {
+      success = false;
+      ERROR("self check failure: %s failed with result %d", info->name, check_result);
+
+      // if pre_run_self_checks() fails, we cannot continue
+      if (0 == i) {
+        break;
+      }
     } else {
-      INFO("%s: ok", self_checks[i].name);
+      INFO("%s: ok", info->name);
     }
   }
 
-  // environment specific additional checks + cleanup
-  int t = post_run_self_checks();
-  if (t != 0) {
-    r = -1;
-    ERROR("post_run_self_checks failed.");
+  if (!success) {
+    print_self_check_results();
   }
-  return r;
+  return success ? 0 : -1;
 }
