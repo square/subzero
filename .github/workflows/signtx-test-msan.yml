@@ -75,7 +75,7 @@ jobs:
     - name: Run SignTx Test with MSAN
       run: |
         cd ${{ github.workspace }}
-        sleep 10
+        sleep 15
         rm -f /tmp/signtx-test-msan.out
         java -jar ./java/gui/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar --signtx-test | tee /tmp/signtx-test-msan.out
         grep -qv "ALL TESTS PASSED" /tmp/signtx-test-msan.out || exit 1
