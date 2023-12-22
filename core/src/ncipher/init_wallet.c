@@ -15,7 +15,7 @@
 
 extern NFast_AppHandle app;
 
-static Result gen_random(uint8_t *buffer, uint32_t buffer_len);
+static Result gen_random(uint8_t* buffer, uint32_t buffer_len);
 
 /**
  * Initialize a wallet.
@@ -34,12 +34,11 @@ static Result gen_random(uint8_t *buffer, uint32_t buffer_len);
  *   - derive the pubkey
  *   - encrypt the master_seed and pubkey
  */
-Result handle_init_wallet(const InternalCommandRequest* const in,
-                          InternalCommandResponse_InitWalletResponse *out) {
+Result handle_init_wallet(const InternalCommandRequest* const in, InternalCommandResponse_InitWalletResponse* out) {
   DEBUG("in handle_init_wallet");
 
   // 1. Read random bytes from nCipher
-  uint8_t master_seed[MASTER_SEED_SIZE] = {0};
+  uint8_t master_seed[MASTER_SEED_SIZE] = { 0 };
   Result r = gen_random(master_seed, sizeof(master_seed));
   if (r != Result_SUCCESS) {
     ERROR("generate_random_bytes failed (%d).", r);
@@ -66,8 +65,7 @@ Result handle_init_wallet(const InternalCommandRequest* const in,
   hdnode_fill_public_key(&node);
 
   char pub_key[XPUB_SIZE];
-  int ret = hdnode_serialize_public(&node, fingerprint, PUBKEY_PREFIX,
-                                    pub_key, sizeof(pub_key));
+  int ret = hdnode_serialize_public(&node, fingerprint, PUBKEY_PREFIX, pub_key, sizeof(pub_key));
   if (ret <= 0) {
     ERROR("hdnode_serialize_public failed");
     return Result_UNKNOWN_INTERNAL_FAILURE;
@@ -92,13 +90,14 @@ Result handle_init_wallet(const InternalCommandRequest* const in,
 }
 
 uint8_t gen_random_buffer[256];
-static Result gen_random(uint8_t *buffer, uint32_t buffer_len) {
+
+static Result gen_random(uint8_t* buffer, uint32_t buffer_len) {
   if (buffer_len > sizeof(gen_random_buffer)) {
     ERROR("buffer_len too large");
     return Result_GEN_RANDOM_BUFFER_TOO_LARGE_FAILURE;
   }
-  M_Command command = {0};
-  M_Reply reply = {0};
+  M_Command command = { 0 };
+  M_Reply reply = { 0 };
   Result r;
 
   command.cmd = Cmd_GenerateRandom;

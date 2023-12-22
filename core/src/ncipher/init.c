@@ -18,9 +18,9 @@ static int initialized = false;
  * returns -1 if nCipher init fails.
  * returns -2 if nCipher connect fails.
  */
- //TODO: convert to Result
+// TODO: convert to Result
 int init(void) {
-  NFastAppInitArgs ia = {0};
+  NFastAppInitArgs ia = { 0 };
   M_Status rc;
 
   if ((rc = NFastApp_InitEx(&app, &ia, NULL))) {

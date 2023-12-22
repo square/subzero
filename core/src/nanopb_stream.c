@@ -13,14 +13,13 @@
 #include <stdint.h>
 #include <sys/socket.h>
 
-static bool write_callback(pb_ostream_t *stream, const uint8_t *buf,
-                           size_t count) {
-  int fd = (intptr_t)stream->state;
-  return send(fd, buf, count, 0) == (ssize_t)count;
+static bool write_callback(pb_ostream_t* stream, const uint8_t* buf, size_t count) {
+  int fd = (intptr_t) stream->state;
+  return send(fd, buf, count, 0) == (ssize_t) count;
 }
 
-static bool read_callback(pb_istream_t *stream, uint8_t *buf, size_t count) {
-  int fd = (intptr_t)stream->state;
+static bool read_callback(pb_istream_t* stream, uint8_t* buf, size_t count) {
+  int fd = (intptr_t) stream->state;
   int result;
 
   result = recv(fd, buf, count, MSG_WAITALL);
@@ -29,16 +28,15 @@ static bool read_callback(pb_istream_t *stream, uint8_t *buf, size_t count) {
     stream->bytes_left = 0; /* EOF */
   }
 
-  return result == (int)count;
+  return result == (int) count;
 }
 
 pb_ostream_t pb_ostream_from_socket(int fd) {
-  pb_ostream_t stream = {&write_callback, (void *)(intptr_t)fd, SIZE_MAX, 0,
-                         NULL};
+  pb_ostream_t stream = { &write_callback, (void*) (intptr_t) fd, SIZE_MAX, 0, NULL };
   return stream;
 }
 
 pb_istream_t pb_istream_from_socket(int fd) {
-  pb_istream_t stream = {&read_callback, (void *)(intptr_t)fd, SIZE_MAX, NULL};
+  pb_istream_t stream = { &read_callback, (void*) (intptr_t) fd, SIZE_MAX, NULL };
   return stream;
 }

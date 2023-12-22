@@ -2,7 +2,7 @@
 #include "squareup/subzero/internal.pb.h"
 
 Result pre_execute_command(const InternalCommandRequest* const in) {
-  (void)in;
+  (void) in;
   return Result_SUCCESS;
 }
 

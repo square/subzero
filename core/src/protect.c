@@ -8,8 +8,7 @@
  *
  * Zeros xpub.
  */
-Result protect_pubkey(char xpub[static XPUB_SIZE],
-                      EncryptedPubKey *encrypted_pub_key) {
+Result protect_pubkey(char xpub[static XPUB_SIZE], EncryptedPubKey* encrypted_pub_key) {
   // Insert magic string for binary static analysis.
   // This is extremely hacky, but works. ¯\_(ツ)_/¯
 #ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
@@ -21,8 +20,9 @@ Result protect_pubkey(char xpub[static XPUB_SIZE],
     return Result_UNKNOWN_INTERNAL_FAILURE;
   }
 
-  static_assert(sizeof(encrypted_pub_key->encrypted_pub_key.bytes) >= MAX_ENCRYPTED_PUBKEY_SIZE,
-                "misconfigured encrypted_pub_key max size");
+  static_assert(
+      sizeof(encrypted_pub_key->encrypted_pub_key.bytes) >= MAX_ENCRYPTED_PUBKEY_SIZE,
+      "misconfigured encrypted_pub_key max size");
   if (pub_key_encryption_key == 0) {
     ERROR("pub_key_encryption_key not initialized");
     return Result_PROTECT_PUBKEY_NO_PUBKEY_ENCRYPTION_KEY_FAILURE;
@@ -32,11 +32,13 @@ Result protect_pubkey(char xpub[static XPUB_SIZE],
 
   pb_size_t xpub_len = (pb_size_t) strlen(xpub);
 
-  Result r = aes_gcm_encrypt(pub_key_encryption_key,
-                             (uint8_t *) xpub, xpub_len,
-                             encrypted_pub_key->encrypted_pub_key.bytes,
-                             sizeof(encrypted_pub_key->encrypted_pub_key.bytes),
-                             &ciphertext_len);
+  Result r = aes_gcm_encrypt(
+      pub_key_encryption_key,
+      (uint8_t*) xpub,
+      xpub_len,
+      encrypted_pub_key->encrypted_pub_key.bytes,
+      sizeof(encrypted_pub_key->encrypted_pub_key.bytes),
+      &ciphertext_len);
   if (Result_SUCCESS != r) {
     ERROR("aes_gcm_encrypt failed (%d)", r);
     return r;
@@ -58,8 +60,7 @@ Result protect_pubkey(char xpub[static XPUB_SIZE],
 /**
  * Decrypt encrypted_pub_key with pubkey encryption key.
  */
-Result expose_pubkey(const EncryptedPubKey* const encrypted_pub_key,
-                     char xpub[static XPUB_SIZE]) {
+Result expose_pubkey(const EncryptedPubKey* const encrypted_pub_key, char xpub[static XPUB_SIZE]) {
   if (pub_key_encryption_key == 0) {
     ERROR("pub_key_encryption_key not initialized");
     return Result_EXPOSE_PUBKEY_NO_PUBKEY_ENCRYPTION_KEY_FAILURE;
@@ -81,10 +82,13 @@ Result expose_pubkey(const EncryptedPubKey* const encrypted_pub_key,
 
   size_t xpub_len;
 
-  Result r = aes_gcm_decrypt(pub_key_encryption_key,
-                             encrypted_pub_key->encrypted_pub_key.bytes,
-                             encrypted_pub_key->encrypted_pub_key.size,
-                             (uint8_t *)xpub, XPUB_SIZE - 1, &xpub_len);
+  Result r = aes_gcm_decrypt(
+      pub_key_encryption_key,
+      encrypted_pub_key->encrypted_pub_key.bytes,
+      encrypted_pub_key->encrypted_pub_key.size,
+      (uint8_t*) xpub,
+      XPUB_SIZE - 1,
+      &xpub_len);
   if (Result_SUCCESS != r) {
     ERROR("%s failed (%d)", __func__, r);
     return r;
@@ -102,11 +106,10 @@ Result expose_pubkey(const EncryptedPubKey* const encrypted_pub_key,
  *
  * Zeros master_seed.
  */
-Result protect_wallet(uint8_t master_seed[static MASTER_SEED_SIZE],
-                      EncryptedMasterSeed *encrypted_master_seed) {
-  static_assert(sizeof(encrypted_master_seed->encrypted_master_seed.bytes) >=
-                    MASTER_SEED_SIZE,
-                "misconfigured encrypted_master_seed max size");
+Result protect_wallet(uint8_t master_seed[static MASTER_SEED_SIZE], EncryptedMasterSeed* encrypted_master_seed) {
+  static_assert(
+      sizeof(encrypted_master_seed->encrypted_master_seed.bytes) >= MASTER_SEED_SIZE,
+      "misconfigured encrypted_master_seed max size");
 
   if (master_seed_encryption_key == 0) {
     ERROR("master_seed_encryption_key not initialized");
@@ -115,7 +118,9 @@ Result protect_wallet(uint8_t master_seed[static MASTER_SEED_SIZE],
 
   size_t ciphertext_len;
   Result r = aes_gcm_encrypt(
-      master_seed_encryption_key, master_seed, MASTER_SEED_SIZE,
+      master_seed_encryption_key,
+      master_seed,
+      MASTER_SEED_SIZE,
       encrypted_master_seed->encrypted_master_seed.bytes,
       sizeof(encrypted_master_seed->encrypted_master_seed.bytes),
       &ciphertext_len);
@@ -138,8 +143,9 @@ Result protect_wallet(uint8_t master_seed[static MASTER_SEED_SIZE],
 /**
  * Decrypt master_seed with master_seed_encryption_key.
  */
-Result expose_wallet(const EncryptedMasterSeed* const encrypted_master_seed,
-                     uint8_t master_seed[static MASTER_SEED_SIZE]) {
+Result expose_wallet(
+    const EncryptedMasterSeed* const encrypted_master_seed,
+    uint8_t master_seed[static MASTER_SEED_SIZE]) {
   if (master_seed_encryption_key == 0) {
     ERROR("master_seed_encryption_key not initialized");
     return Result_EXPOSE_WALLET_NO_MASTER_SEED_ENCRYPTION_KEY_FAILURE;
@@ -151,10 +157,13 @@ Result expose_wallet(const EncryptedMasterSeed* const encrypted_master_seed,
   }
 
   size_t master_seed_len;
-  Result r = aes_gcm_decrypt(master_seed_encryption_key,
-                             encrypted_master_seed->encrypted_master_seed.bytes,
-                             encrypted_master_seed->encrypted_master_seed.size,
-                             master_seed, MASTER_SEED_SIZE, &master_seed_len);
+  Result r = aes_gcm_decrypt(
+      master_seed_encryption_key,
+      encrypted_master_seed->encrypted_master_seed.bytes,
+      encrypted_master_seed->encrypted_master_seed.size,
+      master_seed,
+      MASTER_SEED_SIZE,
+      &master_seed_len);
   if (r != Result_SUCCESS) {
     ERROR("aes_gcm_decrypt failed (%d).", r);
     return r;
