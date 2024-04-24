@@ -25,7 +25,7 @@ restore a wallet at any location.
 
 This repo contains our design documents as well as specific technical information. We are sharing our source code, with
 the caveat that the code is currently only useful if you have the exact same hardware setup. We are willing to make the
-code more modular over time, as long as the broader community shows interest to implement support for additional
+code more modular over time, as long as the broader community shows interest in implementing support for additional
 hardware vendors.
 
 See also [Open Sourcing Subzero (blog post)](https://developer.squareup.com/blog/open-sourcing-subzero)
