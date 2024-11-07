@@ -3,7 +3,7 @@
 Codesafe code to perform Bitcoin wallet operations.
 
 The code is designed to work on Mac OS X (for development purpose), as well as
-nCipher. This is achieved by using glibsee.
+nCipher. Requires glibc.
 
 # Electrum
 Electrum is a popular, open source wallet. The code is in python and it's sometimes useful
