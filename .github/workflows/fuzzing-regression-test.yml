@@ -21,8 +21,6 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
-        python-version: [3.9]
 
     steps:
     - name: Checkout repository
@@ -33,30 +31,27 @@ jobs:
         fetch-depth: 2
         submodules: 'recursive'
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+    - name: Init Hermit
+      uses: cashapp/activate-hermit@v1
 
-    - name: Display Python version
+    - name: Install Clang
       run: |
-        python -c "import sys; print(sys.version)"
+        sudo apt-get update
+        sudo apt install clang -y
 
-    - name: Install dependencies
-      run: scripts/ubuntu_install_protobuf.sh
-
-    - name: Setup Clang
-      uses: egor-tensin/setup-clang@v1.4
-      with:
-        version: latest
-        platform: x64
+    - name: Install python packages
+      run: |
+        cd ${{ github.workspace }}
+        pip install --upgrade pip
+        pip install -r ./core/requirements.txt
 
     # Build CORE with ASAN, UBSAN, and libfuzzer
     - name: Build Subzero Core (ASAN+UBSAN+FUZZER)
       run: |
+        cd ${{ github.workspace }}
         export CC=`which clang`
         export CXX=`which clang++`
-        scripts/build_core.sh -DENABLE_ASAN=ON -DENABLE_UBSAN=ON -DENABLE_FUZZER=ON
+        ./scripts/build_core.sh -DENABLE_ASAN=ON -DENABLE_UBSAN=ON -DENABLE_FUZZER=ON
 
     - name: Run Subzero CORE Fuzzing regression test
       run: |

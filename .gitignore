@@ -1,2 +1,3 @@
 vendor/
 .venv3
+.hermit/

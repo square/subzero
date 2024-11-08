@@ -69,20 +69,34 @@ filesystem with the host.
 
 # Getting started (locally)
 
+1. Install Hermit on your system following the instructions at [https://cashapp.github.io/hermit/](https://cashapp.github.io/hermit/).
+2. Install clang using the standard installation method for your OS (google it if necessary). The clang package for hermit doesn't work properly so this is the only dependency that cannot be "hermit-ized".
+3. Run the following commands:
+```
     git clone --recursive https://github.com/square/subzero.git
-    cd subzero/core
+    cd subzero
+    . bin/activate-hermit # not necessary if you enable hermit shell hooks
+    cd core
     mkdir build
     cd build
     CURRENCY=btc-testnet cmake ../
     make
     ./subzero
+```
 
 # nCipher (without signed code)
 
+1. Install hermit as instructed above
+2. Make sure you have the proprietary ncipher libraries and cross-compiler (you need to get these from nCipher). See core/codesafe.cmake for some details. (TODO: document what versions of ncipher software are needed)
+3. Run the following commands:
+```
     git clone --recursive https://github.com/square/subzero.git
-    cd subzero/core
+    cd subzero
+    . bin/activate-hermit # not necessary if you enable hermit shell hooks
+    cd core
     mkdir build
     cd build
     TARGET=nCipher CURRENCY=btc-testnet cmake ../
     make
     make run
+```
