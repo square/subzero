@@ -21,8 +21,6 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
-        python-version: [3.9]
 
     steps:
     - name: Checkout repository
@@ -33,21 +31,25 @@ jobs:
         fetch-depth: 2
         submodules: 'recursive'
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+    - name: Init Hermit
+      uses: cashapp/activate-hermit@v1
 
-    - name: Display Python version
+    - name: Install Clang
       run: |
-        python -c "import sys; print(sys.version)"
+        sudo apt-get update
+        sudo apt install clang -y
 
-    - name: Install build dependencies
+    - name: Install python packages
       run: |
-        scripts/ubuntu_install_protobuf.sh
+        cd ${{ github.workspace }}
+        pip install --upgrade pip
+        pip install -r ./core/requirements.txt
 
     - name: Build subzero CORE
       run: |
+        cd ${{ github.workspace }}
+        export CC=`which clang`
+        export CXX=`which clang++`
         scripts/build_core.sh
 
     # Run binary static analysis

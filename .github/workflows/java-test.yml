@@ -21,8 +21,6 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
-        python-version: [3.9]
 
     steps:
     - name: Checkout repository
@@ -33,11 +31,11 @@ jobs:
         fetch-depth: 2
         submodules: 'recursive'
 
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
+    - name: Init Hermit
+      uses: cashapp/activate-hermit@v1
 
     # Unit tests for Java
     - name: Run Unit tests
       run: |
         cd ${{ github.workspace }}/java
-        ./gradlew test --info
+        gradle test --info

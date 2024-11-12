@@ -21,8 +21,6 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
-        python-version: [3.9]
 
     steps:
     - name: Checkout repository
@@ -33,30 +31,33 @@ jobs:
         fetch-depth: 2
         submodules: 'recursive'
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Display Python version
-      run: |
-        python -c "import sys; print(sys.version)"
-
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
-
-    - name: Install dependencies
-      run: scripts/ubuntu_install_protobuf.sh
+    - name: Init Hermit
+      uses: cashapp/activate-hermit@v1
 
     # Build Java targets
     - name: Build Java
       run: |
         cd ${{ github.workspace }}/java
-        ./gradlew clean build --info
+        gradle build --info
+
+    - name: Install Clang
+      run: |
+        sudo apt-get update
+        sudo apt install clang -y
+
+    - name: Install python packages
+      run: |
+        cd ${{ github.workspace }}
+        pip install --upgrade pip
+        pip install -r ./core/requirements.txt
 
     # Build CORE
     - name: Build Subzero Core
-      run: scripts/build_core.sh
+      run: |
+        cd ${{ github.workspace }}
+        export CC=`which clang`
+        export CXX=`which clang++`
+        ./scripts/build_core.sh
 
     - name: Run Subzero CORE
       run: |
