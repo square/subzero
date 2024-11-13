@@ -20,21 +20,8 @@ and [CLion](https://www.jetbrains.com/clion/) for the C core.
 `cd core; docker build -t subzero . && docker run -t -p 32366:32366 --name subzero subzero`. In the future, we may
 provide additional docker files for running the GUI and web server).
 
-    # Open Terminal and install Homebrew
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-
-    # install Java
-    brew update
-    brew cask install java
-
-    # note: if Mac OS X gives you a warning about unverified developers, you can go to the
-    # Security & Privacy settings and allow the action to take place.
-
-    # install cmake
-    brew install cmake
-
-    # install protobuf
-    brew install protobuf
+    # Open Terminal and install Hermit, see details at https://cashapp.github.io/hermit/
+    curl -fsSL https://github.com/cashapp/hermit/releases/download/stable/install.sh | /bin/bash
 
     # close + re-open the Terminal window for some changes to take effect
 
@@ -42,21 +29,27 @@ provide additional docker files for running the GUI and web server).
     git clone --recursive https://github.com/square/subzero.git
     cd subzero
 
+    # Activate the Hermit environment (not necessary if you install the hermit shell hooks)
+    . bin/activate-hermit
+
     # build the Java code
     cd java
-    ./gradlew build
+    gradle build
 
-    # build the C code, using testnet transactions.
+    # Install the python packages
     cd ../core
+    pip install --upgrade pip
+    pip install -r requirements.txt
+
+    # Build the core. We are still in subzero/core.
     mkdir build
     cd build
     TARGET=dev CURRENCY=btc-testnet cmake ../
     make
 
-    # create the wallets directory
-    sudo mkdir -p /data/app/subzero/wallets/
-    sudo chown $USER /data/app/subzero/wallets/
-    touch /data/app/subzero/wallets/.subzero_702e63a9
+    # create the wallets directory and create the magic file
+    mkdir -p "${HOME}/subzero-wallets/"
+    touch "${HOME}/subzero-wallets/.subzero_702e63a9"
 
 ## Running the servers and user interface
 
@@ -66,14 +59,15 @@ See also [sample output](core_sample_output.md).
     # when the Core starts, it runs several self checks. Some number of red lines is thus expected
     ./subzero/core/build/subzero
 
-    # in a fresh Terminal tab, start the dev/demo server (listens on port 8080)
+    # in a fresh Terminal tab, start the dev/demo server (listens on port 8080).
+    # Remember to activate hermit if you didn't install shell hooks.
     java -jar ./subzero/java/server/build/libs/server-1.0.0-SNAPSHOT.jar server
 
     # in a fresh Terminal tab, open http://localhost:8080/.
     open http://localhost:8080/
 
     # start the GUI
-    java -jar ./subzero/java/gui/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar
+    java -jar ./subzero/java/gui/build/libs/gui-1.0.0-SNAPSHOT-shaded.jar --wallet-dir "${HOME}/subzero-wallets"
 
 Your environment should look as following (from top left, going clockwise): the GUI, a web browser, and a Terminal.
 
@@ -104,7 +98,7 @@ want to save this response in TextEdit. In our case, the response was `CnMKcQpv3
 Before you can repeat the wallet initialization process 3 more times, you need to move the wallet file out of the way:
 
     # In a fresh Terminal tab
-    cd /data/app/subzero/wallets
+    cd "${HOME}/subzero-wallets"
     mkdir initialized
     mv -n subzero-0.wallet initialized/subzero-0.wallet-1
 
