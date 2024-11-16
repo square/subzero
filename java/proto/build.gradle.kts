@@ -6,7 +6,7 @@ import subzero.DependencyVersions
 
 plugins {
     id("com.squareup.subzero.java-conventions")
-    id("com.google.protobuf") version "0.9.3"
+    id("com.google.protobuf") version "0.9.4"
 }
 
 dependencies {
