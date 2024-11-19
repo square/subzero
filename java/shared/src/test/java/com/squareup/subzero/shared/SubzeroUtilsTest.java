@@ -6,15 +6,22 @@ import com.squareup.subzero.proto.service.Common.Destination;
 import com.squareup.subzero.proto.service.Common.EncryptedMasterSeed;
 import com.squareup.subzero.proto.service.Common.EncryptedPubKey;
 import com.squareup.subzero.proto.service.Common.Path;
+import com.squareup.subzero.proto.service.Common.Signature;
 import com.squareup.subzero.proto.service.Common.TxInput;
 import com.squareup.subzero.proto.service.Common.TxOutput;
 import com.squareup.subzero.proto.service.Internal.InternalCommandRequest;
 import com.squareup.subzero.proto.service.Service.CommandRequest;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.bitcoinj.core.Address;
+import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.params.TestNet3Params;
@@ -494,6 +501,135 @@ public class SubzeroUtilsTest {
     assertTrue(e3.getMessage().contains(ERROR_OUTPUTS_COUNT));
   }
 
+  @Test
+  public void testValidateAndSortValidSignatures() {
+    List<ECKey> keys = Arrays.asList(new ECKey(), new ECKey(), new ECKey());
+    keys.sort(ECKey.PUBKEY_COMPARATOR);
+
+    byte[] hash = sha256Hash("mock input");
+    List<Signature> signatures = Arrays.asList(
+        createValidSignature(hash, keys.get(0)),
+        createValidSignature(hash, keys.get(1))
+    );
+
+    List<byte[]> sortedSigs = SubzeroUtils.validateAndSort(keys, hash, signatures);
+
+    assertEquals(Constants.MULTISIG_THRESHOLD, sortedSigs.size());
+    assertArrayEquals(signatures.get(0).getDer().toByteArray(), sortedSigs.get(0));
+    assertArrayEquals(signatures.get(1).getDer().toByteArray(), sortedSigs.get(1));
+  }
+
+  @Test
+  public void testValidateAndSortInvalidSignatures() {
+    List<ECKey> keys = Arrays.asList(new ECKey(), new ECKey());
+    byte[] hash = sha256Hash("mock input");
+    List<Signature> signatures = Arrays.asList(
+        createInvalidEmptySignature(),
+        createInvalidEmptySignature()
+    );
+
+    RuntimeException exception = assertThrows(RuntimeException.class, () ->
+        SubzeroUtils.validateAndSort(keys, hash, signatures)
+    );
+
+    assertTrue(exception.getMessage().contains("Our calculated hash does not match the HSM provided sig"));
+  }
+
+  @Test
+  public void testValidateAndSortValidSignaturesFlippedBit() {
+    List<ECKey> keys = Arrays.asList(new ECKey(), new ECKey(), new ECKey());
+    keys.sort(ECKey.PUBKEY_COMPARATOR);
+
+    byte[] hash = sha256Hash("mock input");
+    List<Signature> signatures = Arrays.asList(
+        createValidSignature(hash, keys.get(0)),
+        createValidSignature(hash, keys.get(1))
+    );
+
+    List<byte[]> sortedSigs = SubzeroUtils.validateAndSort(keys, hash, signatures);
+
+    assertEquals(Constants.MULTISIG_THRESHOLD, sortedSigs.size());
+    assertArrayEquals(signatures.get(0).getDer().toByteArray(), sortedSigs.get(0));
+    assertArrayEquals(signatures.get(1).getDer().toByteArray(), sortedSigs.get(1));
+
+    // Flip a bit in one signature and check for failure
+    byte[] corruptedSigBytes = signatures.get(0).getDer().toByteArray();
+    corruptedSigBytes[0] ^= 0x01;
+
+    // Use the same hash but use the corrupted signature
+    Signature corruptedSignature = Signature.newBuilder()
+        .setHash(signatures.get(0).getHash())
+        .setDer(ByteString.copyFrom(corruptedSigBytes))
+        .build();
+
+    List<Signature> corruptedSignatures = Arrays.asList(corruptedSignature, signatures.get(1));
+
+    // Validate and expect a failure
+    RuntimeException exception = assertThrows(RuntimeException.class, () ->
+        SubzeroUtils.validateAndSort(keys, hash, corruptedSignatures)
+    );
+
+    assertTrue(exception.getMessage().contains("Failed validating signatures"));
+  }
+
+  @Test
+  public void testValidateAndSortSignatureWithWrongHash() {
+    List<ECKey> keys = Arrays.asList(new ECKey(), new ECKey());
+    byte[] hash = sha256Hash("input1");
+    byte[] wrongHash = sha256Hash("input2");
+    List<Signature> signatures = Arrays.asList(createValidSignature(wrongHash, keys.get(0)));
+
+    RuntimeException exception = assertThrows(RuntimeException.class, () ->
+        SubzeroUtils.validateAndSort(keys, hash, signatures)
+    );
+    assertTrue(exception.getMessage().contains("Our calculated hash does not match the HSM provided sig"));
+  }
+
+  @Test
+  public void testValidateAndSortDuplicateSignatures() {
+    List<ECKey> keys = Arrays.asList(new ECKey(), new ECKey());
+    byte[] hash = sha256Hash("input");
+    Signature validSig = createValidSignature(hash, keys.get(0));
+    List<Signature> signatures = Arrays.asList(validSig, validSig);
+
+    RuntimeException exception = assertThrows(RuntimeException.class, () ->
+        SubzeroUtils.validateAndSort(keys, hash, signatures)
+    );
+    assertTrue(exception.getMessage().contains("Failed validating signatures"));
+  }
+
+  @Test
+  public void testValidateAndSortDuplicateKey() {
+    List<ECKey> keys = Arrays.asList(new ECKey(), new ECKey());
+    byte[] hash = sha256Hash("input");
+
+    // Sign twice using the same key rather than using a copied reference to the same signature
+    // as in testValidateAndSortDuplicateSignatures
+    Signature validSig1 = createValidSignature(hash, keys.get(0));
+    Signature validSig2 = createValidSignature(hash, keys.get(0));
+    List<Signature> signatures = Arrays.asList(validSig1, validSig2);
+
+    RuntimeException exception = assertThrows(RuntimeException.class, () ->
+        SubzeroUtils.validateAndSort(keys, hash, signatures)
+    );
+    assertTrue(exception.getMessage().contains("Failed validating signatures"));
+  }
+
+  @Test
+  public void testValidateAndSortSignaturesBelowThreshold() {
+    List<ECKey> keys = Arrays.asList(new ECKey(), new ECKey());
+    byte[] hash = sha256Hash("input");
+    // Only supply 1 sig
+    List<Signature> signatures = Arrays.asList(
+        createValidSignature(hash, keys.get(0))
+    );
+
+    RuntimeException exception = assertThrows(RuntimeException.class, () ->
+        SubzeroUtils.validateAndSort(keys, hash, signatures)
+    );
+    assertTrue(exception.getMessage().contains("Failed validating signatures"));
+  }
+
   private TxInput testInput() {
     return testInput(1000L, ByteString.copyFromUtf8("test prev hash"));
   }
@@ -524,6 +660,32 @@ public class SubzeroUtilsTest {
         .setPath(Path.newBuilder()
             .setIsChange(destination == Destination.CHANGE)
             .setIndex(2))
+        .build();
+  }
+
+  private Signature createValidSignature(byte[] hash, ECKey ecKey) {
+    Sha256Hash sha256Hash = Sha256Hash.wrap(hash);
+    ECKey.ECDSASignature ecdsaSignature = ecKey.sign(sha256Hash);
+    byte[] signatureBytes = ecdsaSignature.encodeToDER();
+    return Signature.newBuilder()
+        .setHash(ByteString.copyFrom(hash))
+        .setDer(ByteString.copyFrom(signatureBytes))
+        .build();
+  }
+
+  private byte[] sha256Hash(String inputData) {
+    try {
+      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      return digest.digest(inputData.getBytes(StandardCharsets.UTF_8));
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException("SHA-256 not found", e);
+    }
+  }
+
+  private Signature createInvalidEmptySignature() {
+    return Signature.newBuilder()
+        .setHash(ByteString.copyFrom(new byte[]{0}))
+        .setDer(ByteString.copyFrom(new byte[]{0}))
         .build();
   }
 }

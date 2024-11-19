@@ -2,6 +2,7 @@ package com.squareup.subzero.shared;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.BaseEncoding;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.common.BitMatrix;
@@ -18,7 +19,9 @@ import com.squareup.subzero.proto.service.Service.CommandRequest;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
@@ -130,16 +133,19 @@ public class SubzeroUtils {
     // This needs to be the same sort that ScriptBuilder.createRedeemScript does.
     pubkeys.sort(ECKey.PUBKEY_COMPARATOR);
     List<byte[]> sortedSigs = new ArrayList<>();
+    Set<ByteString> seenSigs = new HashSet<>();
 
     // If this check fails, we've probably got invalid signatures that would fail below, or when
     // broadcast.  However, this lets us distinguish between invalid signatures and signatures over
     // the wrong data.  Useful primarily for debugging when making changes to either piece of code.
+    ByteString expectedHash = ByteString.copyFrom(hash);
     for (Signature sig : signatures) {
       if (sig.hasHash()) {
-        if (!Arrays.equals(sig.getHash().toByteArray(), hash)) {
+        ByteString sigHash = sig.getHash();
+        if (!sigHash.equals(expectedHash)) {
           throw new RuntimeException(format(
               "Our calculated hash does not match the HSM provided sig: %s != %s",
-              Hex.toHexString(sig.getHash().toByteArray()), Hex.toHexString(hash)));
+              sigHash.toStringUtf8(), expectedHash.toStringUtf8()));
         }
       }
     }
@@ -149,8 +155,14 @@ public class SubzeroUtils {
     for(ECKey pubkey: pubkeys) {
       for (Signature sig : signatures) {
         try {
-          if (pubkey.verify(hash, sig.getDer().toByteArray())) {
-            sortedSigs.add(sig.getDer().toByteArray());
+          byte[] sigDerBytes = sig.getDer().toByteArray();
+          if (pubkey.verify(hash, sigDerBytes)) {
+            ByteString sigDerByteString = ByteString.copyFrom(sigDerBytes);
+            if (!seenSigs.contains(sigDerByteString)) {
+              // Only add the signature if it is unique
+              sortedSigs.add(sigDerBytes);
+              seenSigs.add(sigDerByteString);
+            }
           }
         } catch (SignatureDecodeException e) {
           // keep going, we'll throw a RuntimeException later if we don't find the right number of
