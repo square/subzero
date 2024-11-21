@@ -24,6 +24,7 @@ import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.crypto.HDKeyDerivation;
 import org.bitcoinj.params.TestNet3Params;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
@@ -31,6 +32,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static com.squareup.subzero.shared.SubzeroUtils.ERROR_ENCRYPTED_MASTER_SEED_SIZE;
@@ -109,7 +111,7 @@ public class SubzeroUtilsTest {
     assertEquals("2MuAdStu2xZtRSyA5B6wRtj7SmaLjDyfm1H", address.toString());
   }
 
-  @Test public void derivePublicKey() {
+  @Test public void testDerivePublicKeyRandom() {
     // Using https://iancoleman.io/bip39/, I created a random key. The derivation we use for cold
     // wallet is m/coin_type'/change/address_index. The coin_type' is taken care of for us,
     // so we only care about change/address_index.
@@ -137,6 +139,38 @@ public class SubzeroUtilsTest {
     childKey = SubzeroUtils.derivePublicKey(extendedPublicKey, SubzeroUtils.newPath(true, 62));
     expected = Hex.decode("03739f4d23146ab04e007809339b39eb0d5ea34ec79e518b4639b2b1bf2fd744dd");
     assertArrayEquals(expected, childKey.getPubKey());
+  }
+
+  @Test public void testDerivePublicKeyNegativeIndex() {
+    DeterministicKey rootKey = HDKeyDerivation.createMasterPrivateKey(new byte[32]);
+    Path invalidPath = Path.newBuilder().setIsChange(false).setIndex(-1).build();
+
+    Exception exception = assertThrows(IllegalStateException.class, () -> {
+      SubzeroUtils.derivePublicKey(rootKey, invalidPath);
+    });
+
+    assertEquals("index should be between 0 and 2^31-1", exception.getMessage());
+  }
+
+  @Test public void testDerivePublicKeyMaxIndex() {
+    DeterministicKey rootKey = HDKeyDerivation.createMasterPrivateKey(new byte[32]);
+    // Integer.MAX_VALUE is 2^31-1.
+    Path path = Path.newBuilder().setIsChange(false).setIndex(Integer.MAX_VALUE).build();
+
+    DeterministicKey derivedKey = SubzeroUtils.derivePublicKey(rootKey, path);
+    assertEquals(33, derivedKey.getPubKey().length);
+  }
+
+  @Test public void testDerivePublicKeyReproducible() {
+    DeterministicKey rootKey = HDKeyDerivation.createMasterPrivateKey(new byte[32]);
+    Path path = Path.newBuilder().setIsChange(false).setIndex(37).build();
+
+    DeterministicKey key1 = SubzeroUtils.derivePublicKey(rootKey, path);
+    DeterministicKey key2 = SubzeroUtils.derivePublicKey(rootKey, path);
+
+    assertNotNull(key1);
+    assertNotNull(key2);
+    assertEquals(key1, key2);
   }
 
   @Test
