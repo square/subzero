@@ -1,4 +1,9 @@
-# Note: this file is a copy of https://github.com/github/gitignore/blob/main/Gradle.gitignore
+# Ignore gradlew files
+gradle/wrapper/
+gradlew
+gradlew.bat
+
+# Note: this rest of the file is a copy of https://github.com/github/gitignore/blob/main/Gradle.gitignore
 
 .gradle
 **/build/
