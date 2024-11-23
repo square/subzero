@@ -55,6 +55,7 @@ public class SubzeroUtilsTest {
   private static ByteString shortByteString;
   private static ByteString longByteString;
   private static List<EncryptedPubKey> pubKeys;
+  private static List<DeterministicKey> rootKeys;
 
   @Before
   public void setUp() {
@@ -68,6 +69,53 @@ public class SubzeroUtilsTest {
 
     String longString = String.join("", Collections.nCopies(100, "abcdefghijklmnopqrstuvwxyz"));
     longByteString = ByteString.copyFromUtf8(longString);
+
+    rootKeys = new ArrayList<>();
+    rootKeys.add(createDeterministicKey(longString + "key1"));
+    rootKeys.add(createDeterministicKey(longString + "key2"));
+    rootKeys.add(createDeterministicKey(longString + "key3"));
+    rootKeys.add(createDeterministicKey(longString + "key4"));
+  }
+
+  @Test public void testDeriveP2SHP2WSHThresholdTooSmall() {
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+      SubzeroUtils.deriveP2SHP2WSH(TestNet3Params.get(), 1, rootKeys, SubzeroUtils.newPath(false, 0));
+    });
+
+    assertEquals("threshold too small", exception.getMessage());
+  }
+
+  @Test public void testDeriveP2SHP2WSHThresholdTooLarge() {
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+      SubzeroUtils.deriveP2SHP2WSH(TestNet3Params.get(), 21, rootKeys, SubzeroUtils.newPath(false, 0));
+    });
+
+    assertEquals("threshold too large", exception.getMessage());
+  }
+
+  @Test public void testDeriveP2SHP2WSHInconsistentThreshold() {
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+      SubzeroUtils.deriveP2SHP2WSH(TestNet3Params.get(), 5, rootKeys, SubzeroUtils.newPath(false, 0));
+    });
+
+    assertEquals("inconsistent threshold", exception.getMessage());
+  }
+
+  @Test public void testDeriveP2SHP2WSHInvalidMultisigThreshold() {
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+      SubzeroUtils.deriveP2SHP2WSH(TestNet3Params.get(), 3, rootKeys, SubzeroUtils.newPath(false, 0));
+    });
+
+    assertEquals("threshold != MULTISIG_THRESHOLD", exception.getMessage());
+  }
+
+  @Test public void testDeriveP2SHP2WSHInvalidMultisigParticipants() {
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+      SubzeroUtils.deriveP2SHP2WSH(TestNet3Params.get(), 2, rootKeys.subList(0, 2),
+          SubzeroUtils.newPath(false, 0));
+    });
+
+    assertEquals("publicRootKeys.size() != MULTISIG_PARTICIPANTS", exception.getMessage());
   }
 
   @Test public void deriveP2SHP2WSH() {
@@ -158,7 +206,8 @@ public class SubzeroUtilsTest {
     Path path = Path.newBuilder().setIsChange(false).setIndex(Integer.MAX_VALUE).build();
 
     DeterministicKey derivedKey = SubzeroUtils.derivePublicKey(rootKey, path);
-    assertEquals(33, derivedKey.getPubKey().length);
+    assertEquals("02f4141db54ed9251a22c29495bc33025f7ea18d1375808be4515b76bf2d3f9765",
+        Hex.toHexString(derivedKey.getPubKey()));
   }
 
   @Test public void testDerivePublicKeyReproducible() {
@@ -168,9 +217,9 @@ public class SubzeroUtilsTest {
     DeterministicKey key1 = SubzeroUtils.derivePublicKey(rootKey, path);
     DeterministicKey key2 = SubzeroUtils.derivePublicKey(rootKey, path);
 
-    assertNotNull(key1);
-    assertNotNull(key2);
     assertEquals(key1, key2);
+    assertEquals("03ff5c00afd62441bfdbfcbbc412873e64a04d20ff8a6fcc3768df03b112bb2b10",
+        Hex.toHexString(key1.getPubKey()));
   }
 
   @Test
@@ -662,6 +711,14 @@ public class SubzeroUtilsTest {
         SubzeroUtils.validateAndSort(keys, hash, signatures)
     );
     assertTrue(exception.getMessage().contains("Failed validating signatures"));
+  }
+
+  public static DeterministicKey createDeterministicKey(String input) {
+    DeterministicKey masterKey =
+        HDKeyDerivation.createMasterPrivateKey(input.getBytes(StandardCharsets.UTF_8));
+    DeterministicKey childKey = HDKeyDerivation.deriveChildKey(masterKey, 0);
+
+    return childKey;
   }
 
   private TxInput testInput() {
