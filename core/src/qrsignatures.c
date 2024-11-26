@@ -54,18 +54,13 @@ bool check_qrsignature_pub(
   }
 
   int result_verify = ecdsa_verify(
-    (const ecdsa_curve *)&nist256p1,
-    HASHER_SHA2,
-    (const uint8_t *) pubkey,
-    signature,
-    data,
-    (uint32_t)data_len);
+      (const ecdsa_curve*) &nist256p1, HASHER_SHA2, (const uint8_t*) pubkey, signature, data, (uint32_t) data_len);
 
   if (result_verify == 0) {
-      result = true;
-      DEBUG("QR signature verification successful.");
+    result = true;
+    DEBUG("QR signature verification successful.");
   } else {
-      DEBUG("QR signature verification failed.");
+    DEBUG("QR signature verification failed.");
   }
 
 out:

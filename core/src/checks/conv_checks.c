@@ -9,11 +9,12 @@ int verify_conv_btc_to_satoshi(void) {
   uint64_t satoshi = conv_btc_to_satoshi(btc);
   uint64_t expected = 0;
   if (satoshi != expected) {
-    ERROR("%s: conv_btc_to_satoshi(%" PRIu32 ") returned %" PRIu64 " (expected: %" PRIu64 ")",
-          __func__,
-          btc,
-          satoshi,
-          expected);
+    ERROR(
+        "%s: conv_btc_to_satoshi(%" PRIu32 ") returned %" PRIu64 " (expected: %" PRIu64 ")",
+        __func__,
+        btc,
+        satoshi,
+        expected);
     return -1;
   }
 
@@ -21,11 +22,12 @@ int verify_conv_btc_to_satoshi(void) {
   satoshi = conv_btc_to_satoshi(btc);
   expected = 100000000ull;
   if (satoshi != expected) {
-    ERROR("%s: conv_btc_to_satoshi(%" PRIu32 ") returned %" PRIu64 " (expected: %" PRIu64 ")",
-          __func__,
-          btc,
-          satoshi,
-          expected);
+    ERROR(
+        "%s: conv_btc_to_satoshi(%" PRIu32 ") returned %" PRIu64 " (expected: %" PRIu64 ")",
+        __func__,
+        btc,
+        satoshi,
+        expected);
     return -1;
   }
 
@@ -33,11 +35,12 @@ int verify_conv_btc_to_satoshi(void) {
   satoshi = conv_btc_to_satoshi(btc);
   expected = 2100000000000000ull;
   if (satoshi != expected) {
-    ERROR("%s: conv_btc_to_satoshi(%" PRIu32 ") returned %" PRIu64 " (expected: %" PRIu64 ")",
-          __func__,
-          btc,
-          satoshi,
-          expected);
+    ERROR(
+        "%s: conv_btc_to_satoshi(%" PRIu32 ") returned %" PRIu64 " (expected: %" PRIu64 ")",
+        __func__,
+        btc,
+        satoshi,
+        expected);
     return -1;
   }
 

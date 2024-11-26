@@ -11,8 +11,7 @@
  * We currently use XOR to mix the two buffers.
  * TODO(alok): replace with HMAC, which is slightly better.
  */
-Result mix_entropy(uint8_t master_seed[static MASTER_SEED_SIZE],
-                   const InternalCommandRequest* const in) {
+Result mix_entropy(uint8_t master_seed[static MASTER_SEED_SIZE], const InternalCommandRequest* const in) {
   if (in->command.InitWallet.random_bytes.size != MASTER_SEED_SIZE) {
     ERROR("unexpected random_bytes.size");
     return Result_INCORRECT_RANDOM_BYTES_SIZE;

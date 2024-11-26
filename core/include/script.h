@@ -12,9 +12,11 @@ typedef struct _script_t {
   uint8_t data[SCRIPT_MAX_LEN];
 } script_t;
 
-#define SCRIPT_EMPTY                                                           \
-  {                                                                            \
-    0, { 0 }                                                                   \
+#define SCRIPT_EMPTY \
+  {                  \
+    0, {             \
+      0              \
+    }                \
   }
 
 /** Script opcodes */
@@ -162,5 +164,5 @@ enum opcodetype {
   OP_INVALIDOPCODE = 0xff,
 };
 
-Result script_push(script_t *script, enum opcodetype opcode);
-Result script_push_data(script_t *script, const uint8_t *data, size_t len);
+Result script_push(script_t* script, enum opcodetype opcode);
+Result script_push_data(script_t* script, const uint8_t* data, size_t len);

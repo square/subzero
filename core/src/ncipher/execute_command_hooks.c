@@ -9,7 +9,7 @@
 
 extern NFast_AppHandle app;
 
-static Result ticket2keyId(const uint8_t *ticket_bytes, uint32_t ticket_len, M_KeyID *key_id);
+static Result ticket2keyId(const uint8_t* ticket_bytes, uint32_t ticket_len, M_KeyID* key_id);
 extern M_KeyID master_seed_encryption_key;
 extern M_KeyID pub_key_encryption_key;
 
@@ -30,16 +30,16 @@ Result pre_execute_command(const InternalCommandRequest* const in) {
 
   int i;
   // 1. Load the master_seed_encryption_key using the ticket
-  DEBUG("master_seed_encryption_key_ticket: %d",
-        in->master_seed_encryption_key_ticket.size);
+  DEBUG("master_seed_encryption_key_ticket: %d", in->master_seed_encryption_key_ticket.size);
   for (i = 0; i < in->master_seed_encryption_key_ticket.size; i++) {
     DEBUG_("%02x", in->master_seed_encryption_key_ticket.bytes[i]);
   }
   DEBUG_("\n");
 
-  Result r = ticket2keyId(in->master_seed_encryption_key_ticket.bytes,
-                          in->master_seed_encryption_key_ticket.size,
-                          &master_seed_encryption_key);
+  Result r = ticket2keyId(
+      in->master_seed_encryption_key_ticket.bytes,
+      in->master_seed_encryption_key_ticket.size,
+      &master_seed_encryption_key);
   if (r != Result_SUCCESS) {
     ERROR("ticket2keyId failed (%d).", r);
     master_seed_encryption_key = 0;
@@ -48,17 +48,15 @@ Result pre_execute_command(const InternalCommandRequest* const in) {
   INFO("master_seed_encryption_key loaded");
 
   // 2. Load the pub_key_encryption_key using the ticket
-  DEBUG("pub_key_encryption_key_ticket: %d",
-        in->pub_key_encryption_key_ticket.size);
+  DEBUG("pub_key_encryption_key_ticket: %d", in->pub_key_encryption_key_ticket.size);
   for (i = 0; i < in->pub_key_encryption_key_ticket.size; i++) {
     DEBUG_("%02x", in->pub_key_encryption_key_ticket.bytes[i]);
   }
   DEBUG_("\n");
 
   // Load the shared encryption key
-  r = ticket2keyId(in->pub_key_encryption_key_ticket.bytes,
-                   in->pub_key_encryption_key_ticket.size,
-                   &pub_key_encryption_key);
+  r = ticket2keyId(
+      in->pub_key_encryption_key_ticket.bytes, in->pub_key_encryption_key_ticket.size, &pub_key_encryption_key);
   if (r != Result_SUCCESS) {
     ERROR("ticket2keyId failed (%d).", r);
     master_seed_encryption_key = 0;
@@ -76,14 +74,14 @@ void post_execute_command(void) {
 }
 
 uint8_t ticket_buffer[256];
-static Result ticket2keyId(const uint8_t *ticket_bytes, uint32_t ticket_len,
-                           M_KeyID *key_id) {
+
+static Result ticket2keyId(const uint8_t* ticket_bytes, uint32_t ticket_len, M_KeyID* key_id) {
   if (ticket_len > sizeof(ticket_buffer)) {
     ERROR("ticket len too large");
     return Result_TICKET_LEN_OVERFLOW_FAILURE;
   }
-  M_Command command = {0};
-  M_Reply reply = {0};
+  M_Command command = { 0 };
+  M_Reply reply = { 0 };
   M_ByteBlock ticket_block;
   Result r;
 

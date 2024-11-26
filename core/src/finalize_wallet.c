@@ -14,13 +14,11 @@
 #include <stdint.h>
 #include <string.h>
 
-Result
-handle_finalize_wallet(
+Result handle_finalize_wallet(
     const InternalCommandRequest_FinalizeWalletRequest* const in,
-    InternalCommandResponse_FinalizeWalletResponse *out) {
+    InternalCommandResponse_FinalizeWalletResponse* out) {
   if (in->encrypted_pub_keys_count != MULTISIG_PARTS) {
-    ERROR("expecting %d encrypted_pub_keys, received %d.", MULTISIG_PARTS,
-          in->encrypted_pub_keys_count);
+    ERROR("expecting %d encrypted_pub_keys, received %d.", MULTISIG_PARTS, in->encrypted_pub_keys_count);
     return Result_MISSING_ARGUMENTS;
   }
 
@@ -76,8 +74,7 @@ handle_finalize_wallet(
     hdnode_fill_public_key(&node);
 
     char pub_key[XPUB_SIZE];
-    int ret = hdnode_serialize_public(&node, fingerprint, PUBKEY_PREFIX,
-                                      pub_key, sizeof(pub_key));
+    int ret = hdnode_serialize_public(&node, fingerprint, PUBKEY_PREFIX, pub_key, sizeof(pub_key));
     if (ret <= 0) {
       ERROR("hdnode_serialize_public failed");
       return Result_UNKNOWN_INTERNAL_FAILURE;
@@ -92,14 +89,13 @@ handle_finalize_wallet(
     return Result_UNKNOWN_INTERNAL_FAILURE;
   }
 
-  static_assert(sizeof(out->pub_key.bytes) == XPUB_SIZE,
-                "misconfigured pub_key max size");
-  if (subzero_strlcpy((char *)out->pub_key.bytes, pub_keys[i],
-    sizeof(out->pub_key.bytes)) >= sizeof(out->pub_key.bytes)) {
-      ERROR("pub_key %d is too long", i);
-      return Result_UNKNOWN_INTERNAL_FAILURE;
-    }
-  out->pub_key.size = (pb_size_t)strlen(pub_keys[i]);
+  static_assert(sizeof(out->pub_key.bytes) == XPUB_SIZE, "misconfigured pub_key max size");
+  if (subzero_strlcpy((char*) out->pub_key.bytes, pub_keys[i], sizeof(out->pub_key.bytes)) >=
+      sizeof(out->pub_key.bytes)) {
+    ERROR("pub_key %d is too long", i);
+    return Result_UNKNOWN_INTERNAL_FAILURE;
+  }
+  out->pub_key.size = (pb_size_t) strlen(pub_keys[i]);
 
   // TODO: figure out pub_keys_hash story
   out->pub_keys_hash.bytes[0] = 0x99;
