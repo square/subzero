@@ -18,3 +18,7 @@ publishing {
         }
     }
 }
+
+java {
+    withSourcesJar()
+}
