@@ -11,8 +11,8 @@
 extern M_KeyID master_seed_encryption_key;
 extern M_KeyID pub_key_encryption_key;
 
-M_PermissionGroup check_aes_gcm_pg = {0};
-M_Action check_aes_gcm_act = {0};
+M_PermissionGroup check_aes_gcm_pg = { 0 };
+M_Action check_aes_gcm_act = { 0 };
 
 static int check_aes_gcm(void);
 
@@ -22,14 +22,13 @@ static int check_aes_gcm(void);
 int pre_run_self_checks(void) {
   // Create a temporary key, assign it to master_seed_encryption_key and
   // pub_key_encryption_key
-  M_Command command = {0};
-  M_Reply reply = {0};
+  M_Command command = { 0 };
+  M_Reply reply = { 0 };
   Result r;
 
   check_aes_gcm_act.type = Act_OpPermissions;
   check_aes_gcm_act.details.oppermissions.perms =
-      (Act_OpPermissions_Details_perms_Encrypt |
-       Act_OpPermissions_Details_perms_Decrypt);
+      (Act_OpPermissions_Details_perms_Encrypt | Act_OpPermissions_Details_perms_Decrypt);
 
   check_aes_gcm_pg.flags = 0;
   check_aes_gcm_pg.n_limits = 0;
@@ -75,29 +74,26 @@ int post_run_self_checks(void) {
  */
 static int check_aes_gcm(void) {
   // encrypt some bytes twice.
-  uint8_t plaintext[40] = {0x1a, 0x44, 0x2b, 0x56, 0x83, 0xa9, 0xa4, 0xd2,
-                           0x98, 0x1d, 0x2b, 0x29, 0x3a, 0x03, 0x93, 0xaa,
-                           0x0e, 0x78, 0xda, 0x47, 0x4e, 0x07, 0x36, 0x15,
-                           0xfc, 0x49, 0x97, 0xdd, 0x8f, 0x0f, 0x1b, 0xaa,
-                           0xd7, 0x63, 0x27, 0x72, 0x23, 0x0a, 0x49, 0x08};
-  uint8_t plaintext2[40] = {0};
+  uint8_t plaintext[40] = { 0x1a, 0x44, 0x2b, 0x56, 0x83, 0xa9, 0xa4, 0xd2, 0x98, 0x1d, 0x2b, 0x29, 0x3a, 0x03,
+                            0x93, 0xaa, 0x0e, 0x78, 0xda, 0x47, 0x4e, 0x07, 0x36, 0x15, 0xfc, 0x49, 0x97, 0xdd,
+                            0x8f, 0x0f, 0x1b, 0xaa, 0xd7, 0x63, 0x27, 0x72, 0x23, 0x0a, 0x49, 0x08 };
+  uint8_t plaintext2[40] = { 0 };
   memcpy(plaintext2, plaintext, sizeof(plaintext));
 
-  uint8_t ciphertext1[100] = {0};
-  uint8_t ciphertext2[100] = {0};
-  uint8_t roundtrip[40] = {0};
+  uint8_t ciphertext1[100] = { 0 };
+  uint8_t ciphertext2[100] = { 0 };
+  uint8_t roundtrip[40] = { 0 };
 
   size_t ciphertext1_len, ciphertext2_len, roundtrip_len;
-  Result r =
-      aes_gcm_encrypt(master_seed_encryption_key, plaintext, sizeof(plaintext),
-                      ciphertext1, sizeof(ciphertext1), &ciphertext1_len);
+  Result r = aes_gcm_encrypt(
+      master_seed_encryption_key, plaintext, sizeof(plaintext), ciphertext1, sizeof(ciphertext1), &ciphertext1_len);
   if (r != Result_SUCCESS) {
     ERROR("first encryption failed (%d).", r);
     return -1;
   }
 
-  r = aes_gcm_encrypt(master_seed_encryption_key, plaintext, sizeof(plaintext),
-                      ciphertext2, sizeof(ciphertext2), &ciphertext2_len);
+  r = aes_gcm_encrypt(
+      master_seed_encryption_key, plaintext, sizeof(plaintext), ciphertext2, sizeof(ciphertext2), &ciphertext2_len);
   if (r != Result_SUCCESS) {
     ERROR("second encryption failed (%d).", r);
     return -1;
@@ -115,8 +111,8 @@ static int check_aes_gcm(void) {
   }
 
   // check that we can decrypt back to the original string.
-  r = aes_gcm_decrypt(master_seed_encryption_key, ciphertext1, ciphertext1_len,
-                      roundtrip, sizeof(roundtrip), &roundtrip_len);
+  r = aes_gcm_decrypt(
+      master_seed_encryption_key, ciphertext1, ciphertext1_len, roundtrip, sizeof(roundtrip), &roundtrip_len);
   if (r != Result_SUCCESS) {
     ERROR("first decryption failed (%d).", r);
     return -1;
@@ -134,8 +130,8 @@ static int check_aes_gcm(void) {
   // check that modifying a byte causes decryption to fail.
   ciphertext2[10] = ciphertext2[10] ^ 0x22;
   ERROR("expecting aes_gcm_decrypt to fail.");
-  r = aes_gcm_decrypt(master_seed_encryption_key, ciphertext2, ciphertext2_len,
-                      roundtrip, sizeof(roundtrip), &roundtrip_len);
+  r = aes_gcm_decrypt(
+      master_seed_encryption_key, ciphertext2, ciphertext2_len, roundtrip, sizeof(roundtrip), &roundtrip_len);
   if (r == Result_SUCCESS) {
     ERROR("decryption of corrupted bytes should not have worked.");
     return -1;

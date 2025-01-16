@@ -25,9 +25,8 @@
 #include <stdio.h>
 #include <string.h>
 
-static void compute_prevout_hash(const TxInput* const inputs,
-                                 pb_size_t inputs_count,
-                                 uint8_t hash[static HASHER_DIGEST_LENGTH]) {
+static void
+compute_prevout_hash(const TxInput* const inputs, pb_size_t inputs_count, uint8_t hash[static HASHER_DIGEST_LENGTH]) {
   Hasher hasher;
   hasher_Init(&hasher, HASHER_SHA2D);
   for (int i = 0; i < inputs_count; i++) {
@@ -44,8 +43,8 @@ static void compute_prevout_hash(const TxInput* const inputs,
 }
 
 // This assumes all inputs have the same sequence value
-static void compute_sequence_hash(uint32_t sequence, pb_size_t inputs_count,
-                                  uint8_t hash[static HASHER_DIGEST_LENGTH]) {
+static void
+compute_sequence_hash(uint32_t sequence, pb_size_t inputs_count, uint8_t hash[static HASHER_DIGEST_LENGTH]) {
   Hasher hasher;
   hasher_Init(&hasher, HASHER_SHA2D);
   for (int i = 0; i < inputs_count; i++) {
@@ -58,9 +57,8 @@ static void compute_sequence_hash(uint32_t sequence, pb_size_t inputs_count,
  * Takes an (decrypted) extended public key and produces the public key derived
  * from the path specified.
  */
-static Result derive_public_key(const char *xpub,
-                                const Path* const path,
-                                uint8_t public_key[static COMPRESSED_PUBKEY_SIZE]) {
+static Result
+derive_public_key(const char* xpub, const Path* const path, uint8_t public_key[static COMPRESSED_PUBKEY_SIZE]) {
   HDNode node;
 
   int r = hdnode_deserialize(xpub, PUBKEY_PREFIX, 0, SECP256K1_NAME, &node, NULL);
@@ -97,9 +95,7 @@ static Result derive_public_key(const char *xpub,
  * Takes the seed and a path. Returns HDNode suitable for signing transactions
  * at that path.
  */
-static Result derive_private_key(uint8_t seed[static SHA512_DIGEST_LENGTH],
-                                 const Path* const path,
-                                 HDNode *out) {
+static Result derive_private_key(uint8_t seed[static SHA512_DIGEST_LENGTH], const Path* const path, HDNode* out) {
   if (hdnode_from_seed(seed, SHA512_DIGEST_LENGTH, SECP256K1_NAME, out) != 1) {
     ERROR("error: hdnode_from_seed failed.");
     return Result_DERIVE_PRIVATE_KEY_HDNODE_FROM_SEED_FAILURE;
@@ -141,8 +137,7 @@ static void sort_public_keys(
   for (i = 0; i < MULTISIG_PARTS; i++) {
     int score = 0;
     for (j = 0; j < MULTISIG_PARTS; j++) {
-      if (strncmp((char *)unsorted_keys[i], (char *)unsorted_keys[j],
-                  COMPRESSED_PUBKEY_SIZE) > 0) {
+      if (strncmp((char*) unsorted_keys[i], (char*) unsorted_keys[j], COMPRESSED_PUBKEY_SIZE) > 0) {
         score++;
       }
     }
@@ -153,10 +148,7 @@ static void sort_public_keys(
 /**
  * Returns the script (i.e. 2 [addr1] [addr2] [addr3] [addr4] 4 checkmultisig).
  */
-static Result multisig_script(
-    script_t *script,
-    char xpub[static MULTISIG_PARTS][XPUB_SIZE],
-    const Path* const path) {
+static Result multisig_script(script_t* script, char xpub[static MULTISIG_PARTS][XPUB_SIZE], const Path* const path) {
   // Derive addresses for this path
   uint8_t public_keys[MULTISIG_PARTS][COMPRESSED_PUBKEY_SIZE];
   for (int i = 0; i < MULTISIG_PARTS; i++) {
@@ -257,15 +249,15 @@ bool validate_fees(const InternalCommandRequest_SignTxRequest* const request) {
   return fee < conv_btc_to_satoshi(1) || fee * 10 < total;
 }
 
-static Result hash_input(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
-                         const TxInput* const input,
-                         uint32_t sequence,
-                         uint32_t lock_time,
-                         uint8_t prevoutsHash[static HASHER_DIGEST_LENGTH],
-                         uint8_t seqHash[static HASHER_DIGEST_LENGTH],
-                         uint8_t outputHash[static HASHER_DIGEST_LENGTH],
-                         uint8_t hash[static HASHER_DIGEST_LENGTH]) {
-
+static Result hash_input(
+    char xpub[static MULTISIG_PARTS][XPUB_SIZE],
+    const TxInput* const input,
+    uint32_t sequence,
+    uint32_t lock_time,
+    uint8_t prevoutsHash[static HASHER_DIGEST_LENGTH],
+    uint8_t seqHash[static HASHER_DIGEST_LENGTH],
+    uint8_t outputHash[static HASHER_DIGEST_LENGTH],
+    uint8_t hash[static HASHER_DIGEST_LENGTH]) {
   Hasher hasher;
 
   DEBUG("hash_input");
@@ -328,10 +320,7 @@ static Result hash_input(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
 }
 
 // hash_p2pkh_address derives a P2PKH address and hashes it into hasher
-static Result hash_p2pkh_address(
-    Hasher *hasher,
-    const char *xpub,
-    const Path* const path) {
+static Result hash_p2pkh_address(Hasher* hasher, const char* xpub, const Path* const path) {
   uint8_t public_key[COMPRESSED_PUBKEY_SIZE];
   Result r = derive_public_key(xpub, path, public_key);
   if (r != Result_SUCCESS) {
@@ -386,9 +375,7 @@ static Result hash_p2pkh_address(
 
 // hash_change_address computes a change address for Path and hashes it.
 // TODO: While this looks mostly right, it's untested.
-static Result hash_change_address(Hasher *hasher,
-                                  char xpub[static MULTISIG_PARTS][XPUB_SIZE],
-                                  const Path* const path) {
+static Result hash_change_address(Hasher* hasher, char xpub[static MULTISIG_PARTS][XPUB_SIZE], const Path* const path) {
   // Here we need to generate a P2SH-P2WSH change transaction back to the
   // cold wallet
 
@@ -476,12 +463,11 @@ static Result hash_change_address(Hasher *hasher,
 }
 
 // compute_output_hash iterates over all
-static Result
-compute_output_hash(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
-                    const TxOutput* const outputs,
-                    pb_size_t outputs_count,
-                    uint8_t output_hash[static HASHER_DIGEST_LENGTH]) {
-
+static Result compute_output_hash(
+    char xpub[static MULTISIG_PARTS][XPUB_SIZE],
+    const TxOutput* const outputs,
+    pb_size_t outputs_count,
+    uint8_t output_hash[static HASHER_DIGEST_LENGTH]) {
   Hasher hasher;
   hasher_Init(&hasher, HASHER_SHA2D);
   for (int i = 0; i < outputs_count; i++) {
@@ -518,15 +504,16 @@ compute_output_hash(char xpub[static MULTISIG_PARTS][XPUB_SIZE],
  * An effort has been made to zeroize them regardless of success or failure of this function.
  *
  */
-Result handle_sign_tx(const InternalCommandRequest_SignTxRequest* const request,
-                      InternalCommandResponse_SignTxResponse *response) {
+Result handle_sign_tx(
+    const InternalCommandRequest_SignTxRequest* const request,
+    InternalCommandResponse_SignTxResponse* response) {
   Result r = Result_SUCCESS;
 
-  uint8_t CONFIDENTIAL seed[SHA512_DIGEST_LENGTH] = {0};
+  uint8_t CONFIDENTIAL seed[SHA512_DIGEST_LENGTH] = { 0 };
   HDNode CONFIDENTIAL wallet;
   memzero(&wallet, sizeof(HDNode));
-  char CONFIDENTIAL xpub[MULTISIG_PARTS][XPUB_SIZE] = {{0}};
-  uint8_t CONFIDENTIAL public_key[33] = {0};
+  char CONFIDENTIAL xpub[MULTISIG_PARTS][XPUB_SIZE] = { { 0 } };
+  uint8_t CONFIDENTIAL public_key[33] = { 0 };
 
   if (0 == request->outputs_count) {
     ERROR("%s: request specifies zero outputs", __func__);
@@ -591,12 +578,10 @@ Result handle_sign_tx(const InternalCommandRequest_SignTxRequest* const request,
 
   // Create a signature for each input.
   for (int i = 0; i < request->inputs_count; i++) {
-
     // Compute hash to sign: BIP-0143
     uint8_t hash[HASHER_DIGEST_LENGTH];
 
-    r = hash_input(xpub, &request->inputs[i], sequence, request->lock_time,
-                  prevoutsHash, seqHash, outputHash, hash);
+    r = hash_input(xpub, &request->inputs[i], sequence, request->lock_time, prevoutsHash, seqHash, outputHash, hash);
     if (r != Result_SUCCESS) {
       ERROR("hash_input failed: (%d).", r);
       goto cleanup;
@@ -616,23 +601,23 @@ Result handle_sign_tx(const InternalCommandRequest_SignTxRequest* const request,
         ERROR("Failed deriving public key");
         goto cleanup;
       }
-      static_assert(sizeof(public_key) == sizeof(wallet.public_key),
-                    "Pubkey size mismatch");
+      static_assert(sizeof(public_key) == sizeof(wallet.public_key), "Pubkey size mismatch");
       if (memcmp(public_key, wallet.public_key, sizeof(public_key)) == 0) {
         DEBUG("Signing for pubkey %d", j);
         found = true;
       }
     }
     if (!found) {
-      ERROR("We're signing with a private key that doesn't match one of our "
-            "public keys");
+      ERROR(
+          "We're signing with a private key that doesn't match one of our "
+          "public keys");
       print_bytes(wallet.public_key, sizeof(wallet.public_key));
       r = Result_UNKNOWN_INTERNAL_FAILURE;
       goto cleanup;
     }
 
     // sign the hash
-    uint8_t sig[64] = {0};
+    uint8_t sig[64] = { 0 };
     if (hdnode_sign_digest(&wallet, hash, sig, NULL, NULL) != 0) {
       ERROR("hdnode_sign_digest failed");
       r = Result_UNKNOWN_INTERNAL_FAILURE;
@@ -643,8 +628,7 @@ Result handle_sign_tx(const InternalCommandRequest_SignTxRequest* const request,
     // we are operating correctly, and can also potentially prevent some types
     // of glitch attacks.
     hdnode_fill_public_key(&wallet);
-    if (ecdsa_verify_digest(wallet.curve->params, wallet.public_key, sig,
-                            hash) != 0) {
+    if (ecdsa_verify_digest(wallet.curve->params, wallet.public_key, sig, hash) != 0) {
       ERROR("Verifying signature we just created failed");
       r = Result_UNKNOWN_INTERNAL_FAILURE;
       goto cleanup;
@@ -655,7 +639,7 @@ Result handle_sign_tx(const InternalCommandRequest_SignTxRequest* const request,
 
     int der_len = ecdsa_sig_to_der(sig, response->signatures[i].der.bytes);
     response->signatures[i].has_der = true;
-    response->signatures[i].der.size = (pb_size_t)der_len;
+    response->signatures[i].der.size = (pb_size_t) der_len;
     DEBUG("Signature:");
     for (int j = 0; j < der_len; j++) {
       DEBUG_("%02x", response->signatures[i].der.bytes[j]);
@@ -663,21 +647,19 @@ Result handle_sign_tx(const InternalCommandRequest_SignTxRequest* const request,
     DEBUG_("\n");
 
     response->signatures[i].has_hash = true;
-    static_assert(sizeof(hash) == sizeof(response->signatures[i].hash),
-                  "Expect hash size to match proto size");
+    static_assert(sizeof(hash) == sizeof(response->signatures[i].hash), "Expect hash size to match proto size");
     memcpy(response->signatures[i].hash, hash, sizeof(hash));
   }
   response->signatures_count = request->inputs_count;
-  
-  cleanup:
+
+cleanup:
   // cleanup the house be it error or success.
   memzero(seed, SHA512_DIGEST_LENGTH);
   memzero(&wallet, sizeof(HDNode));
-  for (int i = 0 ; i < MULTISIG_PARTS ; i++) {
-      memzero(xpub[i], XPUB_SIZE);
+  for (int i = 0; i < MULTISIG_PARTS; i++) {
+    memzero(xpub[i], XPUB_SIZE);
   }
   memzero(public_key, 33);
-
 
   return r;
 }

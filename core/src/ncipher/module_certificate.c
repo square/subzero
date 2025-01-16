@@ -14,7 +14,7 @@ extern NFast_AppHandle app;
  * These are used to verify signatures on CodeSafe modules when they attempt to
  * access keys that are protected by a seeinteg key
  */
-Result module_certificate_init(M_CertificateList *cert_list, M_Certificate *certs) {
+Result module_certificate_init(M_CertificateList* cert_list, M_Certificate* certs) {
   int signer_count = 0;
   M_Command command;
   M_Reply reply;
@@ -53,16 +53,14 @@ Result module_certificate_init(M_CertificateList *cert_list, M_Certificate *cert
   int i;
   for (i = 0; i < signer_count; i++) {
     certs[i].type = CertType_SEECert;
-    memcpy(&certs[i].keyhash,
-           &(reply.reply.getworldsigners.sigs[i].hash),
-           sizeof(M_KeyHash));
+    memcpy(&certs[i].keyhash, &(reply.reply.getworldsigners.sigs[i].hash), sizeof(M_KeyHash));
   }
 
   NFastApp_Free_Reply(app, NULL, NULL, &reply);
   return Result_SUCCESS;
 }
 
-void module_certificate_cleanup(M_CertificateList *cert_list) {
+void module_certificate_cleanup(M_CertificateList* cert_list) {
   int i;
   for (i = 0; i < cert_list->n_certs; i++) {
     memzero(&cert_list->certs[i], sizeof(M_Certificate));

@@ -16,7 +16,7 @@
  * - None of the pointers may be NULL.
  * - data_len must be > 0.
  * - signature_len must equal QRSIGNATURE_LEN.
- * 
+ *
  * @return true on successful signature verification and false otherwise.
  */
 bool check_qrsignature(

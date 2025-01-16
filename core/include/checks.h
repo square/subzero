@@ -63,4 +63,4 @@ int verify_rpc_oversized_message_rejected(void);
       ERROR("got: %s", value);                      \
       return -1;                                    \
     }                                               \
-  } while(0)
+  } while (0)

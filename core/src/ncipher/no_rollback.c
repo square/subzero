@@ -29,8 +29,8 @@ extern NFast_AppHandle app;
 Result no_rollback_read(const char* filename, char buf[static VERSION_SIZE]) {
   Result r = Result_UNKNOWN_INTERNAL_FAILURE;
 
-  M_Command command = {0};
-  M_Reply reply = {0};
+  M_Command command = { 0 };
+  M_Reply reply = { 0 };
 
   command.cmd = Cmd_NVMemOp;
   command.args.nvmemop.module = 1; // we assume there's only HSM.
@@ -45,8 +45,7 @@ Result no_rollback_read(const char* filename, char buf[static VERSION_SIZE]) {
   }
 
   // Validate magic string and return the version
-  DEBUG("no_rollback_read: nvram contents: (%d) ",
-        reply.reply.nvmemop.res.read.data.len);
+  DEBUG("no_rollback_read: nvram contents: (%d) ", reply.reply.nvmemop.res.read.data.len);
   for (unsigned int i = 0; i < reply.reply.nvmemop.res.read.data.len; i++) {
     DEBUG_("%02x", reply.reply.nvmemop.res.read.data.ptr[i]);
   }
@@ -76,8 +75,8 @@ Result no_rollback_write(const char* filename, char buf[static VERSION_SIZE]) {
 
   Result r = Result_UNKNOWN_INTERNAL_FAILURE;
 
-  M_Command command = {0};
-  M_Reply reply = {0};
+  M_Command command = { 0 };
+  M_Reply reply = { 0 };
 
   command.cmd = Cmd_NVMemOp;
   command.args.nvmemop.module = 1; // we assume there's only one HSM.

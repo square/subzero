@@ -14,7 +14,7 @@ extern NFastApp_Connection conn;
 extern NFast_AppHandle app;
 extern M_CertificateList cert_list;
 
-Result transact(M_Command *command, M_Reply *reply) {
+Result transact(M_Command* command, M_Reply* reply) {
   if (command->cmd != Cmd_GetWorldSigners) {
     // Set certs_present, unless we are asking the HSM for the certs in the first place.
     command->certs = &cert_list;

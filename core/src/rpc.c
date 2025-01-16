@@ -14,8 +14,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-static void execute_command(const InternalCommandRequest* const cmd,
-                            InternalCommandResponse *out);
+static void execute_command(const InternalCommandRequest* const cmd, InternalCommandResponse* out);
 
 static int check_version(const InternalCommandRequest* const cmd) {
   if (VERSION != cmd->version) {
@@ -24,14 +23,14 @@ static int check_version(const InternalCommandRequest* const cmd) {
   }
   return true;
 }
+
 /**
  * Check signature on input bytes.
  * Deserialize them and then populate the internal command request's
  * redundant fields with the deserialized data.
  * @return Return an error if the signature check failed or decoding the bytes failed.
  */
-static Result populate_internal_command(InternalCommandRequest * to){
-  
+static Result populate_internal_command(InternalCommandRequest* to) {
   Result res = Result_SUCCESS;
   if (!to->has_qrsignature || !to->qrsignature.has_signature) {
     res = Result_QRSIG_CHECK_FAILED;
@@ -52,7 +51,8 @@ static Result populate_internal_command(InternalCommandRequest * to){
     goto cleanup;
   }
 
-  pb_istream_t pb_command = pb_istream_from_buffer(to->serialized_command_request.bytes, to->serialized_command_request.size);
+  pb_istream_t pb_command =
+      pb_istream_from_buffer(to->serialized_command_request.bytes, to->serialized_command_request.size);
   CommandRequest from = CommandRequest_init_default;
   // Cannot use pb_decode_delimited as on the coordinator service the java code is generating bytes
   // without the delimited values.
@@ -61,22 +61,21 @@ static Result populate_internal_command(InternalCommandRequest * to){
     ERROR("Could not decode input bytes for command request.");
     goto cleanup;
   }
-  if(from.which_command != CommandRequest_SignTx_tag){
+  if (from.which_command != CommandRequest_SignTx_tag) {
     res = Result_COMMAND_SHOULD_BE_SIGNTX;
     ERROR("Input command is not Sign Tx");
     goto cleanup;
-  }  
+  }
   to->command.SignTx.inputs_count = from.command.SignTx.inputs_count;
   to->command.SignTx.outputs_count = from.command.SignTx.outputs_count;
-  for(pb_size_t i = 0; i < from.command.SignTx.inputs_count ; i++){
-      to->command.SignTx.inputs[i] = from.command.SignTx.inputs[i];
-      
+  for (pb_size_t i = 0; i < from.command.SignTx.inputs_count; i++) {
+    to->command.SignTx.inputs[i] = from.command.SignTx.inputs[i];
   }
-  for(pb_size_t i = 0; i < from.command.SignTx.outputs_count ; i++){
-      to->command.SignTx.outputs[i] = from.command.SignTx.outputs[i];
+  for (pb_size_t i = 0; i < from.command.SignTx.outputs_count; i++) {
+    to->command.SignTx.outputs[i] = from.command.SignTx.outputs[i];
   }
- 
-  //lock time is used in internal hash calculation so it should be present.
+
+  // lock time is used in internal hash calculation so it should be present.
   if (from.command.SignTx.has_lock_time) {
     to->command.SignTx.lock_time = from.command.SignTx.lock_time;
   } else {
@@ -84,32 +83,33 @@ static Result populate_internal_command(InternalCommandRequest * to){
     res = Result_REQUIRED_FIELDS_NOT_PRESENT;
     goto cleanup;
   }
-  //Wallet ID is optional and not really used in the code at the moment.
+  // Wallet ID is optional and not really used in the code at the moment.
   if (from.has_wallet_id) {
     to->wallet_id = from.wallet_id;
   }
 
-  cleanup:
-  
+cleanup:
+
   return res;
 }
-static void handle_error(pb_istream_t * input, pb_ostream_t * output, Result error_code, const char * error_message){
+
+static void handle_error(pb_istream_t* input, pb_ostream_t* output, Result error_code, const char* error_message) {
   InternalCommandResponse out = InternalCommandResponse_init_default;
   ERROR("%s: %s", error_message, PB_GET_ERROR(input));
   out.which_response = InternalCommandResponse_Error_tag;
   out.response.Error.code = error_code;
-  snprintf(out.response.Error.message, sizeof(out.response.Error.message),
-            "%s: %s", error_message, PB_GET_ERROR(input));
+  snprintf(
+      out.response.Error.message, sizeof(out.response.Error.message), "%s: %s", error_message, PB_GET_ERROR(input));
   out.response.Error.has_message = true;
   if (!pb_encode_delimited(output, &InternalCommandResponse_msg, &out)) {
-    ERROR("Encoding error message about decoding failed: %s",
-          PB_GET_ERROR(output));
+    ERROR("Encoding error message about decoding failed: %s", PB_GET_ERROR(output));
   }
-  return; 
+  return;
 }
+
 // handle_incoming_message is the central RPC entry point that invokes the
 // requested command.
-void handle_incoming_message(pb_istream_t *input, pb_ostream_t *output) {
+void handle_incoming_message(pb_istream_t* input, pb_ostream_t* output) {
   InternalCommandRequest cmd = InternalCommandRequest_init_default;
   InternalCommandResponse out = InternalCommandResponse_init_default;
 
@@ -119,7 +119,7 @@ void handle_incoming_message(pb_istream_t *input, pb_ostream_t *output) {
   }
   // For sign command QR code needs to be signed.
   if (cmd.which_command == InternalCommandRequest_SignTx_tag) {
-    if(!cmd.has_serialized_command_request){
+    if (!cmd.has_serialized_command_request) {
       handle_error(input, output, Result_SERIALIZED_BYTES_SHOULD_BE_PRESENT, "Serialized QR code not present in input");
       return;
     }
@@ -139,8 +139,7 @@ void handle_incoming_message(pb_istream_t *input, pb_ostream_t *output) {
 }
 
 // execute command
-static void execute_command(const InternalCommandRequest* const cmd,
-                            InternalCommandResponse *out) {
+static void execute_command(const InternalCommandRequest* const cmd, InternalCommandResponse* out) {
   if (!check_version(cmd)) {
     out->which_response = InternalCommandResponse_Error_tag;
     out->response.Error.code = Result_VERSION_MISMATCH;
@@ -163,8 +162,7 @@ static void execute_command(const InternalCommandRequest* const cmd,
     break;
   case InternalCommandRequest_FinalizeWallet_tag:
     INFO("Command FinalizeWallet");
-    r = handle_finalize_wallet(&cmd->command.FinalizeWallet,
-                               &out->response.FinalizeWallet);
+    r = handle_finalize_wallet(&cmd->command.FinalizeWallet, &out->response.FinalizeWallet);
     out->which_response = InternalCommandResponse_FinalizeWallet_tag;
     break;
   case InternalCommandRequest_SignTx_tag:
@@ -182,8 +180,12 @@ static void execute_command(const InternalCommandRequest* const cmd,
   if (r != Result_SUCCESS) {
     out->which_response = InternalCommandResponse_Error_tag;
     out->response.Error.code = r;
-    snprintf(out->response.Error.message, sizeof(out->response.Error.message),
-             "Error handling command tag %d; r = %d\n", cmd->which_command, r);
+    snprintf(
+        out->response.Error.message,
+        sizeof(out->response.Error.message),
+        "Error handling command tag %d; r = %d\n",
+        cmd->which_command,
+        r);
     ERROR("%s", out->response.Error.message);
     out->response.Error.has_message = true;
   }

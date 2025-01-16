@@ -1,3 +1,6 @@
+// clang-format off
+// (to avoid conflicting with production patch files)
+
 #pragma once
 
 // maximum size for xpub. TODO: we can make this 112 bytes, based on:
@@ -119,3 +122,5 @@
 #define MASTER_SEED_SIZE 64
 
 #define COMPRESSED_PUBKEY_SIZE 33
+
+// clang-format on

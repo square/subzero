@@ -4,7 +4,7 @@
 
 #include <log.h>
 
-Result script_push(script_t *script, enum opcodetype opcode) {
+Result script_push(script_t* script, enum opcodetype opcode) {
   if (script->len == SCRIPT_MAX_LEN) {
     return Result_SCRIPT_PUSH_OVERFLOW_FAILURE;
   }
@@ -13,7 +13,7 @@ Result script_push(script_t *script, enum opcodetype opcode) {
   return Result_SUCCESS;
 }
 
-Result script_push_data(script_t *script, const uint8_t *data, size_t len) {
+Result script_push_data(script_t* script, const uint8_t* data, size_t len) {
   Result r;
   if (len < OP_PUSHDATA1) {
     r = script_push(script, len);

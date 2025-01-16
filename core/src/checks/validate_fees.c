@@ -11,8 +11,7 @@ int verify_validate_fees(void) {
 
   // test case where the fee is within both limits (under 1BTC, under 10% of
   // total)
-  InternalCommandRequest_SignTxRequest tx1 =
-      InternalCommandRequest_SignTxRequest_init_default;
+  InternalCommandRequest_SignTxRequest tx1 = InternalCommandRequest_SignTxRequest_init_default;
   tx1.inputs_count = 1;
   tx1.inputs[0].has_amount = true;
   tx1.inputs[0].amount = 100000;
@@ -27,8 +26,7 @@ int verify_validate_fees(void) {
   }
 
   // test case where fee is under 1BTC but over 10%
-  InternalCommandRequest_SignTxRequest tx2 =
-      InternalCommandRequest_SignTxRequest_init_default;
+  InternalCommandRequest_SignTxRequest tx2 = InternalCommandRequest_SignTxRequest_init_default;
   tx2.inputs_count = 1;
   tx2.inputs[0].has_amount = true;
   tx2.inputs[0].amount = 1000000;
@@ -43,8 +41,7 @@ int verify_validate_fees(void) {
   }
 
   // test case where fee is over 1BTC but under 10%
-  InternalCommandRequest_SignTxRequest tx3 =
-      InternalCommandRequest_SignTxRequest_init_default;
+  InternalCommandRequest_SignTxRequest tx3 = InternalCommandRequest_SignTxRequest_init_default;
   tx3.inputs_count = 1;
   tx3.inputs[0].has_amount = true;
   tx3.inputs[0].amount = 2000000000;
@@ -59,8 +56,7 @@ int verify_validate_fees(void) {
   }
 
   // test case where fee is over 1BTC and over 10%
-  InternalCommandRequest_SignTxRequest tx4 =
-      InternalCommandRequest_SignTxRequest_init_default;
+  InternalCommandRequest_SignTxRequest tx4 = InternalCommandRequest_SignTxRequest_init_default;
   tx4.inputs_count = 1;
   tx4.inputs[0].has_amount = true;
   tx4.inputs[0].amount = 10000000000L;
@@ -71,8 +67,9 @@ int verify_validate_fees(void) {
   t = validate_fees(&tx4);
   if (t) {
     r = -1;
-    ERROR("verify_validate_fees: tx4 did not fail fee validation, but fee is "
-           "over limits.");
+    ERROR(
+        "verify_validate_fees: tx4 did not fail fee validation, but fee is "
+        "over limits.");
   }
 
   // test case where fee is over 1BTC and over 10% if you don't count the amount
@@ -83,8 +80,7 @@ int verify_validate_fees(void) {
   // we miscalculated the fee % by including the amount going to the change
   // address as part of the total, it would be 9.29%, which would pass
   // validation
-  InternalCommandRequest_SignTxRequest tx5 =
-      InternalCommandRequest_SignTxRequest_init_default;
+  InternalCommandRequest_SignTxRequest tx5 = InternalCommandRequest_SignTxRequest_init_default;
   tx5.inputs_count = 1;
   tx5.inputs[0].has_amount = true;
   tx5.inputs[0].amount = 10000000000L;
@@ -98,13 +94,13 @@ int verify_validate_fees(void) {
   t = validate_fees(&tx5);
   if (t) {
     r = -1;
-    ERROR("verify_validate_fees: tx5 did not fail fee validation, but fee is "
-           "over limits.");
+    ERROR(
+        "verify_validate_fees: tx5 did not fail fee validation, but fee is "
+        "over limits.");
   }
 
   // test case with negative fee
-  InternalCommandRequest_SignTxRequest tx6 =
-      InternalCommandRequest_SignTxRequest_init_default;
+  InternalCommandRequest_SignTxRequest tx6 = InternalCommandRequest_SignTxRequest_init_default;
   tx6.inputs_count = 1;
   tx6.inputs[0].has_amount = true;
   tx6.inputs[0].amount = 1000;
@@ -119,8 +115,9 @@ int verify_validate_fees(void) {
   t = validate_fees(&tx6);
   if (t) {
     r = -1;
-    ERROR("verify_validate_fees: tx6 did not fail fee validation, but fee is "
-           "negative.");
+    ERROR(
+        "verify_validate_fees: tx6 did not fail fee validation, but fee is "
+        "negative.");
   }
 
   return r;

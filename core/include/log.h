@@ -24,46 +24,58 @@
 
 #if ENABLE_DEBUG_LOGGING == 1
   // Print DEBUG to stdout in cyan
-  #define DEBUG(...)                                                           \
-    do {                                                                       \
-      printf("\033[0;36m");                                                    \
-      printf("[DEBUG] %s:%d ", __FILENAME__, __LINE__);                        \
-      printf(__VA_ARGS__);                                                     \
-      printf("\033[0m\n");                                                     \
+  #define DEBUG(...)                                    \
+    do {                                                \
+      printf("\033[0;36m");                             \
+      printf("[DEBUG] %s:%d ", __FILENAME__, __LINE__); \
+      printf(__VA_ARGS__);                              \
+      printf("\033[0m\n");                              \
     } while (0)
 
-  #define DEBUG_(...)                                                          \
-    do {                                                                       \
-      printf("\033[0;36m");                                                    \
-      printf(__VA_ARGS__);                                                     \
-      printf("\033[0m");                                                       \
+  #define DEBUG_(...)       \
+    do {                    \
+      printf("\033[0;36m"); \
+      printf(__VA_ARGS__);  \
+      printf("\033[0m");    \
     } while (0)
 #else
-  #define DEBUG(...) do { snprintf(NULL, 0, __VA_ARGS__); } while(0)
-  #define DEBUG_(...) do { snprintf(NULL, 0, __VA_ARGS__); } while(0)
+  #define DEBUG(...)                  \
+    do {                              \
+      snprintf(NULL, 0, __VA_ARGS__); \
+    } while (0)
+  #define DEBUG_(...)                 \
+    do {                              \
+      snprintf(NULL, 0, __VA_ARGS__); \
+    } while (0)
 #endif
 
 #if ENABLE_INFO_AND_ERROR_LOGGING == 1
   // Print INFO to stdout in green
-  #define INFO(...)                                                              \
-    do {                                                                         \
-      printf("\033[0;32m");                                                      \
-      printf("[INFO] %s:%d ", __FILENAME__, __LINE__);                           \
-      printf(__VA_ARGS__);                                                       \
-      printf("\033[0m\n");                                                       \
+  #define INFO(...)                                    \
+    do {                                               \
+      printf("\033[0;32m");                            \
+      printf("[INFO] %s:%d ", __FILENAME__, __LINE__); \
+      printf(__VA_ARGS__);                             \
+      printf("\033[0m\n");                             \
     } while (0)
 
   // Print ERROR to stdout in red
-  #define ERROR(...)                                                             \
-    do {                                                                         \
-      printf("\033[0;31m");                                                      \
-      printf("[ERROR] %s:%d ", __FILENAME__, __LINE__);                          \
-      printf(__VA_ARGS__);                                                       \
-      printf("\033[0m\n");                                                       \
+  #define ERROR(...)                                    \
+    do {                                                \
+      printf("\033[0;31m");                             \
+      printf("[ERROR] %s:%d ", __FILENAME__, __LINE__); \
+      printf(__VA_ARGS__);                              \
+      printf("\033[0m\n");                              \
     } while (0)
 #else
-  #define INFO(...) do { snprintf(NULL, 0, __VA_ARGS__); } while(0)
-  #define ERROR(...) do { snprintf(NULL, 0, __VA_ARGS__); } while(0)
+  #define INFO(...)                   \
+    do {                              \
+      snprintf(NULL, 0, __VA_ARGS__); \
+    } while (0)
+  #define ERROR(...)                  \
+    do {                              \
+      snprintf(NULL, 0, __VA_ARGS__); \
+    } while (0)
 #endif
 
 // FATAL(...) will print the fatal error and immediately crash via abort().
